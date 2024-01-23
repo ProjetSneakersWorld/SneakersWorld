@@ -1,0 +1,178 @@
+:root {
+    --gris: rgba(255, 255, 255, .3);
+    --gris-clair: rgba(255, 255, 255, .5);
+    --input: #e0d8f0;
+    --shadow: rgba(0, 0, 0, .2);
+    --bleu-table: #6495ed;
+    --deg1: #da2093;
+    --deg2: #2d3e8f;
+    --error: #c13838;
+    --success: limegreen;
+}
+body {
+    height: 100Vh;
+    background: repeating-linear-gradient(85deg, #b75190, var(--deg2)) fixed;
+}
+
+
+.body {
+    height: 100Vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    font-family: arial, sans-serif;
+}
+
+.welcomDiv{
+    height: 70Vh;
+}
+
+.h1 {
+    font-weight: bold;
+    font-size: xxx-large;
+}
+
+.titreBox{
+    padding-top: 5rem;
+}
+
+.box {
+    max-width: 26rem;
+    font-size: 1.3rem;
+    background: var(--gris);
+    box-shadow: 50px 50px 40px -6px var(--shadow);
+    padding: 3rem;
+    border: 6px solid var(--gris);
+    border-radius: 40px;
+}
+
+.form-group {
+    display: flex;
+    justify-content: space-evenly;
+    margin-bottom: 1rem;
+}
+
+.labels {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    margin: 1rem 1rem 1rem 0;
+    text-align: left;
+}
+
+.inputs {
+    display: flex;
+    flex-direction: column;
+}
+
+.inputs:not(:last-child) {
+    margin-bottom: 1.5rem;
+}
+
+.labels:last-child {
+    margin-top: 4rem;
+}
+
+/* a l'intérieur du rectangle du formulaire */
+.inputs {
+    /*height: 2.3rem;*/
+    /*width: 100%;*/
+    font-size: 1.2rem;
+    background: var(--input);
+    border: 2px solid var(--gris-clair);
+    padding: 1.2rem;
+    outline: none;
+    border-radius: 50px;
+}
+
+.inputs:hover, .inputs:focus {
+    background: rgb(213 157 217 / 50%);
+    transition: all .3s;
+}
+
+/* Espacer les éléments du formulaire */
+.formlabel{
+    margin: 8px 0;
+}
+
+
+.title{
+    font-family: "Nunito", sans-serif;
+    color: #282626;
+    text-align: center;
+    font-size: 40px;
+}
+
+/* Cacher les flèches de l'input number*/
+/* Chrome, Safari, Edge, Opera */
+.inputs::-webkit-outer-spin-button,
+.inputs::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+}
+
+/* Cacher les flèches de l'input number*/
+/* Firefox */
+.inputs[type=number] {
+    -moz-appearance: textfield;
+}
+
+.button {
+    background: var(--input);
+    border: 2px solid var(--gris-clair);
+    padding: 1rem;
+    border-radius: 50px;
+    width: 150px;
+    font-size: 1.2rem;
+    cursor: pointer;
+    text-align: center;
+    transition: all .3s;
+}
+
+.button:hover:enabled, select:hover, .button:hover {
+    background: rgba(205, 220, 55, 0.7);
+    transition: all .3s;
+}
+
+.button:disabled {
+    cursor: not-allowed;
+}
+
+option {
+    background: white;
+}
+
+.popButton {
+    text-decoration: none;
+    padding: 8px;
+    background-color: rgb(56 182 255 / 90%);
+    border-radius: 20px;
+    color: white;
+    border: 2px solid var(--gris-clair);
+    cursor: pointer;
+}
+
+.popButton:hover {
+    background: rgb(214 226 44 / 83%) !important;
+    transition: all .3s;
+}
+
+.info {
+    font-weight: 500;
+    opacity: .7;
+    font-size: 1.2rem;
+    margin-top: 20px;
+    margin-bottom: 20px;
+    text-shadow: 2px 2px 4px var(--shadow);
+}
+
+.success {
+    color: var(--success);
+}
+
+.error {
+    color: var(--error);
+}
+
+
+

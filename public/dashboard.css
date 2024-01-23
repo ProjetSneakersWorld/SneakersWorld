@@ -1,0 +1,430 @@
+:root {
+    --couleur-fond: #0a0a0a;
+    --gris-clair: rgba(164, 214, 232, 0.5);
+    --input: #767386;
+}
+
+body {
+    height: 95Vh;
+    text-align: center;
+    background: repeating-linear-gradient(95deg, #335e8f, #3d734a) fixed;
+}
+
+.titre {
+    padding-top: 3Vmin;
+    color: #e2dfec;
+    font-family: "Arial", ui-serif;
+}
+
+.text {
+    font-family: ui-serif;
+}
+
+/* Styles pour la grille d'images */
+.imagegrid {
+    margin: 1% 17% 2%;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(80px, 1fr));
+    gap: 85px;
+    justify-items: center;
+    align-items: center;
+    font-family: "Calibri", system-ui;
+}
+
+
+.imagecontainer {
+    border-radius: 15px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 143px;
+}
+
+.divBouton{
+    display: flex;
+    flex-direction: column;
+    flex-wrap: wrap;
+    align-items: center;
+    align-content: center;
+    justify-content: center;
+}
+
+/* Styles pour les images */
+img {
+    width: 120px;
+    cursor: pointer;
+    border-radius: 10px;
+}
+
+.imageBouton {
+    width: 45px;
+}
+
+button {
+    margin: 5px;
+    padding: 0.8em 1em;
+    text-align: center;
+    grid-auto-flow: column;
+    grid-gap: .5em;
+    border: solid .25em transparent;
+    border-radius: 9em;
+    /*background: linear-gradient(to right bottom, var(--couleur-fond)) border-box;*/
+}
+
+button:hover {
+    cursor: pointer;
+}
+
+.buttonCategories {
+    text-align: center;
+    grid-auto-flow: column;
+    grid-gap: .5em;
+    border: solid .25em transparent;
+    padding: 1.2em 1.2em;
+    border-radius: 9em;
+    /*background: linear-gradient(to right bottom, var(--couleur-fond)) border-box;*/
+    font: 200 1.1em/ .5 ubuntu, sans-serif;
+}
+
+button:hover {
+    background-color: #e0d8f0;
+}
+.renamebutton:hover {
+    background-color: #9ee3cb !important;
+    color: #ffffff !important;
+}
+
+.deletebutton {
+    background: #ff1e1e;
+}
+
+.deletebutton:hover {
+    background-color: #fa0101 !important;
+    color: #ffffff !important;
+}
+
+.titreImage {
+    text-align: center;
+}
+
+.tailleImage {
+    font-size: 15px;
+    text-align: center;
+}
+
+.deletebutton .renamebutton .compressbutton {
+    margin: 5px;
+    padding: 5px;
+    text-align: center;
+    grid-auto-flow: column;
+    grid-gap: .5em;
+    border: solid .25em transparent;
+    border-radius: 9em;
+    background: linear-gradient(to right bottom, var(--couleur-fond)) border-box;
+}
+
+li {
+    list-style: none;
+    margin: 2rem;
+    background-color: #d0bec7bf;
+    padding: 8px;
+    border-radius: 2%;
+}
+
+
+a {
+    text-decoration: none;
+    color: #000000;
+    padding: 10px;
+}
+
+a:hover {
+    color: #b75190;
+}
+
+
+/* Style pour l'image dans la boîte modale */
+.modal-content-image {
+    width: fit-content;
+    max-width: 100%;
+    max-height: 100%;
+    margin: auto;
+    display: block;
+    object-fit: contain;
+}
+
+/* Style pour le bouton de fermeture */
+.close {
+    color: white;
+    font-size: 30px;
+    font-weight: bold;
+    position: absolute;
+    top: 20px;
+    right: 30px;
+    cursor: pointer;
+}
+
+
+/* style modale chargement*/
+.modal {
+    position: fixed;
+    z-index: 1;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    font-family: Calibri, serif;
+}
+
+.modal-content {
+    background: #e0d8f0 repeating-linear-gradient(95deg, rgba(51, 56, 143, 0.66), rgba(35, 104, 114, 0.65)) fixed;
+    margin: 10% auto;
+    padding: 50px;
+    border: 1px solid #9b9b9b;
+    width: 60%;
+    border-radius: 20px;
+}
+
+.modal-content2 {
+    background: #e0d8f0 repeating-linear-gradient(95deg, rgba(51, 56, 143, 0.66), rgba(35, 104, 114, 0.65)) fixed;
+    margin: 15% auto;
+    padding: 3rem;
+    border: 1px solid #9b9b9b;
+    width: 60%;
+    border-radius: 20px;
+}
+
+.modal-content-close {
+    color: #ee0000;
+    font-size: 20px;
+    font-weight: bold;
+    position: absolute;
+    top: 20px;
+    right: 30px;
+    cursor: pointer;
+}
+
+.logout{
+    padding: 10px 10px 0 0;
+    position: absolute;
+    top: 0;
+    right: 0;
+}
+
+/* Styles pour la barre de progression */
+.progress-container {
+    margin: auto;
+    width: 80%;
+    height: 30px;
+    background-color: #9f9595;
+    border-radius: 30px;
+}
+
+.progress-bar {
+    border-radius: 30px;
+    height: 100%;
+    width: 0;
+    background-image: linear-gradient(225deg, #27d86c 0%, #26aff8 50%, #c625d0 100%);
+    text-align: center;
+    line-height: 30px;
+    color: #000000;
+    /*margin: auto;*/
+}
+.progressNumber{
+    font-size: 19px;
+    margin: 5px;
+}
+
+.loadingText {
+    padding-top: 20px;
+    justify-content: center;
+    align-items: center;
+    display: block;
+    margin: auto;
+    font-size: 18px
+}
+
+/* a l'intérieur du rectangle du formulaire */
+input {
+    margin: auto;
+    font-size: 1rem;
+    background: white;
+    border: 2px solid var(--gris-clair);
+    padding: 12px;
+    outline: none;
+    border-radius: 50px;
+}
+
+input[type="file" i]{
+    border-radius: 15px;
+    text-align: center;
+}
+
+.nameFileFormat {
+    font-size: 1rem;
+    background: white;
+    border: 2px solid var(--gris-clair);
+    padding: 12px;
+    margin: auto auto auto 5px;
+    outline: none;
+    border-radius: 50px;
+}
+.divName{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.nameFolder {
+    font-size: 17px;
+    text-transform: uppercase;
+    color: black;
+    font-weight: bold;
+    font-family: Arial, sans-serif, serif;
+    border: 2px solid rgb(255, 255, 255);
+    background: white;
+    border-radius: 9px;
+    width: 220px;
+    height: 50px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 15px;
+}
+
+.valider {
+    margin: 25px auto;
+    text-align: center;
+    display: block;
+}
+
+.textDoc {
+    font-size: 18px;
+}
+
+.titreDocs {
+    font-size: 26px;
+}
+
+/*input {*/
+/*    appearance: auto;*/
+/*}*/
+
+
+.slider__wrapper {
+    width: 100%;
+    max-width: 600px;
+    margin: 48px auto 0;
+    height: 6px;
+    position: relative;
+}
+
+.buttonUpdate{
+    padding: 20px 50px;
+    font-size: 1.5rem;
+    cursor: pointer;
+    border: 0;
+    background: transparent;
+    position: relative;
+    transition: all .2s;
+    overflow: hidden;
+    color: #fff;
+    border-radius: 30px;
+    box-shadow: 0 -0px 0 0 rgba(143, 64, 248, .5), 0 0 0 0 rgba(39, 200, 255, .5);
+}
+
+.buttonUpdate::after {
+    content: '';
+    width: 400px;
+    height: 400px;
+    position: absolute;
+    top: -50px;
+    left: -100px;
+    background-image: linear-gradient(225deg, #27d86c 0%, #26aff8 50%, #c625d0 100%);
+    z-index: -1;
+    transition: all .5s;
+}
+
+.buttonUpdate:hover::after {
+    transform: rotate(150deg);
+}
+
+.buttonUpdate:hover {
+    transform: translate(0,-6px);
+    box-shadow: 10px -10px 25px 0 rgba(143, 64, 248, .25), -10px 10px 25px 0 rgba(39, 200, 255, .25);
+}
+
+.buttonUpdate:disabled{
+    background-color: #b74242;
+    color: #e0d8f0;
+    cursor: not-allowed;
+}
+
+.progress-container-load-file {
+    margin: auto;
+    width: 450px;
+    height: 7px;
+    background-color: #ddd;
+    border-radius: 20px;
+    overflow: hidden;
+}
+
+.progress-bar-load-file {
+    width: 100%;
+    height: 100%;
+    border-radius: 3px;
+    animation: progressAnimation-load-file 1.5s ease-in-out infinite;
+    background: #1ed568;
+}
+
+@keyframes progressAnimation-load-file {
+    0%, 100% {
+        transform: translateX(-90%);
+    }
+    50% {
+        transform: translateX(90%);
+    }
+}
+
+
+.left-div {
+    flex: 1;
+    border-right: 1px solid white;
+    padding-right: 25px;
+    margin-right: 5px;
+    padding-left: 25px;
+    /*padding-top: 35px;*/
+}
+
+.right-div {
+    flex: 1;
+    padding-left: 25px;
+}
+
+.DeleteFileYes:hover {
+    background: red;
+    color: white;
+}
+
+.totalSize {
+    padding-top: 15px;
+    color: white;
+    font-family: Arial, ui-serif;
+    --darkreader-inline-color: #dcdbd8;
+}
+
+.cdiv {
+    padding-top: 50px;
+    bottom: 0;
+    color: white;
+    font-family: Arial, ui-serif;
+    width: 100%;
+    height: 80px;
+    -moz-border-radius: 35px;
+    border-radius: 35px;
+    position: relative;
+    text-align: center;
+    margin-left: auto;
+    margin-right: auto;
+    user-select: none
+}
