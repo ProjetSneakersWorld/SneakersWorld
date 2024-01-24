@@ -6,6 +6,7 @@ import {router} from "next/router";
 const playerImage = "/images/graphics-sprites 2d-game-character.png"
 const testmaison = "/images/maison.png";
 const fond = "/images/fond.png"
+const sendImage = "/images/send.png"
 
 const PixiComponent = () => {
     const pixiContainer = useRef(null);
@@ -24,9 +25,8 @@ const PixiComponent = () => {
         }
         // Set up Pixi.js
         let renderer = PIXI.autoDetectRenderer({
-
-            width: windowSize.current[0],
-            height: windowSize.current[1]
+            width: windowSize.current[0] - 380,
+            height: windowSize.current[1] - 60
         });
         const backgroundTexture = PIXI.Texture.from(fond);
 
@@ -230,8 +230,12 @@ const PixiComponent = () => {
             </div>
             <div className="pixiContainer">
                 <div className="chatContainer">
-                    <input className="inputs"/>
-                    <button className="button">Send</button>
+                    <div className="chatContainer2">
+                        <input className="inputsChat"/>
+                        <img width="40" height="40"
+                             src={sendImage}
+                             alt="external-send-user-interface-febrian-hidayat-gradient-febrian-hidayat"/>
+                    </div>
                 </div>
                 <div ref={pixiContainer} className="pixi"></div>
             </div>

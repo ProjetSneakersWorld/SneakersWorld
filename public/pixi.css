@@ -34,43 +34,54 @@ body {
 }
 
 .pixiContainer{
+    gap: 10px;
     display: flex;
     justify-content: center;
 }
 
 .chatContainer{
+    width: 250px;
     display: flex;
     flex-direction: row;
+    margin: 5px 5px 10px;
+    align-items: flex-end;
+    background: rgb(63,215,170);
+    background: linear-gradient(0deg, rgba(63, 215, 170, 0.86) 28%, rgba(76, 188, 255, 0.83) 72%);
+    box-shadow: 50px 50px 40px -6px rgba(0, 0, 0, .2);
+    border : 4px solid #dcd9d9;
+    border-radius: 15px;
+}
+.chatContainer2{
+    margin : 5px;
+    display: flex;
     align-items: center;
-    border : 5px solid red;
 }
 
-.inputs {
+.inputsChat{
     /*height: 2.3rem;*/
-    /*width: 100%;*/
-    font-size: 1.2rem;
-    background: var(--input);
-    border: 2px solid var(--gris-clair);
-    padding: 1.2rem;
+    width: 100%;
+    font-size: 1rem;
+    background: white;
+    border: 2px solid rgba(73, 76, 201, 0.86);
+    padding: 0.5rem;
     outline: none;
-    border-radius: 50px;
+    border-radius: 15px;
 }
 
-.button {
-    background: var(--input);
-    border: 2px solid var(--gris-clair);
-    padding: 1rem;
-    border-radius: 50px;
+.buttonChat {
+    background: red;
+    border: 10px solid white;
+    border-radius: 15px;
     width: 150px;
-    font-size: 1.2rem;
+    font-size: 15px;
     cursor: pointer;
     text-align: center;
     transition: all .3s;
 }
 
 .pixi {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 100vh;
+    /*display: flex;*/
+    /*justify-content: center;*/
+    /*align-items: center;*/
+    /*height: 100vh;*/
 }

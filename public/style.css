@@ -1,17 +1,6 @@
-:root {
-    --gris: rgba(255, 255, 255, .3);
-    --gris-clair: rgba(255, 255, 255, .5);
-    --input: #e0d8f0;
-    --shadow: rgba(0, 0, 0, .2);
-    --bleu-table: #6495ed;
-    --deg1: #da2093;
-    --deg2: #2d3e8f;
-    --error: #c13838;
-    --success: limegreen;
-}
 body {
     height: 100Vh;
-    background: repeating-linear-gradient(85deg, #b75190, var(--deg2)) fixed;
+    background: repeating-linear-gradient(85deg, #b75190, #2d3e8f) fixed !important;
 }
 
 
@@ -55,10 +44,10 @@ body {
 .box {
     max-width: 26rem;
     font-size: 1.3rem;
-    background: var(--gris);
-    box-shadow: 50px 50px 40px -6px var(--shadow);
+    background: rgba(255, 255, 255, .3);
+    box-shadow: 50px 50px 40px -6px rgba(0, 0, 0, .2);
     padding: 3rem;
-    border: 6px solid var(--gris);
+    border: 6px solid rgba(255, 255, 255, .3);
     border-radius: 40px;
 }
 
@@ -79,7 +68,7 @@ body {
 .labelsSignup {
     margin: 12px;
     font-size: 1.2rem;
-    /*background: var(--input);*/
+    /*background: rgba(0, 0, 0, .2);*/
     padding: 0.8rem;
     display: flex;
     flex-direction: column;
@@ -100,8 +89,8 @@ body {
     /*height: 2.3rem;*/
     /*width: 100%;*/
     font-size: 1.2rem;
-    background: var(--input);
-    border: 2px solid var(--gris-clair);
+    background: rgba(0, 0, 0, .2);
+    border: 2px solid #f1eff1;
     padding: 1.2rem;
     outline: none;
     border-radius: 50px;
@@ -110,8 +99,8 @@ body {
 .inputsSignup {
     margin: 6px;
     font-size: 1.2rem;
-    background: var(--input);
-    border: 2px solid var(--gris-clair);
+    background: rgba(0, 0, 0, .2);
+    border: 2px solid white;
     padding: 0.8rem;
     outline: none;
     border-radius: 50px;
@@ -149,8 +138,8 @@ body {
 }
 
 .button {
-    background: var(--input);
-    border: 2px solid var(--gris-clair);
+    background: #e0d8f0;
+    border: 2px solid white;
     padding: 1rem;
     border-radius: 50px;
     width: 150px;
@@ -179,7 +168,7 @@ option {
     background-color: rgb(56 182 255 / 90%);
     border-radius: 20px;
     color: white;
-    border: 2px solid var(--gris-clair);
+    border: 2px solid white;
     cursor: pointer;
 }
 
@@ -194,15 +183,15 @@ option {
     font-size: 1.2rem;
     margin-top: 20px;
     margin-bottom: 20px;
-    text-shadow: 2px 2px 4px var(--shadow);
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, .2);
 }
 
 .success {
-    color: var(--success);
+    color: limegreen;
 }
 
 .error {
-    color: var(--error);
+    color: #c13838;
 }
 
 
