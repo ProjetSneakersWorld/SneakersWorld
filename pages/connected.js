@@ -13,13 +13,13 @@ function ConnectedPage() {
         // console.log("TEST token : "+token)
         if (!token) {
             // S'il n'y a pas de token, rediriger vers la page de connexion
-            router.push('/home');
+            router.push('/login');
         } else {
             try {
                 jwt.verify(token, 'secret_key', (err) => {
                     if (err) {
                         // console.error('Error verifying token:', err);
-                        router.push('/home');
+                        router.push('/login');
                     } else {
                         // console.log('Token verified successfully:', decoded);
                         router.push('/pixi/Home');
@@ -28,7 +28,7 @@ function ConnectedPage() {
             } catch (err) {
                 // En cas d'erreur de vérification, rediriger également vers la page de connexion
                 // console.error("Error verifying token:", err);
-                router.push('/home');
+                router.push('/login');
             } finally {
                 setLoading(false);
             }

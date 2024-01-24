@@ -4,18 +4,6 @@ body {
     background: #000000;
 }
 
-.pixi-container {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 100vh;
-}
-
-/*.sneakers-title {*/
-/*    font-size: 24px;*/
-/*    fill: #000;*/
-/*}*/
-
 .house {
     max-width: 50px;
     max-height: 50px;
@@ -25,4 +13,64 @@ body {
     background-color: white;
     border: 1px solid #000;
     padding: 20px;
+}
+
+.divPixi{
+    display: flex;
+    background: black;
+}
+
+.titre{
+    color: white;
+    position: relative;
+    margin: auto;
+    align-items: center;
+    justify-content: center;
+    display: flex;
+    font-family: "Arial", ui-serif;
+    font-size: 37px;
+    padding-top: 15px;
+
+}
+
+.pixiContainer{
+    display: flex;
+    justify-content: center;
+}
+
+.chatContainer{
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    border : 5px solid red;
+}
+
+.inputs {
+    /*height: 2.3rem;*/
+    /*width: 100%;*/
+    font-size: 1.2rem;
+    background: var(--input);
+    border: 2px solid var(--gris-clair);
+    padding: 1.2rem;
+    outline: none;
+    border-radius: 50px;
+}
+
+.button {
+    background: var(--input);
+    border: 2px solid var(--gris-clair);
+    padding: 1rem;
+    border-radius: 50px;
+    width: 150px;
+    font-size: 1.2rem;
+    cursor: pointer;
+    text-align: center;
+    transition: all .3s;
+}
+
+.pixi {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
 }

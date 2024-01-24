@@ -1,7 +1,8 @@
 import React, { useEffect, useRef } from 'react';
+import jwt from 'jsonwebtoken';
 import * as PIXI from 'pixi.js';
 import '/public/pixi.css';
-import {router} from "next/client";
+import {router} from "next/router";
 const playerImage = "/images/graphics-sprites 2d-game-character.png"
 const testmaison = "/images/maison.png";
 const fond = "/images/fond.png"
@@ -221,21 +222,51 @@ const PixiComponent = () => {
 
     return (
         <div>
-            <div style={{display: "flex"}}>
-                <p style={{
-                    color: "white", position: "relative",
-                    margin: "auto",
-                    alignItems: "center",
-                    justifyContent: "center", display: "flex", fontFamily: "Arial", fontSize: "37px", paddingTop: "15px"
-                }}>Sneakers World</p>
+            <div className="divPixi">
+                <p className="titre">Sneakers World</p>
                 <div style={{display: "flex", alignItems: "center", paddingRight: "15px"}} onClick={()=>router.push('/logout')}>
                     <button style={{color: "black", fontFamily: "Arial", fontSize: "17px"}}>Logout</button>
                 </div>
             </div>
-            <div ref={pixiContainer} className="pixi-container"></div>
+            <div className="pixiContainer">
+                <div className="chatContainer">
+                    <input className="inputs"/>
+                    <button className="button">Send</button>
+                </div>
+                <div ref={pixiContainer} className="pixi"></div>
+            </div>
         </div>
     );
 };
+
+export async function getServerSideProps(context) {
+    const {req} = context;
+    const token = req.cookies.TOKEN;
+    if (!token) {
+        return {
+            redirect: {
+                destination: '/',
+                permanent: false,
+            },
+        };
+    } else {
+        try {
+            jwt.verify(token, 'secret_key');
+        } catch (err) {
+            // console.error('Error verifying token:', err);
+            return {
+                redirect: {
+                    destination: '/',
+                    permanent: false,
+                },
+            };
+        }
+    }
+
+    return {
+        props: {},
+    };
+}
 
 export default PixiComponent;
 

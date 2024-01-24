@@ -1,11 +1,11 @@
-// pages/home.js
+// pages/login.js
 import React, {useEffect} from 'react';
 import "../public/style.css"
 import Cookies from "js-cookie";
 import jwt from "jsonwebtoken";
 import {useRouter} from "next/router";
 
-const Home = () => {
+const Login = () => {
     const router = useRouter();
 
     useEffect(() => {
@@ -16,7 +16,7 @@ const Home = () => {
                 jwt.verify(token, 'secret_key', (err) => {
                     if (err) {
                         // console.error('Error verifying token:', err);
-                        router.push('/home');
+                        router.push('/login');
                     } else {
                         // console.log('Token verified successfully:', decoded);
                         router.push('/pixi/Home');
@@ -25,7 +25,7 @@ const Home = () => {
             } catch (err) {
                 // En cas d'erreur de vérification, rediriger également vers la page de connexion
                 // console.error("Error verifying token:", err);
-                router.push('/home');
+                router.push('/login');
             }
         }
     }, [router]);
@@ -46,10 +46,15 @@ const Home = () => {
 
         if (response.status === 200) {
             // Rediriger vers la page de connexion réussie
-            window.location.href = "/connected";
+            // window.location.href = "/connected";
+            await router.push("/connected");
         } else if (response.status === 401) {
             document.getElementById("error").innerText = "identifiant ou mot de passe incorrect";
         }
+    };
+
+    const handleClick = (route) => {
+        router.push(route);
     };
 
     return (
@@ -74,7 +79,10 @@ const Home = () => {
                     <p id="error" className="error"></p>
                 </form>
             </div>
+            <div style={{paddingTop: "15px"}}>
+                <button className="button" onClick={() => handleClick('/')}>Retour</button>
+            </div>
         </div>);
 };
 
-export default Home;
+export default Login;

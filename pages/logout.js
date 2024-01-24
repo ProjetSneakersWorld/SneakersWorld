@@ -2,7 +2,6 @@
 import { useEffect } from 'react';
 import { useRouter } from 'next/router';
 import { useState } from 'react';
-import '../public/dashboard.css';
 
 const Logout = () => {
     const router = useRouter();
@@ -15,7 +14,7 @@ const Logout = () => {
         // Attend 3 secondes avant de rediriger vers '/home'
         setTimeout(() => {
             setLoading(false);
-            router.push('/home');
+            router.push('/');
         }, 2000); // 3000 millisecondes équivalent à 3 secondes
     }, []);
 
