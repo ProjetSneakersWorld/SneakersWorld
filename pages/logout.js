@@ -10,6 +10,7 @@ const Logout = () => {
     useEffect(() => {
         // Supprime le cookie nommé 'TOKEN'
         document.cookie = 'TOKEN=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
+        document.cookie = 'Pseudo=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
 
         // Attend 3 secondes avant de rediriger vers '/home'
         setTimeout(() => {
