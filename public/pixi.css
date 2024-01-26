@@ -76,7 +76,10 @@ body {
     display: flex;
     flex-direction: column;
     align-items: flex-start;
+    overflow-y: auto; /* Ajoutez cette ligne */
+    max-height: 80VH;
 }
+
 
 .messageContainer {
     width: fit-content;
@@ -118,6 +121,11 @@ body {
     width: fit-content;
 }
 
+.messageVide{
+    margin:auto;
+    font-family: "Arial", ui-serif;
+   padding-top: 15px;
+}
 
 .inputsChat{
     /*height: 2.3rem;*/

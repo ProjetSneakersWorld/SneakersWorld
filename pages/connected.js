@@ -21,6 +21,7 @@ function ConnectedPage() {
                         // console.error('Error verifying token:', err);
                         router.push('/login');
                     } else {
+                        //aller chercher les infos user
                         // console.log('Token verified successfully:', decoded);
                         router.push('/pixi/Home');
                     }

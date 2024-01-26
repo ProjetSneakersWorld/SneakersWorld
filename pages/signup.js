@@ -6,6 +6,7 @@ import {router} from "next/router";
 const Signup = () => {
     const [pseudoError, setPseudoError] = useState("");
     const checkPseudo = async (event) => {
+        document.getElementById("validInscription").disabled = true;
         const pseudo = event.target.value;
 
         const response = await fetch("/api/checkPseudo", {
@@ -19,6 +20,7 @@ const Signup = () => {
         if (response.status === 409) {
             setPseudoError("Ce pseudo existe déjà");
         } else {
+            document.getElementById("validInscription").disabled = false;
             setPseudoError("");
         }
     };
@@ -38,10 +40,24 @@ const Signup = () => {
             body: JSON.stringify({name, lastName, pseudo, newPassword}),
         });
 
+        let idf = pseudo;
+        let mdp = newPassword;
         if (response.status === 200) {
-            // Rediriger vers la page pixi
-            router.push('/login');
-            console.log("Inscription réussi")
+            const response = await fetch("/api/home", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({idf, mdp}),
+            });
+
+            if (response.status === 200) {
+                // Rediriger vers la page de connexion réussie
+                // window.location.href = "/connected";
+                await router.push("/connected");
+            } else if (response.status === 401) {
+                document.getElementById("error").innerText = "identifiant ou mot de passe incorrect";
+            }
         } else if (response.status === 401) {
             document.getElementById("error").innerText = "erreur";
         } else if (response.status === 409) {
@@ -78,7 +94,7 @@ const Signup = () => {
                         </div>
                     </div>
                     <br/>
-                    <button className="button" type='submit'>Inscription</button>
+                    <button className="button" id="validInscription" type='submit'>Inscription</button>
                     <p id="error" className="error"></p>
                 </form>
             </div>

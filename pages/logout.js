@@ -16,7 +16,7 @@ const Logout = () => {
         setTimeout(() => {
             setLoading(false);
             router.push('/');
-        }, 2000); // 3000 millisecondes équivalent à 3 secondes
+        }, 200); // 3000 millisecondes équivalent à 3 secondes
     }, []);
 
     return loading ? (

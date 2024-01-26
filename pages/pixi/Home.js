@@ -1,234 +1,185 @@
 import React, {useEffect, useRef, useState} from 'react';
 import jwt from 'jsonwebtoken';
-import * as PIXI from 'pixi.js';
+import * as PIXI from "pixi.js"
+import {Tilemap} from '@pixi/tilemap';
+import {Assets} from '@pixi/assets';
 import '/public/pixi.css';
 import {router} from "next/router";
-const playerImage = "/images/graphics-sprites 2d-game-character.png"
-const testmaison = "/images/maison.png";
-const fond = "/images/fond.png"
 const sendImage = "/images/send.png"
 import {createClient} from "@supabase/supabase-js";
 import Cookies from "js-cookie";
 
 const supabase = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY);
 
+
 const PixiComponent = () => {
     const pixiContainer = useRef(null);
-    let keys = {};
-    const onKeyDown = (e) => {
-        keys[e.keyCode] = true;
-    };
-
-    const onKeyUp = (e) => {
-        keys[e.keyCode] = false;
-    };
     const windowSize = useRef([0, 0]);
+
     useEffect(() => {
         if (typeof window !== 'undefined') {
             windowSize.current = [window.innerWidth, window.innerHeight];
         }
+
         // Set up Pixi.js
         let renderer = PIXI.autoDetectRenderer({
             width: windowSize.current[0] - 380,
             height: windowSize.current[1] - 110
         });
-        const backgroundTexture = PIXI.Texture.from(fond);
 
-        // Create a new sprite with the texture
-        const backgroundSprite = new PIXI.Sprite(backgroundTexture);
-
-        // Resize the sprite to fill the screen
-        backgroundSprite.width = renderer.width;
-        backgroundSprite.height = renderer.height;
-
-        // Add the sprite to the stage
-
+        // Add the renderer view element to the DOM
         pixiContainer.current.innerHTML = ""; // Clear the container
         pixiContainer.current.appendChild(renderer.view);
-        // Create a container for the scene and the blue border
-        const sceneContainer = new PIXI.Container();
-        const maison = new PIXI.Sprite(PIXI.Texture.from(testmaison));
-        maison.width = 588 / 3.75;
-        maison.height = 678 / 3.75;
-        maison.position.set(renderer.width / 1.28, renderer.height / 8); // Positionnez le sprite au centre de la scène
-        sceneContainer.addChild(maison);
-        const maison1 = new PIXI.Sprite(PIXI.Texture.from(testmaison));
-        maison1.width = 588 / 3.75;
-        maison1.height = 678 / 3.75;
-        maison1.position.set(renderer.width / 1.75, renderer.height / 8); // Positionnez le sprite au centre de la scène
-        sceneContainer.addChild(maison1);
-        const border = new PIXI.Graphics();
-        border.lineStyle(15, 0xe1dbdb); // Line style: 5 pixels width, blue color
-        border.drawRect(0, 0, renderer.width, renderer.height - 60); // Draw a rectangle around the scene
-        sceneContainer.addChild(border);
+
         // Create the stage
         const stage = new PIXI.Container();
-        let spriteSheet = PIXI.Texture.from(playerImage);
-        let characterTextures = {
-            down: [],
-            left: [],
-            right: [],
-            up: []
-        };
 
-        // Utilisez une boucle pour extraire chaque sprite de la feuille de sprites
-        for (let i = 1; i < 6; i++) {
-            let frame = new PIXI.Rectangle(i * 100, 0, 100, 100); // Remplacez 0 par la ligne appropriée pour chaque direction
-            characterTextures.down.push(new PIXI.Texture(spriteSheet.baseTexture, frame));
-            frame = new PIXI.Rectangle(i * 100, 100, 100, 100);
-            characterTextures.up.push(new PIXI.Texture(spriteSheet.baseTexture, frame));
-            frame = new PIXI.Rectangle(i * 100, 200, 100, 100);
-            characterTextures.right.push(new PIXI.Texture(spriteSheet.baseTexture, frame));
-        }
+        Assets.load('/map.json').then((resources) => {
+            // Check if 'data' property exists
+            if (resources && resources.data) {
+                const data = resources.data;
 
-        // Create the "player" using the texture
-        const player = new PIXI.Sprite(characterTextures.down[0]);
-        player.anchor.set(0.5); // Centre l'origine du sprite
-        player.position.set(renderer.width / 2, renderer.height / 2);
-        sceneContainer.addChild(player);
+                // Assuming your Tiled map uses a single tileset image
+                const tileset = PIXI.Texture.from('/map_principal.png');
+                const tilemap = new Tilemap([tileset.baseTexture]);
+                stage.addChild(tilemap);
 
-        // Créez le texte
-        let styleText = new PIXI.TextStyle({
-            fontFamily: 'Verdana', // Remplacez "NouvellePolice" par le nom de la police que vous souhaitez utiliser
-            fontSize: 32, // Remplacez par la taille de police souhaitée
-            fill: 0xFFFFFF, // Couleur du texte en hexadécimal
-            align: 'center', // Alignement du texte
-        });
-        // Créez le texte
-        let houseText = new PIXI.Text('Chat', styleText);
-        houseText.anchor.set(0.5); // Centre l'origine du texte
-        houseText.position.set(renderer.width / 2.63, renderer.height / 4.1); // Positionnez le texte au-dessus du centre de la scène
+                // Loop through each layer in the Tiled map
+                for (let layer of data.layers) {
+                    // Loop through each tile in the layer
+                    for (let y = 0; y < data.height; y++) {
+                        for (let x = 0; x < data.width; x++) {
+                            const i = x + y * data.width;
+                            const id = layer.data[i] - 1; // Tiled IDs are one-indexed
+                            if (id >= 0) {
+                                // Calculate the tileset position of the tile
+                                const tx = id % (tileset.width / data.tilewidth);
+                                const ty = Math.floor(id / (tileset.width / data.tilewidth));
+                                const texture = new PIXI.Texture(tileset, new PIXI.Rectangle(tx * data.tilewidth, ty * data.tileheight, data.tilewidth, data.tileheight));
 
-        // Create a text for the prompt
-        const promptText = new PIXI.Text("Rentrer dans cette maison ?", { fill: 0xffffff });
-        promptText.anchor.set(0.5);
-        promptText.visible = false; // Hide the text initially
-        stage.addChild(backgroundSprite);
-        stage.addChild(sceneContainer);
-        stage.addChild(promptText);
-        stage.addChild(houseText);
+                                // Create a sprite and add it to the tilemap layer
+                                const sprite = new PIXI.Sprite(texture);
+                                sprite.position.set(x * data.tilewidth, y * data.tileheight);
+                                tilemap.addChild(sprite);
+                            }
+                        }
+                    }
+                }
 
-        animate();
-
-        // Ajoutez ces lignes avant vos contrôles de mouvement
-        let houseRect = new PIXI.Rectangle(houseText.position.x, houseText.position.y, houseText.width, houseText.height);
-        let playerRect = new PIXI.Rectangle(player.position.x, player.position.y, player.width, player.height);
-        let rightStepCounter = 0;
-        let downStepCounter = 0;
-        let upStepCounter = 0;
-        let isWalking = false;
-        function animate() {
-            // Render the stage
-            renderer.render(stage);
-            // Check the distance between the player and the house
-            const distance = Math.sqrt(Math.pow(maison.position.x - player.position.x, 2) + Math.pow(maison.position.y - player.position.y, 2));
-            if (distance < 250) {
-                // If the player is close to the house, show the prompt
-                promptText.visible = true;
-                promptText.position.set(player.position.x, player.position.y - player.height / 2 - promptText.height);
+                // Render the stage
+                renderer.render(stage);
             } else {
-                // If the player is not close to the house, hide the prompt
-                promptText.visible = false;
+                console.error("Failed to load Tiled map. Check the path and format of the file.");
             }
-            const timeOut = 100;
-            // Modifiez la partie du code qui gère le mouvement vers la gauche comme suit :
-            if (keys[37] && player.position.x - 3 > 0 && !houseRect.contains(playerRect.x - 3, playerRect.y)) { // gauche
-                if (!isWalking) {
-                    isWalking = true;
-                    player.texture = characterTextures.right[rightStepCounter % 5];
-                    player.scale.x = -1;
-                    rightStepCounter++;
-
-                    setTimeout(() => {
-                        isWalking = false;
-                    }, timeOut); // Ajoutez le temps d'attente ici (200 millisecondes dans cet exemple)
-                }
-                player.position.x -= 2;
-            }
-            if (keys[38] && player.position.y - 5 > 0 && !houseRect.contains(playerRect.x, playerRect.y - 3)) { // haut
-                if (!isWalking) {
-                    isWalking = true;
-                    player.texture = characterTextures.up[upStepCounter % 5];
-                    player.scale.x = 1;
-                    upStepCounter++;
-                    setTimeout(() => {
-                        isWalking = false;
-                    }, timeOut);
-                }
-                player.position.y -= 2;
-            }
-            // Modifiez la partie du code qui gère le mouvement vers la droite comme suit :
-            if (keys[39] && player.position.x + 5 < renderer.width && !houseRect.contains(playerRect.x + 3, playerRect.y)) { // droite
-                if (!isWalking) {
-                    isWalking = true;
-                    player.texture = characterTextures.right[rightStepCounter % 5];
-                    player.scale.x = 1;
-                    rightStepCounter++;
-
-                    setTimeout(() => {
-                        isWalking = false;
-                    }, timeOut);
-                }
-                player.position.x += 2;
-            }
-            if (keys[40] && player.position.y + 5 < renderer.height && !houseRect.contains(playerRect.x, playerRect.y + 3)) { // bas
-                if (!isWalking) {
-                    isWalking = true;
-                    player.texture = characterTextures.down[downStepCounter % 5];
-                    player.scale.x = 1;
-                    downStepCounter++;
-
-                    setTimeout(() => {
-                        isWalking = false;
-                    }, timeOut);
-                }
-                player.position.y += 2;
-            }
-            checkCollision();
-            requestAnimationFrame(animate);
-        }
-
-        window.addEventListener('keydown', function(e) {
-            keys[e.keyCode] = true;
         });
-        window.addEventListener('keyup', function(e) {
-            keys[e.keyCode] = false;
-        });
-        window.addEventListener('keydown', onKeyDown);
-        window.addEventListener('keyup', onKeyUp);
-// Ajoutez un écouteur d'événements pour le redimensionnement de la fenêtre
-// Define the resize function
-        const onResize = () => {
-            // Update the renderer size
-            renderer.resize(window.innerWidth, window.innerHeight);
-            // Update the position of the elements based on the new window size
-            player.position.set(renderer.width / 2, renderer.height / 2);
-            maison.position.set(renderer.width / 2, renderer.height / 2.7);
-            houseText.position.set(renderer.width / 2, renderer.height / 4);
-        };
 
-        return () => {
-            window.removeEventListener('keydown', onKeyDown);
-            window.removeEventListener('keyup', onKeyUp);
-            window.removeEventListener('resize', onResize);
-        };
-
-// Ajoutez un écouteur d'événements pour vérifier si le personnage touche la boule
-        function checkCollision() {
-            let playerRect = new PIXI.Rectangle(player.position.x, player.position.y, player.width, player.height);
-            let maisonRect = new PIXI.Rectangle(maison.position.x, maison.position.y, maison.width, maison.height);
-            if (playerRect.intersects(maisonRect)) {
-                // Chargez la nouvelle scène
-                router.push('/pixi/NewScene');
-            }
-        }
     }, []);
 
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    //CODE gestion de le BD supabase
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
     let lastAuthor = null;
+    const [id_USER, setId_USER] = useState('null');
+
     useEffect(() => {
         //choper le cookies pseudo
         document.getElementById("PseudoName").innerText = "Welcome, " + Cookies.get('Pseudo');
+        let messageContainer = document.getElementById('messageContainer');
+
+        //récupere l'id du pseudo
+        const fetchId_Pseudo = async () => {
+            try {
+                let pseudoCookies = Cookies.get('Pseudo')
+                let {data: id, error} = await supabase
+                    .from('connexion')
+                    .select('id')
+                    .eq('pseudo', pseudoCookies);
+
+                if (error) throw error; // Si une erreur est renvoyée par supabase, la propager
+
+                // console.log(id[0].id):
+                setId_USER(id[0].id);
+            } catch (error) {
+                console.error('Une erreur est survenue lors de la récupération de l\'ID :', error);
+                // Gérer l'erreur comme vous le souhaitez
+            }
+        }
+
+
+        // Récupérer tous les messages existants
+        const fetchMessages = async () => {
+            let {data: messages, error} = await supabase
+                .from('message')
+                .select('*')
+                .order('id', {ascending: true});
+
+            if (error) console.log('Error fetching messages: ', error);
+            else {
+                if (messages.length === 0) {
+                    // Afficher un message si aucun message n'est disponible
+                    messageContainer.className = "messageVide";
+                    const messageVideP = document.createElement("p");
+                    messageVideP.id = "messageVideP";
+                    messageVideP.innerText = "Aucun message disponible";
+
+                    messageContainer.appendChild(messageVideP);
+
+                    setIsLoading(false);
+                } else {
+                    for (const message of messages) {
+                        const pseudo = await pseudoMessage(message.id_user);
+                        displayMessage(pseudo, message);
+                    }
+                }
+            }
+        };
+
+
+        // Fonction pour afficher un message
+        const displayMessage = (pseudo, message) => {
+            // Si l'auteur du message est différent du dernier auteur
+            if (pseudo !== lastAuthor) {
+                // Créer une nouvelle div pour l'auteur du message
+                const newAuthorDiv = document.createElement("div");
+                newAuthorDiv.className = "messageAuthor";
+
+                // Créer un nouveau paragraphe pour l'auteur du message
+                const newAuthorP = document.createElement("p");
+                newAuthorP.id = "messageAuthor";
+                const newAuthorContent = document.createTextNode(pseudo);
+                newAuthorP.appendChild(newAuthorContent);
+
+                // Ajouter le paragraphe à la div de l'auteur du message
+                newAuthorDiv.appendChild(newAuthorP);
+
+                // Ajouter la nouvelle div à l'élément messageContainer
+                messageContainer.appendChild(newAuthorDiv);
+
+                // Mettre à jour l'auteur du dernier message
+                lastAuthor = pseudo;
+            }
+
+            // Créer une nouvelle div pour le message
+            const newMessageDiv = document.createElement("div");
+            newMessageDiv.className = "messageContainer";
+
+            // Créer un nouveau paragraphe pour le message
+            const newMessageP = document.createElement("p");
+            newMessageP.id = "message";
+            const newMessageContent = document.createTextNode(message.message);
+            newMessageP.appendChild(newMessageContent);
+
+            // Ajouter le paragraphe à la div du message
+            newMessageDiv.appendChild(newMessageP);
+
+            // Ajouter la nouvelle div à l'élément messageContainer
+            messageContainer.appendChild(newMessageDiv);
+            setIsLoading(false);
+        };
+
+        fetchMessages();
+        fetchId_Pseudo();
 
         // Créer un canal pour écouter les changements dans la table "message"
         supabase.channel('custom-all-channel')
@@ -236,76 +187,40 @@ const PixiComponent = () => {
                 'postgres_changes',
                 {event: 'INSERT', schema: 'public', table: 'message'},
                 async (payload) => {
-                    // console.log('Change received : ', payload.new.message)
-                    // console.log('Change received : ', payload)
-                    // console.log(userMessage(payload.new.id_user));
-                    const pseudo = await userMessage(payload.new.id_user);
-
-                    // Si l'auteur du nouveau message est différent du dernier auteur
-                    if (pseudo !== lastAuthor) {
-                        // Créer une nouvelle div pour l'auteur du message
-                        const newAuthorDiv = document.createElement("div");
-                        newAuthorDiv.className = "messageAuthor";
-
-                        // Créer un nouveau paragraphe pour l'auteur du message
-                        const newAuthorP = document.createElement("p");
-                        newAuthorP.id = "messageAuthor";
-                        const newAuthorContent = document.createTextNode(pseudo);
-                        newAuthorP.appendChild(newAuthorContent);
-
-                        // Ajouter le paragraphe à la div de l'auteur du message
-                        newAuthorDiv.appendChild(newAuthorP);
-
-                        // Ajouter la nouvelle div à l'élément messageContainer
-                        messageContainer.appendChild(newAuthorDiv);
-
-                        // Mettre à jour l'auteur du dernier message
-                        lastAuthor = pseudo;
-                    }
-
-                    // Créer une nouvelle div pour le message
-                    const newMessageDiv = document.createElement("div");
-                    newMessageDiv.className = "messageContainer";
-
-                    // Créer un nouveau paragraphe pour le message
-                    const newMessageP = document.createElement("p");
-                    newMessageP.id = "message";
-                    const newMessageContent = document.createTextNode(payload.new.message);
-                    newMessageP.appendChild(newMessageContent);
-
-                    // Ajouter le paragraphe à la div du message
-                    newMessageDiv.appendChild(newMessageP);
-
-                    // Ajouter la nouvelle div à l'élément messageContainer
-                    messageContainer.appendChild(newMessageDiv);
-
+                    const pseudo = await pseudoMessage(payload.new.id_user);
+                    displayMessage(pseudo, payload.new);
+                    setIsLoading(false);
                 }
             )
-            .subscribe()
+            .subscribe();
     }, []);
 
 
     const sendMessage = async () => {
         let msg = document.getElementById('inputMessage').value;
-        document.getElementById('inputMessage').value = "";
-        if (msg === "") {
-            document.getElementById("erreurSend").innerText = "Message vide !"
-        } else {
-            setIsLoading(true);
-            try {
-                const {data, error} = await supabase
-                    .from('message')
-                    .insert([
-                        //TODO changer le 3 en recuperant le id_user de la personne qui est connecté actuelement
-                        {id_user: '3', message: msg, timestamp: '2024-01-26 15:40:35', place: 'home'},
-                    ])
-                    .select()
-            } catch (error) {
-                console.error("Une erreur s'est produite lors de la récupération des données :", error);
-            }
-            setIsLoading(false);
+        document.getElementById('messageContainer').className = "";
+        if (document.getElementById('messageVideP')) {
+            document.getElementById('messageVideP').remove();
         }
-
+        if (id_USER === null || id_USER === undefined) {
+            console.log("erreur lors de la recuperation de l'id du pseudo !!")
+        } else {
+            if (msg === "") {
+                document.getElementById("erreurSend").innerText = "Message vide !"
+            } else {
+                setIsLoading(true);
+                try {
+                    const {data, error} = await supabase
+                        .from('message')
+                        .insert([
+                            {id_user: id_USER, message: msg, timestamp: '2024-01-26 15:40:35', place: 'home'},
+                        ])
+                        .select()
+                } catch (error) {
+                    console.error("Une erreur s'est produite lors de la récupération des données :", error);
+                }
+            }
+        }
     }
 
     const Rolling = () => (
@@ -348,13 +263,14 @@ const PixiComponent = () => {
         </svg>
     );
 
-    const userMessage = async (id_user_message) => {
+    const pseudoMessage = async (id_user_message) => {
         //choper le pseudo de l'utilisateur qui a send un msg
 
         // Récupérer tous les messages
         let {data: messages, error} = await supabase
             .from('message')
             .select('*');
+        // console.log(messages)
         if (error) {
             console.error('Erreur lors de la récupération des messages:', error);
             return;
@@ -374,12 +290,19 @@ const PixiComponent = () => {
             // console.log(user)
             if (user[0] !== undefined) {
                 // Afficher le pseudo de l'utilisateur
-                console.log('Pseudo:', user[0].pseudo);
-                return user[0].pseudo
+                // console.log('Pseudo:', user[0].pseudo);
+                // Convertir le timestamp en objet Date
+                const date = new Date(messages[0].timestamp);
+                // Créer un objet de formateur de date avec le fuseau horaire de Paris
+                const options = {timeZone: "Europe/Paris", hour: "numeric", minute: "numeric"};
+                // Formater la date en heures et minutes avec le fuseau horaire de Paris
+                const heureMinuteParis = new Intl.DateTimeFormat('fr-FR', options).format(date);
+
+                return user[0].pseudo + " " + heureMinuteParis
             }
         }
     }
-    const [isLoading, setIsLoading] = useState(false);
+    const [isLoading, setIsLoading] = useState(true);
     return (
         <div>
             <div className="divPixi">
@@ -408,18 +331,31 @@ const PixiComponent = () => {
                         {isLoading ? (
                             <div>
                                 <Rolling/>
+                                <p style={{
+                                    display: "flex",
+                                    justifyContent: "center",
+                                    fontFamily: "Arial,ui-serif"
+                                }}>Chargement ...</p>
                             </div>
                         ) : (
+
                             <div className="chatContainer3">
-                                <input className="inputsChat" maxLength="45" id="inputMessage" required/>
-                                <img
-                                    width="35"
-                                    height="35"
-                                    style={{cursor: "pointer"}}
-                                    src={sendImage}
-                                    alt="external-send-user-interface-febrian-hidayat-gradient-febrian-hidayat"
-                                    onClick={() => sendMessage()}
-                                />
+                                <form style={{display: "flex", alignItems: "center"}} onSubmit={(e) => {
+                                    e.preventDefault(); // Empêche le rechargement de la page
+                                    sendMessage();
+                                }}>
+                                    <input className="inputsChat" maxLength="45" id="inputMessage"
+                                           placeholder="écrire un message" required/>
+                                    <button type="submit" style={{background: "none", border: "none"}}>
+                                        <img
+                                            width="35"
+                                            height="35"
+                                            style={{display: "flex", alignItems: "center", cursor: "pointer"}}
+                                            src={sendImage}
+                                            alt="external-send-user-interface-febrian-hidayat-gradient-febrian-hidayat"
+                                        />
+                                    </button>
+                                </form>
                             </div>
                         )}
                     </div>
