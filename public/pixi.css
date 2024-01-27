@@ -49,9 +49,14 @@ body {
 }
 
 .pixiContainer{
-    gap: 10px;
+    gap: 2rem;
     display: flex;
     justify-content: center;
+}
+.ChatName{
+    color: white;
+    font-size: 2VH;
+    font-family: "Arial", ui-serif;
 }
 .pixiContainerTitle{
     font-family: "Arial", ui-serif  ;
@@ -71,21 +76,23 @@ body {
     border-radius: 15px;
 }
 .chatContainer2{
+    height: 79VH;
     bottom: 0;
     margin : 5px;
     display: flex;
     flex-direction: column;
     align-items: flex-start;
-    overflow-y: auto; /* Ajoutez cette ligne */
-    max-height: 80VH;
+    overflow-y: auto;
+    max-height: 79VH;
 }
+
 
 
 .messageContainer {
     width: fit-content;
     display: flex;
     font-family: "Arial", ui-serif;
-    margin: 5px;
+    margin: 0.1rem;
     background: rgb(218, 226, 231);
     border-radius: 15px;
     padding: 1px 15px;
@@ -95,7 +102,7 @@ body {
 
 .messageAuthor {
     margin-bottom: -9px;
-    padding-top: 15px;
+    padding-top: 1px;
     padding-left: 15px;
     font-family: "Arial", ui-serif;
     font-size: 15px;

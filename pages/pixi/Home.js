@@ -8,7 +8,7 @@ import {router} from "next/router";
 const sendImage = "/images/send.png"
 import {createClient} from "@supabase/supabase-js";
 import Cookies from "js-cookie";
-
+import moment from 'moment-timezone';
 const supabase = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY);
 
 
@@ -76,65 +76,76 @@ const PixiComponent = () => {
     }, []);
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    //CODE gestion de le BD supabase
+    //CODE Chat et gestion de le BD supabase
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
     let lastAuthor = null;
     const [id_USER, setId_USER] = useState('null');
+    const [isLoading, setIsLoading] = useState(true);
 
     useEffect(() => {
         //choper le cookies pseudo
         document.getElementById("PseudoName").innerText = "Welcome, " + Cookies.get('Pseudo');
         let messageContainer = document.getElementById('messageContainer');
 
-        //récupere l'id du pseudo
-        const fetchId_Pseudo = async () => {
-            try {
-                let pseudoCookies = Cookies.get('Pseudo')
-                let {data: id, error} = await supabase
-                    .from('connexion')
-                    .select('id')
-                    .eq('pseudo', pseudoCookies);
-
-                if (error) throw error; // Si une erreur est renvoyée par supabase, la propager
-
-                // console.log(id[0].id):
-                setId_USER(id[0].id);
-            } catch (error) {
-                console.error('Une erreur est survenue lors de la récupération de l\'ID :', error);
-                // Gérer l'erreur comme vous le souhaitez
-            }
-        }
-
-
-        // Récupérer tous les messages existants
-        const fetchMessages = async () => {
-            let {data: messages, error} = await supabase
+        const fetchMessagesAndUsers = async () => {
+            // Récupérer tous les messages
+            let {data: messages, error2} = await supabase
                 .from('message')
-                .select('*')
-                .order('id', {ascending: true});
+                .select('*');
 
-            if (error) console.log('Error fetching messages: ', error);
-            else {
-                if (messages.length === 0) {
-                    // Afficher un message si aucun message n'est disponible
-                    messageContainer.className = "messageVide";
-                    const messageVideP = document.createElement("p");
-                    messageVideP.id = "messageVideP";
-                    messageVideP.innerText = "Aucun message disponible";
+            if (error2) {
+                console.error('Erreur lors de la récupération des messages:', error);
+                return;
+            }
+            // Si aucun message n'est disponible, afficher un message
+            if (messages.length === 0) {
+                // Afficher un message si aucun message n'est disponible
+                messageContainer.className = "messageVide";
+                const messageVideP = document.createElement("p");
+                messageVideP.id = "messageVideP";
+                messageVideP.innerText = "Aucun message disponible";
+                messageContainer.appendChild(messageVideP);
+                setIsLoading(false);
+                return;
+            }
 
-                    messageContainer.appendChild(messageVideP);
+            // Récupérer tous les utilisateurs
+            let {data: users, error} = await supabase
+                .from('connexion')
+                .select('*');
+            if (error) {
+                console.error('Erreur lors de la récupération des utilisateurs:', error);
+                return;
+            }
 
-                    setIsLoading(false);
-                } else {
-                    for (const message of messages) {
-                        const pseudo = await pseudoMessage(message.id_user);
-                        displayMessage(pseudo, message);
-                    }
+            // Créer un objet pour faciliter la recherche des pseudos
+            const usersById = users.reduce((acc, user) => ({...acc, [user.id]: user.pseudo}), {});
+
+            // Afficher tous les messages
+            for (let message of messages) {
+                const pseudo = usersById[message.id_user];
+                if (pseudo) {
+                    displayMessage(pseudo, message);
                 }
             }
         };
 
+        fetchMessagesAndUsers();
+
+
+        // Créer un canal pour écouter les changements dans la table "message"
+        supabase.channel('custom-all-channel')
+            .on(
+                'postgres_changes',
+                {event: 'INSERT', schema: 'public', table: 'message'},
+                async (payload) => {
+                    const pseudo = await pseudoMessage(payload.new.id_user);
+                    displayMessage(pseudo, payload.new);
+                    setIsLoading(false);
+                }
+            )
+            .subscribe();
 
         // Fonction pour afficher un message
         const displayMessage = (pseudo, message) => {
@@ -178,22 +189,31 @@ const PixiComponent = () => {
             setIsLoading(false);
         };
 
-        fetchMessages();
-        fetchId_Pseudo();
-
-        // Créer un canal pour écouter les changements dans la table "message"
-        supabase.channel('custom-all-channel')
-            .on(
-                'postgres_changes',
-                {event: 'INSERT', schema: 'public', table: 'message'},
-                async (payload) => {
-                    const pseudo = await pseudoMessage(payload.new.id_user);
-                    displayMessage(pseudo, payload.new);
-                    setIsLoading(false);
-                }
-            )
-            .subscribe();
     }, []);
+
+    useEffect(() => {
+        // Récupérer l'id du pseudo
+        const fetchId_Pseudo = async () => {
+            try {
+                let pseudoCookies = Cookies.get('Pseudo')
+                let {data: id, error} = await supabase
+                    .from('connexion')
+                    .select('id')
+                    .eq('pseudo', pseudoCookies);
+
+                if (error) throw error; // Si une erreur est renvoyée par supabase, la propager
+
+                setId_USER(id[0].id);
+            } catch (error) {
+                console.error('Une erreur est survenue lors de la récupération de l\'ID :', error);
+                // Gérer l'erreur comme vous le souhaitez
+            }
+        }
+
+        fetchId_Pseudo();
+    }, []);
+
+
 
 
     const sendMessage = async () => {
@@ -213,12 +233,45 @@ const PixiComponent = () => {
                     const {data, error} = await supabase
                         .from('message')
                         .insert([
-                            {id_user: id_USER, message: msg, timestamp: '2024-01-26 15:40:35', place: 'home'},
+                            {id_user: id_USER, message: msg, timestamp: moment().tz('Europe/Paris').format(), place: 'home'},
                         ])
                         .select()
                 } catch (error) {
                     console.error("Une erreur s'est produite lors de la récupération des données :", error);
                 }
+            }
+        }
+    }
+
+
+    const pseudoMessage = async (id_user_message) => {
+        //choper le pseudo de l'utilisateur qui a send un msg
+
+        // Récupérer tous les messages
+        let {data: messages, error} = await supabase
+            .from('message')
+            .select('*');
+        // console.log(messages)
+        if (error) {
+            console.error('Erreur lors de la récupération des messages:', error);
+            return;
+        }
+        // Pour chaque message, récupérer le pseudo de l'utilisateur correspondant
+        for (let message of messages) {
+            let {data: user, error} = await supabase
+                .from('connexion')
+                .select('pseudo')
+                .eq('id', id_user_message);
+
+            if (error) {
+                console.error('Erreur lors de la récupération de l\'utilisateur:', error);
+                continue;
+            }
+
+            // console.log(user)
+            if (user[0] !== undefined) {
+
+                return user[0].pseudo
             }
         }
     }
@@ -233,8 +286,8 @@ const PixiComponent = () => {
                 display: "block",
                 shapeRendering: "auto",
             }}
-            width="120px"
-            height="120px"
+            width="40px"
+            height="40px"
             viewBox="0 0 100 100"
             preserveAspectRatio="xMidYMid"
         >
@@ -263,57 +316,22 @@ const PixiComponent = () => {
         </svg>
     );
 
-    const pseudoMessage = async (id_user_message) => {
-        //choper le pseudo de l'utilisateur qui a send un msg
 
-        // Récupérer tous les messages
-        let {data: messages, error} = await supabase
-            .from('message')
-            .select('*');
-        // console.log(messages)
-        if (error) {
-            console.error('Erreur lors de la récupération des messages:', error);
-            return;
-        }
-        // Pour chaque message, récupérer le pseudo de l'utilisateur correspondant
-        for (let message of messages) {
-            let {data: user, error} = await supabase
-                .from('connexion')
-                .select('pseudo')
-                .eq('id', id_user_message);
 
-            if (error) {
-                console.error('Erreur lors de la récupération de l\'utilisateur:', error);
-                continue;
-            }
-
-            // console.log(user)
-            if (user[0] !== undefined) {
-                // Afficher le pseudo de l'utilisateur
-                // console.log('Pseudo:', user[0].pseudo);
-                // Convertir le timestamp en objet Date
-                const date = new Date(messages[0].timestamp);
-                // Créer un objet de formateur de date avec le fuseau horaire de Paris
-                const options = {timeZone: "Europe/Paris", hour: "numeric", minute: "numeric"};
-                // Formater la date en heures et minutes avec le fuseau horaire de Paris
-                const heureMinuteParis = new Intl.DateTimeFormat('fr-FR', options).format(date);
-
-                return user[0].pseudo + " " + heureMinuteParis
-            }
-        }
-    }
-    const [isLoading, setIsLoading] = useState(true);
     return (
-        <div>
+        <div style={{background: "black"}}>
             <div className="divPixi">
                 <div className="pixiContainerTitle">
                     <p className="titre">Sneakers World</p>
                     <p id="PseudoName" className="pseudo"></p>
                 </div>
-                <div style={{display: "flex", alignItems: "center", paddingRight: "15px"}} onClick={() => router.push('/logout')}>
-                    <button className="button">Logout</button>
+                <div style={{display: "flex", alignItems: "center"}}>
+                    <div style={{marginLeft: "auto", paddingRight: "15px"}} onClick={() => router.push('/logout')}>
+                        <button className="button">Logout</button>
+                    </div>
                 </div>
             </div>
+
             <div className="pixiContainer">
                 <div className="chatContainer">
                     <div className="chatContainer2">
@@ -332,9 +350,11 @@ const PixiComponent = () => {
                             <div>
                                 <Rolling/>
                                 <p style={{
+                                    margin: "0",
                                     display: "flex",
                                     justifyContent: "center",
-                                    fontFamily: "Arial,ui-serif"
+                                    fontFamily: "Arial,ui-serif",
+                                    fontSize: "15px"
                                 }}>Chargement ...</p>
                             </div>
                         ) : (
