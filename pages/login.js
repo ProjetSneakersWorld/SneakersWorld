@@ -60,7 +60,7 @@ const Login = ({ defaultIdf = '', defaultMdp = '' }) => {
     return (
         <div className="body">
             <div className="box">
-                <p className="title">Login Form</p>
+                <p className="title">Login</p>
                 <form action="/api/home" method="post" onSubmit={handleSubmit}>
                     <div className="form-group">
                         <div className="formlabel">

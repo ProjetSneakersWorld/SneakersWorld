@@ -144,7 +144,7 @@ const Signup = () => {
                             <div>
                                 <Rolling/>
                             </div>
-                        ) : (<p>Inscription</p>)}
+                        ) : (<>Inscription</>)}
                     </button>
                     <p id="error" className="error"></p>
                 </form>

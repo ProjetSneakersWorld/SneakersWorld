@@ -1,8 +1,5 @@
 import React, {useEffect, useRef, useState} from 'react';
 import jwt from 'jsonwebtoken';
-import * as PIXI from "pixi.js"
-import {Tilemap} from '@pixi/tilemap';
-import {Assets} from '@pixi/assets';
 import '/public/pixi.css';
 import {router} from "next/router";
 const sendImage = "/images/send.png"
@@ -11,70 +8,45 @@ import Cookies from "js-cookie";
 import moment from 'moment-timezone';
 const supabase = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY);
 
-
-const PixiComponent = () => {
-    const pixiContainer = useRef(null);
-    const windowSize = useRef([0, 0]);
+const Home = () => {
+    const gameContainer = useRef(null);
 
     useEffect(() => {
-        if (typeof window !== 'undefined') {
-            windowSize.current = [window.innerWidth, window.innerHeight];
-        }
-
-        // Set up Pixi.js
-        let renderer = PIXI.autoDetectRenderer({
-            width: windowSize.current[0] - 380,
-            height: windowSize.current[1] - 110
-        });
-
-        // Add the renderer view element to the DOM
-        pixiContainer.current.innerHTML = ""; // Clear the container
-        pixiContainer.current.appendChild(renderer.view);
-
-        // Create the stage
-        const stage = new PIXI.Container();
-
-        Assets.load('/map.json').then((resources) => {
-            // Check if 'data' property exists
-            if (resources && resources.data) {
-                const data = resources.data;
-
-                // Assuming your Tiled map uses a single tileset image
-                const tileset = PIXI.Texture.from('/map_principal.png');
-                const tilemap = new Tilemap([tileset.baseTexture]);
-                stage.addChild(tilemap);
-
-                // Loop through each layer in the Tiled map
-                for (let layer of data.layers) {
-                    // Loop through each tile in the layer
-                    for (let y = 0; y < data.height; y++) {
-                        for (let x = 0; x < data.width; x++) {
-                            const i = x + y * data.width;
-                            const id = layer.data[i] - 1; // Tiled IDs are one-indexed
-                            if (id >= 0) {
-                                // Calculate the tileset position of the tile
-                                const tx = id % (tileset.width / data.tilewidth);
-                                const ty = Math.floor(id / (tileset.width / data.tilewidth));
-                                const texture = new PIXI.Texture(tileset, new PIXI.Rectangle(tx * data.tilewidth, ty * data.tileheight, data.tilewidth, data.tileheight));
-
-                                // Create a sprite and add it to the tilemap layer
-                                const sprite = new PIXI.Sprite(texture);
-                                sprite.position.set(x * data.tilewidth, y * data.tileheight);
-                                tilemap.addChild(sprite);
-                            }
-                        }
-                    }
+        const Phaser = require('phaser');
+        const SceneMain = require('../scenes/SceneMain').default;
+        const config = {
+            type: Phaser.AUTO,
+            parent: gameContainer.current,
+            width: window.innerWidth - 700, // Utilisez la largeur de la fenêtre
+            height: window.innerHeight - 110, // Utilisez la hauteur de la fenêtre
+            scene: [SceneMain], // Utilisez un tableau pour la scène
+            physics: {
+                default: 'arcade',
+                arcade: {
+                    gravity: { y: 200 }
                 }
-
-                // Render the stage
-                renderer.render(stage);
-            } else {
-                console.error("Failed to load Tiled map. Check the path and format of the file.");
             }
+        };
+
+        const game = new Phaser.Game(config);
+
+        game.scene.scenes.forEach(scene => {
+            scene.events.on('create', () => {
+                // Ajustez ces valeurs en fonction de la taille de votre carte
+                const mapWidth = 2208;
+                const mapHeight = 1408;
+
+                scene.cameras.main.setBounds(0, 0, mapWidth, mapHeight, true);
+                scene.cameras.main.setZoom(Math.min(game.scale.width / mapWidth, game.scale.height / mapHeight));
+                scene.cameras.main.centerOn(mapWidth / 2, mapHeight / 2);
+            });
         });
 
+        return () => {
+            // Destroy the game instance when the component is unmounted
+            game.destroy(true);
+        };
     }, []);
-
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     //CODE Chat et gestion de le BD supabase
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -223,7 +195,7 @@ const PixiComponent = () => {
     useEffect(() => {
         // Récupérer l'id du pseudo
         const fetchId_Pseudo = async () => {
-            console.log(pseudoCookies)
+            // console.log(pseudoCookies)
             try {
                 let {data: id, error} = await supabase
                     .from('connexion')
@@ -314,8 +286,8 @@ const PixiComponent = () => {
                 display: "block",
                 shapeRendering: "auto",
             }}
-            width="50px"
-            height="50px"
+            width="60px"
+            height="60px"
             viewBox="0 0 100 100"
             preserveAspectRatio="xMidYMid"
         >
@@ -345,7 +317,6 @@ const PixiComponent = () => {
     );
 
 
-
     return (
         <div style={{background: "black"}}>
             <div className="divPixi">
@@ -364,7 +335,7 @@ const PixiComponent = () => {
                 <div className="chatContainer">
                     <div style={{display: "flex", justifyContent: "center", flexDirection: "column"}}>
                         <div style={{display: "flex", justifyContent: "center", fontFamily: "Arial"}}>
-                            <p style={{fontSize: "20px"}}>Chat Principale</p>
+                            <p style={{fontSize: "20px"}}>Chat Principal</p>
                         </div>
                         {isLoading ? (
                             <div>
@@ -398,11 +369,11 @@ const PixiComponent = () => {
                             </div>
                         )}
                     </div>
-                    <div className="chatContainer2" style={{height : isLoading ? "0" : "72VH"}}>
+                    <div className="chatContainer2" style={{height: isLoading ? "0" : "72VH"}}>
                         <div className="messageAuthor">
                             <p id="messageAuthor" style={{margin: 0}}></p>
                         </div>
-                        <div id="messageContainer" style={{paddingBottom:"3rem", width:"-webkit-fill-available"}}>
+                        <div id="messageContainer" style={{paddingBottom: "3rem", width: "-webkit-fill-available"}}>
 
                         </div>
                     </div>
@@ -410,7 +381,10 @@ const PixiComponent = () => {
                         <p id="erreurSend"></p>
                     </div>
                 </div>
-                <div ref={pixiContainer} className="pixi"></div>
+                {/*<div ref={pixiContainer} className="pixi"></div>*/}
+                <div>
+                    <div ref={gameContainer}/>
+                </div>
             </div>
         </div>
     );
@@ -445,5 +419,5 @@ export async function getServerSideProps(context) {
     };
 }
 
-export default PixiComponent;
+export default Home;
 
