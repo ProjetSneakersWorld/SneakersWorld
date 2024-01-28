@@ -6,6 +6,8 @@ const sendImage = "/images/send.png"
 import {createClient} from "@supabase/supabase-js";
 import Cookies from "js-cookie";
 import moment from 'moment-timezone';
+import Phaser from 'phaser';
+import SceneMain from '../scenes/SceneMain';
 const supabase = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY);
 
 const Home = () => {
