@@ -90,9 +90,17 @@ const PixiComponent = () => {
 
         const fetchMessagesAndUsers = async () => {
             // Récupérer tous les messages
+            let currentDate = new Date();
+            let pastDate = new Date();
+
+            // Set the pastDate to 24 hours ago
+            pastDate.setHours(currentDate.getHours() - 24);
+
             let {data: messages, error2} = await supabase
                 .from('message')
-                .select('*');
+                .select('*')
+                .eq('place', "home")
+                .gte('timestamp', pastDate.toISOString().slice(0, 19).replace('T', ' '));
 
             if (error2) {
                 console.error('Erreur lors de la récupération des messages:', error);
@@ -120,13 +128,20 @@ const PixiComponent = () => {
             }
 
             // Créer un objet pour faciliter la recherche des pseudos
-            const usersById = users.reduce((acc, user) => ({...acc, [user.id]: user.pseudo}), {});
+            const usersById = users.reduce((acc, user) => ({
+                ...acc, [user.id]: user.pseudo
+            }), {});
+
+            // Trier les messages par timestamp
+            messages.sort((a, b) => new Date(a.timestamp) - new Date(b.timestamp));
 
             // Afficher tous les messages
             for (let message of messages) {
                 const pseudo = usersById[message.id_user];
+                const date = new Date(message.timestamp);
+                console.log(date.getHours() + "h" + date.getMinutes());
                 if (pseudo) {
-                    displayMessage(pseudo, message);
+                    displayMessage(pseudo + " " + date.getHours() + "h" + date.getMinutes(), message);
                 }
             }
         };
@@ -141,7 +156,8 @@ const PixiComponent = () => {
                 {event: 'INSERT', schema: 'public', table: 'message'},
                 async (payload) => {
                     const pseudo = await pseudoMessage(payload.new.id_user);
-                    displayMessage(pseudo, payload.new);
+                    const date = new Date();
+                    displayMessage(pseudo + " " + date.getHours() + "h" + date.getMinutes(), payload.new);
                     setIsLoading(false);
                 }
             )
@@ -186,6 +202,10 @@ const PixiComponent = () => {
 
             // Ajouter la nouvelle div à l'élément messageContainer
             messageContainer.appendChild(newMessageDiv);
+            // Après avoir ajouté un nouveau message au conteneur
+            let chatContainer = document.querySelector('.chatContainer2');
+            chatContainer.scrollTop = chatContainer.scrollHeight;
+
             setIsLoading(false);
         };
 
@@ -282,12 +302,11 @@ const PixiComponent = () => {
             xmlnsXlink="http://www.w3.org/1999/xlink"
             style={{
                 margin: "auto",
-
                 display: "block",
                 shapeRendering: "auto",
             }}
-            width="40px"
-            height="40px"
+            width="50px"
+            height="50px"
             viewBox="0 0 100 100"
             preserveAspectRatio="xMidYMid"
         >
@@ -327,25 +346,17 @@ const PixiComponent = () => {
                 </div>
                 <div style={{display: "flex", alignItems: "center"}}>
                     <div style={{marginLeft: "auto", paddingRight: "15px"}} onClick={() => router.push('/logout')}>
-                        <button className="button">Logout</button>
+                        <button className="buttonLogout">Logout</button>
                     </div>
                 </div>
             </div>
 
             <div className="pixiContainer">
                 <div className="chatContainer">
-                    <div className="chatContainer2">
-                        <div className="messageAuthor">
-                            <p id="messageAuthor" style={{margin: 0}}></p>
+                    <div style={{display: "flex", justifyContent: "center", flexDirection: "column"}}>
+                        <div style={{display: "flex", justifyContent: "center", fontFamily: "Arial"}}>
+                            <p>Chat Principale</p>
                         </div>
-                        <div id="messageContainer">
-
-                        </div>
-                    </div>
-                    <div className="chatContainer4">
-                        <p id="erreurSend"></p>
-                    </div>
-                    <div style={{display: "flex", justifyContent: "center"}}>
                         {isLoading ? (
                             <div>
                                 <Rolling/>
@@ -354,18 +365,17 @@ const PixiComponent = () => {
                                     display: "flex",
                                     justifyContent: "center",
                                     fontFamily: "Arial,ui-serif",
-                                    fontSize: "15px"
+                                    fontSize: "18px"
                                 }}>Chargement ...</p>
                             </div>
                         ) : (
-
                             <div className="chatContainer3">
                                 <form style={{display: "flex", alignItems: "center"}} onSubmit={(e) => {
                                     e.preventDefault(); // Empêche le rechargement de la page
                                     sendMessage();
                                 }}>
-                                    <input className="inputsChat" maxLength="45" id="inputMessage"
-                                           placeholder="écrire un message" required/>
+                                    <input className="inputsChat" maxLength="75" id="inputMessage"
+                                           placeholder="envoyer un message" required/>
                                     <button type="submit" style={{background: "none", border: "none"}}>
                                         <img
                                             width="35"
@@ -379,7 +389,17 @@ const PixiComponent = () => {
                             </div>
                         )}
                     </div>
+                    <div className="chatContainer2" style={{height : isLoading ? "0" : "74VH"}}>
+                        <div className="messageAuthor">
+                            <p id="messageAuthor" style={{margin: 0}}></p>
+                        </div>
+                        <div id="messageContainer" style={{paddingBottom:"3rem"}}>
 
+                        </div>
+                    </div>
+                    <div className="chatContainer4">
+                        <p id="erreurSend"></p>
+                    </div>
                 </div>
                 <div ref={pixiContainer} className="pixi"></div>
             </div>
