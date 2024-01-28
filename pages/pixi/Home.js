@@ -80,12 +80,13 @@ const PixiComponent = () => {
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
     let lastAuthor = null;
+    let pseudoCookies = Cookies.get('Pseudo')
     const [id_USER, setId_USER] = useState('null');
     const [isLoading, setIsLoading] = useState(true);
 
     useEffect(() => {
         //choper le cookies pseudo
-        document.getElementById("PseudoName").innerText = "Welcome, " + Cookies.get('Pseudo');
+        document.getElementById("PseudoName").innerText = "Welcome, " + pseudoCookies;
         let messageContainer = document.getElementById('messageContainer');
 
         const fetchMessagesAndUsers = async () => {
@@ -139,9 +140,9 @@ const PixiComponent = () => {
             for (let message of messages) {
                 const pseudo = usersById[message.id_user];
                 const date = new Date(message.timestamp);
-                console.log(date.getHours() + "h" + date.getMinutes());
+                // console.log(date.getHours() + "h" + date.getMinutes());
                 if (pseudo) {
-                    displayMessage(pseudo + " " + date.getHours() + "h" + date.getMinutes(), message);
+                    displayMessage(pseudo, date.getHours() + "h" + date.getMinutes(), message);
                 }
             }
         };
@@ -157,14 +158,14 @@ const PixiComponent = () => {
                 async (payload) => {
                     const pseudo = await pseudoMessage(payload.new.id_user);
                     const date = new Date();
-                    displayMessage(pseudo + " " + date.getHours() + "h" + date.getMinutes(), payload.new);
+                    displayMessage(pseudo, date.getHours() + "h" + date.getMinutes(), payload.new);
                     setIsLoading(false);
                 }
             )
             .subscribe();
 
         // Fonction pour afficher un message
-        const displayMessage = (pseudo, message) => {
+        const displayMessage = (pseudo, dateMessage, message) => {
             // Si l'auteur du message est différent du dernier auteur
             if (pseudo !== lastAuthor) {
                 // Créer une nouvelle div pour l'auteur du message
@@ -173,8 +174,9 @@ const PixiComponent = () => {
 
                 // Créer un nouveau paragraphe pour l'auteur du message
                 const newAuthorP = document.createElement("p");
+                newAuthorP.style.color= "white";
                 newAuthorP.id = "messageAuthor";
-                const newAuthorContent = document.createTextNode(pseudo);
+                const newAuthorContent = document.createTextNode(pseudo + " "+dateMessage);
                 newAuthorP.appendChild(newAuthorContent);
 
                 // Ajouter le paragraphe à la div de l'auteur du message
@@ -189,8 +191,15 @@ const PixiComponent = () => {
 
             // Créer une nouvelle div pour le message
             const newMessageDiv = document.createElement("div");
-            newMessageDiv.className = "messageContainer";
+            newMessageDiv.style.background = "rgb(103, 194, 98)";
+            newMessageDiv.style.color= "white";
 
+            // Si le message vient de l'utilisateur actuel, changer la couleur de fond
+            if (pseudo === pseudoCookies) {
+                newMessageDiv.style.background= "rgb(50, 121, 249)";
+            }
+
+            newMessageDiv.className = "messageContainer";
             // Créer un nouveau paragraphe pour le message
             const newMessageP = document.createElement("p");
             newMessageP.id = "message";
@@ -215,7 +224,6 @@ const PixiComponent = () => {
         // Récupérer l'id du pseudo
         const fetchId_Pseudo = async () => {
             try {
-                let pseudoCookies = Cookies.get('Pseudo')
                 let {data: id, error} = await supabase
                     .from('connexion')
                     .select('id')
@@ -355,7 +363,7 @@ const PixiComponent = () => {
                 <div className="chatContainer">
                     <div style={{display: "flex", justifyContent: "center", flexDirection: "column"}}>
                         <div style={{display: "flex", justifyContent: "center", fontFamily: "Arial"}}>
-                            <p>Chat Principale</p>
+                            <p style={{fontSize: "20px"}}>Chat Principale</p>
                         </div>
                         {isLoading ? (
                             <div>
@@ -389,11 +397,11 @@ const PixiComponent = () => {
                             </div>
                         )}
                     </div>
-                    <div className="chatContainer2" style={{height : isLoading ? "0" : "74VH"}}>
+                    <div className="chatContainer2" style={{height : isLoading ? "0" : "72VH"}}>
                         <div className="messageAuthor">
                             <p id="messageAuthor" style={{margin: 0}}></p>
                         </div>
-                        <div id="messageContainer" style={{paddingBottom:"3rem"}}>
+                        <div id="messageContainer" style={{paddingBottom:"3rem", width:"-webkit-fill-available"}}>
 
                         </div>
                     </div>
