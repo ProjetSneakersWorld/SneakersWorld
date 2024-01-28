@@ -1,3 +1,4 @@
+import Phaser from 'phaser';
 
 const speed = 150;
 export class SceneMain extends Phaser.Scene {
