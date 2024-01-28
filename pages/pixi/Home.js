@@ -223,6 +223,7 @@ const PixiComponent = () => {
     useEffect(() => {
         // Récupérer l'id du pseudo
         const fetchId_Pseudo = async () => {
+            console.log(pseudoCookies)
             try {
                 let {data: id, error} = await supabase
                     .from('connexion')

@@ -17,7 +17,7 @@ export default async function handler(req, res) {
                 .eq('pseudo', idf) // Utiliser le champ correct pour l'identifiant
                 .single();
 
-            // console.log("hi, "+user.name);
+            // console.log("hi, PSEUDO : "+user.pseudo);
 
             if (error || !user) {
                 return res.status(401).json({ error: "identifiant ou mot de passe incorrect" });
@@ -33,7 +33,7 @@ export default async function handler(req, res) {
                     sameSite: 'strict',
                     maxAge: 3600,
                     path: '/',
-                }),serialize('Pseudo', user.name,{
+                }),serialize('Pseudo', user.pseudo,{
                         httpOnly: false,
                         secure: process.env.NODE_ENV !== 'development',
                         sameSite: 'strict',

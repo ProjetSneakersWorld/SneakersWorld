@@ -5,7 +5,7 @@ import Cookies from "js-cookie";
 import jwt from "jsonwebtoken";
 import {useRouter} from "next/router";
 
-const Login = () => {
+const Login = ({ defaultIdf = '', defaultMdp = '' }) => {
     const router = useRouter();
 
     useEffect(() => {
@@ -69,9 +69,9 @@ const Login = () => {
                         </div>
                         <div className="formlabel">
                             <input className="inputs" type='text' id="idf" name="idf" maxLength="19" required
-                                   autoComplete="username"/>
+                                   autoComplete="username" defaultValue={defaultIdf}/>
                             <input className="inputs" type="password" id="mdp" name="mdp" maxLength="19" required
-                                   autoComplete="current-password"/>
+                                   autoComplete="current-password" defaultValue={defaultMdp}/>
                         </div>
                     </div>
                     <br/>
