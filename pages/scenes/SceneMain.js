@@ -59,6 +59,16 @@ export class SceneMain extends Phaser.Scene {
 
         this.player.setScale(1.5);
 
+        this.player.setInteractive(); // Rend le sprite interactif
+
+        this.player.on('pointerover', () => {
+            this.player.inputEnabled = true;
+        });
+
+        this.player.on('pointerout', () => {
+            this.player.inputEnabled = false;
+        });
+
     }
 
 
@@ -76,30 +86,32 @@ export class SceneMain extends Phaser.Scene {
     update() {
         this.player.setVelocity(0);
 
-        if (this.cursors.up.isDown) {
-            this.player.setVelocityY(-speed);
-            this.player.anims.play('up', true);
-        }
-        else if (this.cursors.left.isDown) {
-            this.player.setVelocityX(-speed);
-            this.player.anims.play('left', true);
-        }
-        else if (this.cursors.right.isDown) {
-            this.player.setVelocityX(speed);
-            this.player.anims.play('right', true);
-        }
-        else if (this.cursors.down.isDown) {
-            this.player.setVelocityY(speed);
-            this.player.anims.play('down', true);
-        }
-        else {
-            // If no cursor is down, stop the animation
-            this.player.anims.stop();
+        // Vérifiez si le focus est sur le canvas du jeu
+        if (this.game.canvas === document.activeElement) {
+            if (this.cursors.up.isDown) {
+                this.player.setVelocityY(-speed);
+                this.player.anims.play('up', true);
+            }
+            else if (this.cursors.left.isDown) {
+                this.player.setVelocityX(-speed);
+                this.player.anims.play('left', true);
+            }
+            else if (this.cursors.right.isDown) {
+                this.player.setVelocityX(speed);
+                this.player.anims.play('right', true);
+            }
+            else if (this.cursors.down.isDown) {
+                this.player.setVelocityY(speed);
+                this.player.anims.play('down', true);
+            }
+            else {
+                // If no cursor is down, stop the animation
+                this.player.anims.stop();
 
-            // Optionally, set to a default frame without movement
-            this.player.setFrame(5);
+                // Optionally, set to a default frame without movement
+                this.player.setFrame(5);
+            }
         }
-
     }
 }
 

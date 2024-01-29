@@ -51,6 +51,7 @@ body {
 }
 
 .pixiContainer {
+    height: 89VH;
     gap: 2rem;
     display: flex;
     justify-content: center;

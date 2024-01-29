@@ -29,7 +29,6 @@
     "moment-timezone": "^0.5.44",
     "next": "^14.0.4",
     "phaser": "^3.70.0",
-    "pixi.js": "^7.3.3",
     "react": "^18",
     "react-dom": "^18",
     "react-infinite-scroll-component": "^6.1.0",

@@ -7,6 +7,7 @@ import {useRouter} from "next/router";
 
 const Login = ({ defaultIdf = '', defaultMdp = '' }) => {
     const [isLoading, setIsLoading] = useState(false);
+    const [searchCookies, setSearchCookies] = useState(true);
     const router = useRouter();
 
     useEffect(() => {
@@ -17,21 +18,25 @@ const Login = ({ defaultIdf = '', defaultMdp = '' }) => {
                 jwt.verify(token, 'secret_key', (err) => {
                     if (err) {
                         // console.error('Error verifying token:', err);
-                        router.push('/login');
+                        setSearchCookies(false);
                     } else {
                         // console.log('Token verified successfully:', decoded);
                         router.push('/phaser/Home');
                     }
                 });
-            } catch (err) {
+            }
+            catch (err) {
                 // En cas d'erreur de vérification, rediriger également vers la page de connexion
                 // console.error("Error verifying token:", err);
                 router.push('/login');
             }
         }
+        else {
+            setSearchCookies(false);
+        }
     }, [router]);
 
-    const Rolling = () => (
+    const Rolling = (w, h) => (
         <svg
             xmlns="http://www.w3.org/2000/svg"
             xmlnsXlink="http://www.w3.org/1999/xlink"
@@ -40,8 +45,8 @@ const Login = ({ defaultIdf = '', defaultMdp = '' }) => {
                 display: "block",
                 shapeRendering: "auto",
             }}
-            width="50px"
-            height="50px"
+            width={w}
+            height={h}
             viewBox="0 0 100 100"
             preserveAspectRatio="xMidYMid"
         >
@@ -89,6 +94,7 @@ const Login = ({ defaultIdf = '', defaultMdp = '' }) => {
             // window.location.href = "/connected";
             await router.push("/connected");
         } else if (response.status === 401) {
+            setIsLoading(false);
             document.getElementById("error").innerText = "identifiant ou mot de passe incorrect";
         }
     };
@@ -102,27 +108,40 @@ const Login = ({ defaultIdf = '', defaultMdp = '' }) => {
             <div className="box">
                 <p className="title">Login</p>
                 <form action="/api/home" method="post" onSubmit={handleSubmit}>
-                    <div className="form-group">
-                        <div className="formlabel">
-                            <label className="labels" form="login">Pseudo</label>
-                            <label className="labels" form="password">Password </label>
-                        </div>
-                        <div className="formlabel">
-                            <input className="inputs" type='text' id="idf" name="idf" maxLength="19" required
-                                   autoComplete="username" defaultValue={defaultIdf}/>
-                            <input className="inputs" type="password" id="mdp" name="mdp" maxLength="19" required
-                                   autoComplete="current-password" defaultValue={defaultMdp}/>
-                        </div>
+                    <div>
+                        {searchCookies ? (
+                            <div style={{padding: "1px 5rem"}}>
+                                {Rolling(120, 120)}
+                                <p>Connexion ...</p>
+                            </div>
+                        ) : (
+                            <div>
+                                <div className="form-group">
+                                    <div className="formlabel">
+                                        <label className="labels" form="login">Pseudo</label>
+                                        <label className="labels" form="password">Password </label>
+                                    </div>
+                                    <div className="formlabel">
+                                        <input className="inputs" type='text' id="idf" name="idf" maxLength="19"
+                                               required
+                                               autoComplete="username" defaultValue={defaultIdf}/>
+                                        <input className="inputs" type="password" id="mdp" name="mdp" maxLength="19"
+                                               required
+                                               autoComplete="current-password" defaultValue={defaultMdp}/>
+                                    </div>
+                                </div>
+                                <button className="button" id="validInscription" type='submit' disabled={isLoading}>
+                                    {isLoading ? (
+                                        <div>
+                                            {Rolling(50, 50)}
+                                        </div>
+                                    ) : (<>Connexion</>)}
+                                </button>
+                                <p id="error" className="error"></p>
+                            </div>
+                        )}
                     </div>
                     <br/>
-                    <button className="button" id="validInscription" type='submit' disabled={isLoading}>
-                        {isLoading ? (
-                            <div>
-                                <Rolling/>
-                            </div>
-                        ) : (<>Connexion</>)}
-                    </button>
-                    <p id="error" className="error"></p>
                 </form>
             </div>
             <div style={{paddingTop: "15px"}}>
