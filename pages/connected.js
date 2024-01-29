@@ -23,7 +23,7 @@ function ConnectedPage() {
                     } else {
                         //aller chercher les infos user
                         // console.log('Token verified successfully:', decoded);
-                        router.push('/pixi/Home');
+                        router.push('/phaser/Home');
                     }
                 });
             } catch (err) {

@@ -381,7 +381,7 @@ const Home = () => {
                         <p id="erreurSend"></p>
                     </div>
                 </div>
-                {/*<div ref={pixiContainer} className="pixi"></div>*/}
+                {/*<div ref={pixiContainer} className="phaser"></div>*/}
                 <div>
                     <div ref={gameContainer}/>
                 </div>

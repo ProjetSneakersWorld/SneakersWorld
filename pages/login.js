@@ -19,7 +19,7 @@ const Login = ({ defaultIdf = '', defaultMdp = '' }) => {
                         router.push('/login');
                     } else {
                         // console.log('Token verified successfully:', decoded);
-                        router.push('/pixi/Home');
+                        router.push('/phaser/Home');
                     }
                 });
             } catch (err) {
