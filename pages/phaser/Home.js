@@ -17,8 +17,8 @@ const Home = () => {
         const config = {
             type: Phaser.AUTO,
             parent: gameContainer.current,
-            width: window.innerWidth - 700, // Utilisez la largeur de la fenêtre
-            height: window.innerHeight - 110, // Utilisez la hauteur de la fenêtre
+            width: "75%", // Utilisez la largeur de la fenêtre
+            height: "84%", // Utilisez la hauteur de la fenêtre
             scene: [SceneMain], // Utilisez un tableau pour la scène
             physics: {
                 default: 'arcade',
@@ -325,7 +325,7 @@ const Home = () => {
                     <p id="PseudoName" className="pseudo"></p>
                 </div>
                 <div style={{display: "flex", alignItems: "center"}}>
-                    <div style={{marginLeft: "auto", paddingRight: "15px"}} onClick={() => router.push('/logout')}>
+                    <div style={{marginLeft: "auto", paddingRight: "15px", display: "flex", alignItems: "center"}} onClick={() => router.push('/logout')}>
                         <button className="buttonLogout">Logout</button>
                     </div>
                 </div>
