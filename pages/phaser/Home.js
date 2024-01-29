@@ -19,41 +19,39 @@ const Home = () => {
     const notify = (text) => toast(text);
 
     useEffect(() => {
-        const Phaser = require('phaser');
-        const SceneMain = require('../scenes/SceneMain').default;
-        const config = {
-            type: Phaser.AUTO,
-            parent: gameContainer.current,
-            width: "75%", // Utilisez la largeur de la fenêtre
-            height: "84%", // Utilisez la hauteur de la fenêtre
-            scene: [SceneMain], // Utilisez un tableau pour la scène
-            physics: {
-                default: 'arcade',
-                arcade: {}
-            }
-        };
+        import('phaser').then(Phaser => {
+            const SceneMain = require('../scenes/SceneMain').default;
+            const config = {
+                type: Phaser.AUTO, parent: gameContainer.current, width: "75%", // Utilisez la largeur de la fenêtre
+                height: "84%", // Utilisez la hauteur de la fenêtre
+                scene: [SceneMain], // Utilisez un tableau pour la scène
+                physics: {
+                    default: 'arcade', arcade: {}
+                }
+            };
 
-        const game = new Phaser.Game(config);
+            const game = new Phaser.Game(config);
 
-        game.scene.scenes.forEach(scene => {
-            scene.events.on('create', () => {
-                // Ajustez ces valeurs en fonction de la taille de votre carte
-                const mapWidth = 2208;
-                const mapHeight = 1408;
+            game.scene.scenes.forEach(scene => {
+                scene.events.on('create', () => {
+                    // Ajustez ces valeurs en fonction de la taille de votre carte
+                    const mapWidth = 2208;
+                    const mapHeight = 1408;
 
-                scene.cameras.main.setBounds(0, 0, mapWidth, mapHeight, true);
-                scene.cameras.main.setZoom(Math.min(game.scale.width / mapWidth, game.scale.height / mapHeight));
-                scene.cameras.main.centerOn(mapWidth / 2, mapHeight / 2);
+                    scene.cameras.main.setBounds(0, 0, mapWidth, mapHeight, true);
+                    scene.cameras.main.setZoom(Math.min(game.scale.width / mapWidth, game.scale.height / mapHeight));
+                    scene.cameras.main.centerOn(mapWidth / 2, mapHeight / 2);
 
-                // Masquer le message de chargement une fois que la carte est chargée
-                loadingMessage.current.style.display = 'none';
+                    // Masquer le message de chargement une fois que la carte est chargée
+                    loadingMessage.current.style.display = 'none';
+                });
             });
-        });
 
-        return () => {
-            // Destroy the game instance when the component is unmounted
-            game.destroy(true);
-        };
+            return () => {
+                // Destroy the game instance when the component is unmounted
+                game.destroy(true);
+            };
+        });
     }, []);
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -136,24 +134,18 @@ const Home = () => {
 
         // Créer un canal pour écouter les changements dans la table "message"
         supabase.channel('custom-all-channel')
-            .on(
-                'postgres_changes',
-                {event: 'INSERT', schema: 'public', table: 'message'},
-                async (payload) => {
-                    const pseudo = await pseudoMessage(payload.new.id_user);
-                    const date = new Date();
-                    displayMessage(pseudo, date.getHours() + "h" + date.getMinutes(), payload.new);
-                    setIsLoading(false);
+            .on('postgres_changes', {event: 'INSERT', schema: 'public', table: 'message'}, async (payload) => {
+                const pseudo = await pseudoMessage(payload.new.id_user);
+                const date = new Date();
+                displayMessage(pseudo, date.getHours() + "h" + date.getMinutes(), payload.new);
+                setIsLoading(false);
+            })
+            .on('postgres_changes', {event: 'UPDATE', schema: 'public', table: 'connexion'}, async (payload) => {
+                if (payload.new.pseudo !== pseudoCookies) {
+                    // console.log('Change received!', payload);
+                    notify(payload.new.pseudo + " vient de se connecter");
                 }
-            )
-            .on('postgres_changes',
-                {event: 'UPDATE', schema: 'public', table: 'connexion'},
-                async (payload) => {
-                    if (payload.new.pseudo !== pseudoCookies) {
-                        // console.log('Change received!', payload);
-                        notify(payload.new.pseudo + " vient de se connecter");
-                    }
-                })
+            })
             .subscribe();
 
 
@@ -204,7 +196,7 @@ const Home = () => {
 
             // Ajouter la nouvelle div à l'élément messageContainer
             messageContainer.appendChild(newMessageDiv);
-            if(message.length !== 0){
+            if (message.length !== 0) {
                 // Après avoir ajouté un nouveau message au conteneur
                 let chatContainer = document.querySelector('.chatContainer2');
                 chatContainer.scrollTop = chatContainer.scrollHeight;
@@ -254,14 +246,12 @@ const Home = () => {
                 try {
                     await supabase
                         .from('message')
-                        .insert([
-                            {
-                                id_user: id_USER,
-                                message: msg,
-                                timestamp: moment().tz('Europe/Paris').format(),
-                                place: 'home'
-                            },
-                        ])
+                        .insert([{
+                            id_user: id_USER,
+                            message: msg,
+                            timestamp: moment().tz('Europe/Paris').format(),
+                            place: 'home'
+                        },])
                         .select()
                 } catch (error) {
                     console.error("Une erreur s'est produite lors de la récupération des données :", error);
@@ -303,14 +293,11 @@ const Home = () => {
         }
     }
 
-    const Rolling = () => (
-        <svg
+    const Rolling = () => (<svg
             xmlns="http://www.w3.org/2000/svg"
             xmlnsXlink="http://www.w3.org/1999/xlink"
             style={{
-                margin: "auto",
-                display: "block",
-                shapeRendering: "auto",
+                margin: "auto", display: "block", shapeRendering: "auto",
             }}
             width="60px"
             height="60px"
@@ -326,9 +313,7 @@ const Home = () => {
                 r="28"
                 strokeDasharray="110 40"
                 style={{
-                    animation: "rotate 1s infinite",
-                    transformOrigin: "50% 50%",
-                    strokeLinecap: "round",
+                    animation: "rotate 1s infinite", transformOrigin: "50% 50%", strokeLinecap: "round",
                 }}
             />
             <style>
@@ -339,8 +324,7 @@ const Home = () => {
                     }
                   `}
             </style>
-        </svg>
-    );
+        </svg>);
 
 
     return (<div>
@@ -368,8 +352,7 @@ const Home = () => {
                             <div style={{display: "flex", justifyContent: "center", fontFamily: "Arial"}}>
                                 <p style={{fontSize: "20px"}}>Chat Principal</p>
                             </div>
-                            {isLoading ? (
-                                <div>
+                            {isLoading ? (<div>
                                     <Rolling/>
                                     <p id="textMessage" style={{
                                         margin: "0",
@@ -378,9 +361,7 @@ const Home = () => {
                                         fontFamily: "Arial,ui-serif",
                                         fontSize: "18px"
                                     }}>{isSendMessage ? "Envoie ..." : "Chargement ..."}</p>
-                                </div>
-                            ) : (
-                                <div className="chatContainer3">
+                                </div>) : (<div className="chatContainer3">
                                     <form style={{display: "flex", alignItems: "center"}} onSubmit={(e) => {
                                         e.preventDefault(); // Empêche le rechargement de la page
                                         sendMessage();
@@ -397,8 +378,7 @@ const Home = () => {
                                             />
                                         </button>
                                     </form>
-                                </div>
-                            )}
+                                </div>)}
                             <div className="chatContainer2" style={{height: isLoading ? "0" : "72VH"}}>
                                 <div className="messageAuthor">
                                     <p id="messageAuthor" style={{margin: 0}}></p>
@@ -422,8 +402,7 @@ const Home = () => {
                     </div>
                 </div>
             </div>
-        </div>
-    );
+        </div>);
 };
 
 export async function getServerSideProps(context) {
@@ -432,8 +411,7 @@ export async function getServerSideProps(context) {
     if (!token) {
         return {
             redirect: {
-                destination: '/',
-                permanent: false,
+                destination: '/', permanent: false,
             },
         };
     } else {
@@ -443,8 +421,7 @@ export async function getServerSideProps(context) {
             // console.error('Error verifying token:', err);
             return {
                 redirect: {
-                    destination: '/',
-                    permanent: false,
+                    destination: '/', permanent: false,
                 },
             };
         }
