@@ -7,18 +7,17 @@ const sendImage = "/images/send.png"
 import {createClient} from "@supabase/supabase-js";
 import Cookies from "js-cookie";
 import moment from 'moment-timezone';
-import {toast, ToastContainer} from "react-toastify";
+import {ToastContainer, toast} from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 const supabase = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY);
-import 'react-toastify/dist/ReactToastify.css';
 
 const Home = () => {
     const gameContainer = useRef(null);
-    const notify = (text) => toast(text);
 
     useEffect(() => {
         const Phaser = require('phaser');
-        const SceneMain = require('../scenes/SceneShop').default;
+        const SceneMain = require('../scenes/SceneMain').default;
         const config = {
             type: Phaser.AUTO,
             parent: gameContainer.current,
@@ -27,7 +26,6 @@ const Home = () => {
             scene: [SceneMain], // Utilisez un tableau pour la scène
             physics: {
                 default: 'arcade',
-                arcade: {}
             }
         };
 
@@ -58,6 +56,7 @@ const Home = () => {
     let pseudoCookies = Cookies.get('Pseudo')
     const [id_USER, setId_USER] = useState('null');
     const [isLoading, setIsLoading] = useState(true);
+    const notify = (text) => toast(text);
 
     useEffect(() => {
         //choper le cookies pseudo
@@ -138,13 +137,9 @@ const Home = () => {
                     setIsLoading(false);
                 }
             )
-            .on('postgres_changes',
-                {event: 'UPDATE', schema: 'public', table: 'connexion'},
-                async (payload) => {
-                    // console.log('Change received!', payload);
-                    notify(payload.new.pseudo + " vient de se connecter");
-                })
             .subscribe();
+
+
 
 
         // Fonction pour afficher un message
@@ -226,6 +221,8 @@ const Home = () => {
     }, []);
 
 
+
+
     const sendMessage = async () => {
         let msg = document.getElementById('inputMessage').value;
         document.getElementById('messageContainer').className = "";
@@ -243,12 +240,7 @@ const Home = () => {
                     const {data, error} = await supabase
                         .from('message')
                         .insert([
-                            {
-                                id_user: id_USER,
-                                message: msg,
-                                timestamp: moment().tz('Europe/Paris').format(),
-                                place: 'home'
-                            },
+                            {id_user: id_USER, message: msg, timestamp: moment().tz('Europe/Paris').format(), place: 'home'},
                         ])
                         .select()
                 } catch (error) {

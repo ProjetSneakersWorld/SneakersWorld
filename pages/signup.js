@@ -60,7 +60,7 @@ const Signup = () => {
                     // Rediriger vers la page de connexion réussie
                     await router.push("/connected");
                 } else if (response.status === 401) {
-                    document.getElementById("error").innerText = "identifiant ou mot de passe incorrect";
+                    document.getElementById("error").innerText = "Erreur lors de la requete a la base de données !";
                 }
             }, 2000); // 2000 millisecondes = 2 secondes
         } else if (response.status === 401) {

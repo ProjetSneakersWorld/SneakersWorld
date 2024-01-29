@@ -35,9 +35,7 @@ export class SceneShop extends Phaser.Scene {
     }
 
     handleCollision(player, collisionLayer) {
-        console.log("ça collide chef");
 
-        // Ajoutez ici le code que vous souhaitez exécuter lorsque le joueur est en collision avec la layer
     }
     update() {
 
@@ -59,4 +57,6 @@ export class SceneShop extends Phaser.Scene {
         }
     }
 }
+
 export default SceneShop;
+

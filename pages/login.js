@@ -1,11 +1,12 @@
 // pages/login.js
-import React, {useEffect} from 'react';
+import React, {useEffect, useState} from 'react';
 import "../public/style.css"
 import Cookies from "js-cookie";
 import jwt from "jsonwebtoken";
 import {useRouter} from "next/router";
 
 const Login = ({ defaultIdf = '', defaultMdp = '' }) => {
+    const [isLoading, setIsLoading] = useState(false);
     const router = useRouter();
 
     useEffect(() => {
@@ -30,9 +31,48 @@ const Login = ({ defaultIdf = '', defaultMdp = '' }) => {
         }
     }, [router]);
 
+    const Rolling = () => (
+        <svg
+            xmlns="http://www.w3.org/2000/svg"
+            xmlnsXlink="http://www.w3.org/1999/xlink"
+            style={{
+                margin: "auto",
+                display: "block",
+                shapeRendering: "auto",
+            }}
+            width="50px"
+            height="50px"
+            viewBox="0 0 100 100"
+            preserveAspectRatio="xMidYMid"
+        >
+            <circle
+                cx="50"
+                cy="50"
+                fill="none"
+                stroke="#000000"
+                strokeWidth="6"
+                r="28"
+                strokeDasharray="110 40"
+                style={{
+                    animation: "rotate 1s infinite",
+                    transformOrigin: "50% 50%",
+                    strokeLinecap: "round",
+                }}
+            />
+            <style>
+                {`
+                @keyframes rotate {
+                  0% { transform: rotate(0deg); }
+                  100% { transform: rotate(360deg); }
+                    }
+                  `}
+            </style>
+        </svg>
+    );
+
     const handleSubmit = async (event) => {
         event.preventDefault();
-
+        setIsLoading(true);
         const idf = document.getElementById("idf").value;
         const mdp = document.getElementById("mdp").value;
 
@@ -75,7 +115,13 @@ const Login = ({ defaultIdf = '', defaultMdp = '' }) => {
                         </div>
                     </div>
                     <br/>
-                    <button className="button" type='submit'>Connexion</button>
+                    <button className="button" id="validInscription" type='submit' disabled={isLoading}>
+                        {isLoading ? (
+                            <div>
+                                <Rolling/>
+                            </div>
+                        ) : (<>Connexion</>)}
+                    </button>
                     <p id="error" className="error"></p>
                 </form>
             </div>
