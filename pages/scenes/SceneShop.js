@@ -1,28 +1,28 @@
 /*jshint esversion: 6 */
-import { Parser } from "webpack";
 import Align from "../util/Align";
 import { AlignGrid } from "../util/alignGrid";
 import { UIBlock } from "../util/UIBlock";
-const speed = 150;
-export class SceneMain extends Phaser.Scene {
+
+const speed = 700;
+
+export class SceneShop extends Phaser.Scene {
     constructor() {
-        super("SceneMain");
+        super("SceneShop");
     }
     preload() {
-      this.load.image("tiles","./assets/tileset.png");
-      this.load.tilemapTiledJSON('map',"./assets/othman_map.json");
-      this.load.image("perso","./assets/kirby.png")
+      this.load.image("tiles","./assets/store.png");
+      this.load.tilemapTiledJSON('map',"./assets/shopMapOthman.json");
+      this.load.image("perso","./assets/kirby.png");
     }
     create() {         
 
-      
-        const map = this.make.tilemap({ key: "map", tileWidth: 16, tileHeight: 16});
+        const map = this.make.tilemap({ key: "map", tileWidth: 32, tileHeight: 32});
         
-        const tileset = map.addTilesetImage("tiles1","tiles");
-        const layer = map.createLayer("Calque de Tuiles 1", tileset, 0, 0);
-        const colision = map.createLayer("Collision",tileset,0,0)
-        this.player = this.physics.add.sprite(500,500,"perso");
-        // colision.setCollisionByProperty({ collideBottom: true });
+        const tileset = map.addTilesetImage("tiles","tiles");
+        const layer = map.createLayer("void", tileset, 0, 0);
+        const colision = map.createLayer("colision",tileset,0,0)
+        this.player = this.physics.add.sprite(437,844,"perso");
+
         colision.addCollidesWith(this.player);
         colision.setCollisionByExclusion([-1]);
         this.physics.add.collider(this.player, colision, this.handleCollision, null, this);
@@ -33,19 +33,17 @@ export class SceneMain extends Phaser.Scene {
         this.physics.add.collider(this.player, colision);
         this.cameras.main.startFollow(this.player);
         this.cameras.main.setFollowOffset(-100, -100);
+        this.cameras.main.setZoom(0.5);
 
     } 
 
     handleCollision(player, collisionLayer) {
       console.log("ça collide chef");
-      // if (Math.abs(player.x-947.5)<2 && Math.abs(player.y-1177)<2){
-      //   // this.switchToScene("SceneShop");
-      //   // Phaser.Scene.call(this,"SceneShop")
-      // }
-      //947.5 1177
+      
       // Ajoutez ici le code que vous souhaitez exécuter lorsque le joueur est en collision avec la layer
   }
     update() {
+    
       this.player.setVelocity(0,0);
       if(this.cursors.up.isDown == true){
         this.player.setVelocityY(-speed);
@@ -59,7 +57,9 @@ export class SceneMain extends Phaser.Scene {
       else if(this.cursors.down.isDown == true){
         this.player.setVelocityY(speed);
       }
-    
+     if(this.cursors.space.isDown == true){
+        console.log(this.player.x,this.player.y);
+     }
     }
 }
-export default SceneMain;
+export default SceneShop;
