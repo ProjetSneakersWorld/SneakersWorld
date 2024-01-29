@@ -23,7 +23,6 @@ const Home = () => {
             physics: {
                 default: 'arcade',
                 arcade: {
-                    gravity: { y: 200 }
                 }
             }
         };
@@ -85,6 +84,7 @@ const Home = () => {
                 messageContainer.className = "messageVide";
                 const messageVideP = document.createElement("p");
                 messageVideP.id = "messageVideP";
+                messageVideP.style.textAlign = "center";
                 messageVideP.innerText = "Aucun message disponible";
                 messageContainer.appendChild(messageVideP);
                 setIsLoading(false);
