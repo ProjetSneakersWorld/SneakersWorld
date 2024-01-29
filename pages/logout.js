@@ -1,7 +1,8 @@
 // pages/logout.js
-import { useEffect } from 'react';
-import { useRouter } from 'next/router';
-import { useState } from 'react';
+import React, {useEffect} from 'react';
+import {useRouter} from 'next/router';
+import {useState} from 'react';
+import Head from "next/head";
 
 const Logout = () => {
     const router = useRouter();
@@ -21,7 +22,19 @@ const Logout = () => {
 
     return loading ? (
         <div>
-            <p style={{textAlign:"center", color: "white", paddingTop: "25px", fontSize: "35px",fontFamily: "Calibri"}}>Please wait ...</p>
+            <Head>
+                <title>Sneakers World</title>
+                <meta name="viewport" content="initial-scale=1.0, width=device-width"/>
+            </Head>
+            <div>
+                <p style={{
+                    textAlign: "center",
+                    color: "white",
+                    paddingTop: "25px",
+                    fontSize: "35px",
+                    fontFamily: "Calibri"
+                }}>Please wait ...</p>
+            </div>
         </div>
     ) : null;
 };

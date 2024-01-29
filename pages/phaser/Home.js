@@ -204,10 +204,11 @@ const Home = () => {
 
             // Ajouter la nouvelle div à l'élément messageContainer
             messageContainer.appendChild(newMessageDiv);
-            // Après avoir ajouté un nouveau message au conteneur
-            let chatContainer = document.querySelector('.chatContainer2');
-            chatContainer.scrollTop = chatContainer.scrollHeight;
-
+            if(message.length !== 0){
+                // Après avoir ajouté un nouveau message au conteneur
+                let chatContainer = document.querySelector('.chatContainer2');
+                chatContainer.scrollTop = chatContainer.scrollHeight;
+            }
             setIsLoading(false);
         };
 

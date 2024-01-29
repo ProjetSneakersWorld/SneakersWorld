@@ -3,6 +3,7 @@ import jwt from 'jsonwebtoken';
 import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
 import Cookies from 'js-cookie';
+import Head from "next/head";
 
 function ConnectedPage() {
     const router = useRouter();
@@ -38,7 +39,15 @@ function ConnectedPage() {
 
     if (loading) {
         // Vous pouvez afficher un indicateur de chargement ici si nécessaire
-        return <div>Loading...</div>;
+        return (
+            <div>
+                <Head>
+                    <title>Loading ...</title>
+                    <meta name="viewport" content="initial-scale=1.0, width=device-width"/>
+                </Head>
+                <div>Loading...</div>
+            </div>
+        );
     }
 }
 

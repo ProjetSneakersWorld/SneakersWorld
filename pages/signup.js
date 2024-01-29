@@ -2,6 +2,7 @@
 import React, {useState} from 'react';
 import "../public/style.css"
 import {router} from "next/router";
+import Head from "next/head";
 
 const Signup = () => {
     const [pseudoError, setPseudoError] = useState("");
@@ -15,7 +16,7 @@ const Signup = () => {
             headers: {
                 "Content-Type": "application/json",
             },
-            body: JSON.stringify({ pseudo }),
+            body: JSON.stringify({pseudo}),
         });
 
         if (response.status === 409) {
@@ -113,7 +114,11 @@ const Signup = () => {
         </svg>
     );
 
-    return (
+    return (<div>
+        <Head>
+            <title>Sneakers World</title>
+            <meta name="viewport" content="initial-scale=1.0, width=device-width"/>
+        </Head>
         <div className="body">
             <div className="box">
                 <p className="title">Signup</p>
@@ -152,7 +157,8 @@ const Signup = () => {
             <div style={{paddingTop: "15px"}}>
                 <button className="button" onClick={() => handleClick('/')}>Retour</button>
             </div>
-        </div>);
+        </div>
+    </div>);
 };
 
 export default Signup;
