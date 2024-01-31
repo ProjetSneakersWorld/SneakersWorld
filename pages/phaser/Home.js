@@ -12,7 +12,6 @@ import {toast, ToastContainer} from "react-toastify";
 const supabase = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY);
 import 'react-toastify/dist/ReactToastify.css';
 import Head from "next/head";
-
 const Home = () => {
     const gameContainer = useRef(null);
     const loadingMessage = useRef(null);
@@ -63,6 +62,7 @@ const Home = () => {
     const [id_USER, setId_USER] = useState('null');
     const [isLoading, setIsLoading] = useState(true);
     const [isSendMessage, setIsSendMessage] = useState(false);
+    const [isLoadAvatar, setIsLoadAvatar] = useState(true);
 
     useEffect(() => {
         //choper le cookies pseudo
@@ -130,20 +130,42 @@ const Home = () => {
         };
 
         fetchMessagesAndUsers();
+        let dateOnlineByPseudo = "";
+        const fetchPseudoAndDateOnline = async () => {
+            // Récupère la date actuelle de dateOnline pour tous les utilisateurs
+            let {data: users, error} = await supabase
+                .from('connexion')
+                .select('pseudo, dateOnline');
 
+            // Crée un objet pour stocker les datesOnline par pseudo
+            dateOnlineByPseudo = {};
+            users.forEach(user => {
+                dateOnlineByPseudo[user.pseudo] = user.dateOnline;
+            });
+        }
 
-        // Créer un canal pour écouter les changements dans la table "message"
+        fetchPseudoAndDateOnline();
+        // Créer un canal pour écouter les changements
         supabase.channel('custom-all-channel')
+            //a chaque insertion dans la table message
             .on('postgres_changes', {event: 'INSERT', schema: 'public', table: 'message'}, async (payload) => {
                 const pseudo = await pseudoMessage(payload.new.id_user);
                 const date = new Date();
                 displayMessage(pseudo, date.getHours() + "h" + date.getMinutes(), payload.new);
                 setIsLoading(false);
             })
+            // A chaque mise à jour dans la table connexion
             .on('postgres_changes', {event: 'UPDATE', schema: 'public', table: 'connexion'}, async (payload) => {
-                if (payload.new.pseudo !== pseudoCookies) {
-                    // console.log('Change received!', payload);
-                    notify(payload.new.pseudo + " vient de se connecter");
+                // Récupère l'ancienne dateOnline pour le pseudo qui a été modifié
+                let oldDateOnline = dateOnlineByPseudo[payload.new.pseudo];
+                if (dateOnlineByPseudo !== "") {
+                    // Compare l'ancienne dateOnline avec la nouvelle
+                    if (payload.new.dateOnline !== oldDateOnline && payload.new.pseudo !== pseudoCookies) {
+                        // console.log('Change received!', payload);
+                        notify(payload.new.pseudo + " vient de se connecter");
+                        // Met à jour la dateOnline dans l'objet dateOnlineByPseudo
+                        dateOnlineByPseudo[payload.new.pseudo] = payload.new.dateOnline;
+                    }
                 }
             })
             .subscribe();
@@ -226,6 +248,43 @@ const Home = () => {
         }
 
         fetchId_Pseudo();
+
+
+        // Fonction pour télécharger une image
+        async function uploadImage() {
+            // Utilisez fetch pour obtenir le contenu de l'image
+            const response = await fetch("/images/sneakers.png");
+            const imageBlob = await response.blob();
+
+            const {data, error} = await supabase
+                .storage
+                .from('SneakersWorld')
+                .upload('avatar1.png', imageBlob, {
+                    cacheControl: '3600',
+                    upsert: true,
+                })
+
+            if (error) {
+                console.error('Erreur lors de l\'upload de l\'image : ', error)
+                setIsLoadAvatar(false);
+            } else {
+                setIsLoadAvatar(false);
+                console.log('Image uploadée avec succès : ', data)
+            }
+        }
+
+        uploadImage();
+
+
+        // Obtenez l'URL publique de l'image
+        async function fetchImage() {
+
+            const publicUrl = supabase.storage.from('SneakersWorld').getPublicUrl('avatar1.png')
+
+            console.log(publicUrl)
+        }
+
+        fetchImage();
     }, []);
 
 
@@ -293,38 +352,38 @@ const Home = () => {
         }
     }
 
-    const Rolling = () => (<svg
-            xmlns="http://www.w3.org/2000/svg"
-            xmlnsXlink="http://www.w3.org/1999/xlink"
+    const Rolling = (w, h) => (<svg
+        xmlns="http://www.w3.org/2000/svg"
+        xmlnsXlink="http://www.w3.org/1999/xlink"
+        style={{
+            margin: "auto", display: "block", shapeRendering: "auto",
+        }}
+        width={w}
+        height={h}
+        viewBox="0 0 100 100"
+        preserveAspectRatio="xMidYMid"
+    >
+        <circle
+            cx="50"
+            cy="50"
+            fill="none"
+            stroke="#000000"
+            strokeWidth="6"
+            r="28"
+            strokeDasharray="110 40"
             style={{
-                margin: "auto", display: "block", shapeRendering: "auto",
+                animation: "rotate 1s infinite", transformOrigin: "50% 50%", strokeLinecap: "round",
             }}
-            width="60px"
-            height="60px"
-            viewBox="0 0 100 100"
-            preserveAspectRatio="xMidYMid"
-        >
-            <circle
-                cx="50"
-                cy="50"
-                fill="none"
-                stroke="#000000"
-                strokeWidth="6"
-                r="28"
-                strokeDasharray="110 40"
-                style={{
-                    animation: "rotate 1s infinite", transformOrigin: "50% 50%", strokeLinecap: "round",
-                }}
-            />
-            <style>
-                {`
+        />
+        <style>
+            {`
                 @keyframes rotate {
                   0% { transform: rotate(0deg); }
                   100% { transform: rotate(360deg); }
                     }
                   `}
-            </style>
-        </svg>);
+        </style>
+    </svg>);
 
 
     return (<div>
@@ -332,77 +391,89 @@ const Home = () => {
                 <title>Map principal</title>
                 <meta name="viewport" content="initial-scale=1.0, width=device-width"/>
             </Head>
-            <div style={{background: "black"}}>
-                <div className="divPixi">
-                    <div className="pixiContainerTitle">
-                        <p className="titre">Sneakers World</p>
-                        <p id="PseudoName" className="pseudo"></p>
-                    </div>
-                    <div style={{display: "flex", alignItems: "center"}}>
+        <div style={{background: "black"}}>
+            <div className="divPixi">
+                <div className="pixiContainerTitle">
+                    <p className="titre">Sneakers World</p>
+                    <p id="PseudoName" className="pseudo"></p>
+                </div>
+                <div style={{display: "flex", alignItems: "center"}}>
+                    <div style={{marginLeft: "auto", paddingRight: "15px", display: "flex", alignItems: "center"}}>
                         <div style={{marginLeft: "auto", paddingRight: "15px", display: "flex", alignItems: "center"}}
                              onClick={() => router.push('/logout')}>
                             <button className="buttonLogout">Logout</button>
                         </div>
-                    </div>
-                </div>
-
-                <div className="pixiContainer">
-                    <div className="chatContainer">
-                        <div style={{display: "flex", justifyContent: "center", flexDirection: "column"}}>
-                            <div style={{display: "flex", justifyContent: "center", fontFamily: "Arial"}}>
-                                <p style={{fontSize: "20px"}}>Chat Principal</p>
-                            </div>
-                            {isLoading ? (<div>
-                                    <Rolling/>
-                                    <p id="textMessage" style={{
-                                        margin: "0",
-                                        display: "flex",
-                                        justifyContent: "center",
-                                        fontFamily: "Arial,ui-serif",
-                                        fontSize: "18px"
-                                    }}>{isSendMessage ? "Envoie ..." : "Chargement ..."}</p>
-                                </div>) : (<div className="chatContainer3">
-                                    <form style={{display: "flex", alignItems: "center"}} onSubmit={(e) => {
-                                        e.preventDefault(); // Empêche le rechargement de la page
-                                        sendMessage();
-                                    }}>
-                                        <input className="inputsChat" maxLength="75" id="inputMessage"
-                                               placeholder="envoyer un message" required/>
-                                        <button type="submit" style={{background: "none", border: "none"}}>
-                                            <img
-                                                width="35"
-                                                height="35"
-                                                style={{display: "flex", alignItems: "center", cursor: "pointer"}}
-                                                src={sendImage}
-                                                alt="external-send-user-interface-febrian-hidayat-gradient-febrian-hidayat"
-                                            />
-                                        </button>
-                                    </form>
-                                </div>)}
-                            <div className="chatContainer2" style={{height: isLoading ? "0" : "72VH"}}>
-                                <div className="messageAuthor">
-                                    <p id="messageAuthor" style={{margin: 0}}></p>
-                                </div>
-                                <div id="messageContainer"
-                                     style={{paddingBottom: "3rem", width: "-webkit-fill-available"}}>
-
-                                </div>
-                            </div>
-                            <div className="chatContainer4">
-                                <p id="erreurSend"></p>
-                            </div>
+                        <div className="buttonProfil">
+                            {isLoadAvatar ? (
+                                Rolling(50, 50)
+                            ) : (
+                                <img
+                                    src={`https://ysrnyjbfemojpnptzrrz.supabase.co/storage/v1/object/public/SneakersWorld/${pseudoCookies}_avatar.png?${new Date().getTime()}`}
+                                    width="50" height="50" alt=""/>
+                            )}
                         </div>
-                    </div>
-                    {/*<div ref={pixiContainer} className="phaser"></div>*/}
-                    <div style={{display: "flex", alignItems: "center"}}>
-                        <div ref={gameContainer}/>
-                    </div>
-                    <div>
-                        <ToastContainer/>
+
                     </div>
                 </div>
             </div>
-        </div>);
+
+            <div className="pixiContainer">
+                <div className="chatContainer">
+                    <div style={{display: "flex", justifyContent: "center", flexDirection: "column"}}>
+                        <div style={{display: "flex", justifyContent: "center", fontFamily: "Arial"}}>
+                            <p style={{fontSize: "20px"}}>Chat Principal</p>
+                        </div>
+                        {isLoading ? (<div>
+                            {Rolling(60, 60)}
+                            <p id="textMessage" style={{
+                                margin: "0",
+                                display: "flex",
+                                justifyContent: "center",
+                                fontFamily: "Arial,ui-serif",
+                                fontSize: "18px"
+                            }}>{isSendMessage ? "Envoie ..." : "Chargement ..."}</p>
+                        </div>) : (<div className="chatContainer3">
+                            <form style={{display: "flex", alignItems: "center"}} onSubmit={(e) => {
+                                e.preventDefault(); // Empêche le rechargement de la page
+                                sendMessage();
+                            }}>
+                                <input className="inputsChat" maxLength="75" id="inputMessage"
+                                       placeholder="envoyer un message" required/>
+                                <button type="submit" style={{background: "none", border: "none"}}>
+                                    <img
+                                        width="35"
+                                        height="35"
+                                        style={{display: "flex", alignItems: "center", cursor: "pointer"}}
+                                        src={sendImage}
+                                        alt="external-send-user-interface-febrian-hidayat-gradient-febrian-hidayat"
+                                    />
+                                </button>
+                            </form>
+                        </div>)}
+                        <div className="chatContainer2" style={{height: isLoading ? "0" : "72VH"}}>
+                            <div className="messageAuthor">
+                                <p id="messageAuthor" style={{margin: 0}}></p>
+                            </div>
+                            <div id="messageContainer"
+                                 style={{paddingBottom: "3rem", width: "-webkit-fill-available"}}>
+
+                            </div>
+                        </div>
+                        <div className="chatContainer4">
+                            <p id="erreurSend"></p>
+                        </div>
+                    </div>
+                </div>
+                {/*<div ref={pixiContainer} className="phaser"></div>*/}
+                <div style={{display: "flex", alignItems: "center"}}>
+                    <div ref={gameContainer}/>
+                </div>
+                <div>
+                    <ToastContainer/>
+                </div>
+            </div>
+        </div>
+    </div>);
 };
 
 export async function getServerSideProps(context) {

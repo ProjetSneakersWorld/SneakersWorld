@@ -1,4 +1,5 @@
 import Phaser from 'phaser';
+import {router} from "next/router";
 
 const speed = 150;
 
@@ -65,9 +66,8 @@ export class SceneMain extends Phaser.Scene {
     handleCollision(player, collisionLayer) {
         if (Math.abs(this.player.x >= 925) && Math.abs(this.player.x <= 975)
             && Math.abs(this.player.y >= 1177) && Math.abs(this.player.y <= 1180)) {
-            console.log("RENTRER");
             // Charger la nouvelle carte
-            this.scene.start(SceneMain);
+            router.push('/scenes/SceneShop');
         }
     }
 

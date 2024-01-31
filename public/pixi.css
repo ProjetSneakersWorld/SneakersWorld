@@ -34,6 +34,18 @@ body {
     transition: all .3s;
 }
 
+.buttonProfil{
+    background: #c4c1cb;
+    border: 1px solid white;
+    padding: 1rem;
+    margin-right: 15px;
+    border-radius: 13px;
+    font-size: 1rem;
+    cursor: pointer;
+    text-align: center;
+    transition: all .3s;
+}
+
 .titre {
     color: white;
     position: relative;
