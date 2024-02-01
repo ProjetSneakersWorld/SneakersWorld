@@ -1,6 +1,6 @@
 import React, {useEffect, useRef, useState} from 'react';
 import jwt from 'jsonwebtoken';
-import '/public/pixi.css';
+import '/public/Home.css';
 import {router} from "next/router";
 
 const sendImage = "/images/send.png"
@@ -22,55 +22,47 @@ const Home = () => {
     const notify = (text) => toast(text);
 
     useEffect(() => {
-        import('phaser').then(Phaser => {
-            const SceneMain = require('../scenes/SceneMain').default;
-            const config = {
-                type: Phaser.AUTO, parent: gameContainer.current, width: "75%", // Utilisez la largeur de la fenêtre
-                height: "84%", // Utilisez la hauteur de la fenêtre
-                scene: [SceneMain], // Utilisez un tableau pour la scène
-                physics: {
-                    default: 'arcade', arcade: {}
-                }
-            };
+        if (typeof window !== "undefined") { // Vérifiez si window est défini
+            import('phaser').then(Phaser => {
+                const SceneMain = require('../scenes/SceneMain').default;
+                const config = {
+                    type: Phaser.AUTO, parent: gameContainer.current, width: "75%", // Utilisez la largeur de la fenêtre
+                    height: "84%", // Utilisez la hauteur de la fenêtre
+                    scene: [SceneMain], // Utilisez un tableau pour la scène
+                    physics: {
+                        default: 'arcade', arcade: {}
+                    }
+                };
 
-            gameInstance.current = new Phaser.Game(config); // Modifiez cette ligne
-
-            gameInstance.current.scene.scenes.forEach(scene => {
-                scene.events.on('create', () => {
-                    // Ajustez ces valeurs en fonction de la taille de votre carte
-                    const mapWidth = 2208;
-                    const mapHeight = 1408;
-
-                    scene.cameras.main.setBounds(0, 0, mapWidth, mapHeight, true);
-                    scene.cameras.main.setZoom(Math.min(gameInstance.current.scale.width / mapWidth, gameInstance.current.scale.height / mapHeight));
-                    scene.cameras.main.centerOn(mapWidth / 2, mapHeight / 2);
-
-                    // Masquer le message de chargement une fois que la carte est chargée
-                    loadingMessage.current.style.display = 'none';
-                });
-            });
-
-            return () => {
-                // Destroy the game instance when the component is unmounted
-                gameInstance.current.destroy(true);
-            };
-        });
-    }, []);
-
-    useEffect(() => {
-        const checkInputElement = setInterval(() => {
-            const inputElement = document.getElementById("inputMessage");
-            if (inputElement) {
-                inputElement.addEventListener('focus', () => {
-                    gameInstance.current.input.keyboard.enabled = false;
-                });
-                inputElement.addEventListener('blur', () => {
+                gameInstance.current = new Phaser.Game(config);
+                gameContainer.current.style.borderRadius = '15px';
+                gameContainer.current.style.overflow = 'hidden';
+                gameContainer.current.addEventListener('click', () => {
                     gameInstance.current.input.keyboard.enabled = true;
                 });
-                clearInterval(checkInputElement);
-            }
-        }, 100);
+                gameInstance.current.scene.scenes.forEach(scene => {
+                    scene.events.on('create', () => {
+                        // Ajustez ces valeurs en fonction de la taille de votre carte
+                        const mapWidth = 2208;
+                        const mapHeight = 1408;
+
+                        scene.cameras.main.setBounds(0, 0, mapWidth, mapHeight, true);
+                        scene.cameras.main.setZoom(Math.min(gameInstance.current.scale.width / mapWidth, gameInstance.current.scale.height / mapHeight));
+                        scene.cameras.main.centerOn(mapWidth / 2, mapHeight / 2);
+
+                        // Masquer le message de chargement une fois que la carte est chargée
+                        loadingMessage.current.style.display = 'none';
+                    });
+                });
+
+                return () => {
+                    // Destroy the game instance when the component is unmounted
+                    gameInstance.current.destroy(true);
+                };
+            });
+        }
     }, []);
+
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     //CODE Chat et gestion de le BD supabase
@@ -79,8 +71,10 @@ const Home = () => {
     let lastAuthor = null;
     let pseudoCookies = Cookies.get('Pseudo')
     const [id_USER, setId_USER] = useState('null');
+    const [isActive, setIsActive] = useState('null');
     const [isLoading, setIsLoading] = useState(true);
     const [isSendMessage, setIsSendMessage] = useState(false);
+    const [avatarSrc, setAvatarSrc] = useState(null);
     const [isLoadAvatar, setIsLoadAvatar] = useState(true);
 
     useEffect(() => {
@@ -187,6 +181,12 @@ const Home = () => {
                     }
                 }
             })
+            // A chaque mise à jour dans la table connexion
+            .on('postgres_changes', {event: 'UPDATE', schema: 'public', table: 'connexion'}, async (payload) => {
+                if (payload.new.isActive === true) {
+                    setIsActive(true);
+                }
+            })
             .subscribe();
 
 
@@ -254,12 +254,15 @@ const Home = () => {
             try {
                 let {data: id, error} = await supabase
                     .from('connexion')
-                    .select('id')
+                    .select('id, isActive') // Ajoutez isActive ici
                     .eq('pseudo', pseudoCookies);
 
                 if (error) throw error; // Si une erreur est renvoyée par supabase, la propager
 
                 setId_USER(id[0].id);
+                setIsActive(id[0].isActive);
+                if (isActive) {
+                }
             } catch (error) {
                 console.error('Une erreur est survenue lors de la récupération de l\'ID :', error);
                 // Gérer l'erreur comme vous le souhaitez
@@ -269,37 +272,47 @@ const Home = () => {
         fetchId_Pseudo();
 
 
-        // Fonction pour télécharger une image
-        async function uploadImage() {
-            // Utilisez fetch pour obtenir le contenu de l'image
-            const response = await fetch("/images/sneakers.png");
-            const imageBlob = await response.blob();
+        // // Fonction pour télécharger une image
+        // async function uploadImage() {
+        //     // Utilisez fetch pour obtenir le contenu de l'image
+        //     const response = await fetch("/images/sneakers.png");
+        //     const imageBlob = await response.blob();
+        //
+        //     const {data, error} = await supabase
+        //         .storage
+        //         .from('SneakersWorld')
+        //         .upload('avatar1.png', imageBlob, {
+        //             cacheControl: '3600', upsert: true,
+        //         })
+        //
+        //     if (error) {
+        //         console.error('Erreur lors de l\'upload de l\'image : ', error)
+        //         setIsLoadAvatar(false);
+        //     } else {
+        //         setIsLoadAvatar(false);
+        //         console.log('Image uploadée avec succès : ', data)
+        //     }
+        // }
+        //
+        // uploadImage();
 
-            const {data, error} = await supabase
-                .storage
-                .from('SneakersWorld')
-                .upload('avatar1.png', imageBlob, {
-                    cacheControl: '3600', upsert: true,
-                })
 
-            if (error) {
-                console.error('Erreur lors de l\'upload de l\'image : ', error)
-                setIsLoadAvatar(false);
-            } else {
-                setIsLoadAvatar(false);
-                console.log('Image uploadée avec succès : ', data)
-            }
-        }
-
-        uploadImage();
+        // // Obtenez l'URL publique de l'image
+        // async function fetchImage() {
+        //
+        //     const publicUrl = supabase.storage.from('SneakersWorld').getPublicUrl('avatar1.png')
+        //
+        //     console.log(publicUrl)
+        // }
 
 
-        // Obtenez l'URL publique de l'image
         async function fetchImage() {
-
-            const publicUrl = supabase.storage.from('SneakersWorld').getPublicUrl('avatar1.png')
-
-            console.log(publicUrl)
+            const img = new Image();
+            img.src = `https://ysrnyjbfemojpnptzrrz.supabase.co/storage/v1/object/public/SneakersWorld/${pseudoCookies}_avatar.png?${new Date().getTime()}`;
+            img.onload = () => {
+                setIsLoadAvatar(false);
+                setAvatarSrc(img.src);
+            };
         }
 
         fetchImage();
@@ -410,7 +423,7 @@ const Home = () => {
             <title>Map principal</title>
             <meta name="viewport" content="initial-scale=1.0, width=device-width"/>
         </Head>
-            <div style={{background: "black"}}>
+        <div style={{background: "black", height: "100Vh"}}>
                 <div className="divPixi">
                     <div className="pixiContainerTitle">
                         <p className="titre">Sneakers World</p>
@@ -418,22 +431,16 @@ const Home = () => {
                     </div>
                     <div style={{display: "flex", alignItems: "center"}}>
                     <div style={{marginLeft: "auto", paddingRight: "15px", display: "flex", alignItems: "center"}}>
-                            <div style={{
-                                marginLeft: "auto",
-                                paddingRight: "15px",
-                                display: "flex",
-                                alignItems: "center"
-                            }}
-                                 onClick={() => router.push('/logout')}>
-                                <button className="buttonLogout">Logout</button>
-                            </div>
-                            <div className="buttonProfil">
-                                {isLoadAvatar ? (Rolling(50, 50)) : (<img
-                                        src={`https://ysrnyjbfemojpnptzrrz.supabase.co/storage/v1/object/public/SneakersWorld/${pseudoCookies}_avatar.png?${new Date().getTime()}`}
-                                        width="50" height="50" alt=""/>)}
-                            </div>
-
+                        <div style={{
+                            marginLeft: "auto", paddingRight: "15px", display: "flex", alignItems: "center"
+                        }}
+                             onClick={() => router.push('/logout')}>
+                            <button className="buttonLogout">Logout</button>
                         </div>
+                        <div className="buttonProfil">
+                            {isLoadAvatar ? Rolling(50, 50) : <img src={avatarSrc} width="50" height="50" alt=""/>}
+                        </div>
+                    </div>
                     </div>
                 </div>
 
@@ -458,7 +465,8 @@ const Home = () => {
                                     sendMessage();
                                 }}>
                                     <input className="inputsChat" maxLength="75" id="inputMessage"
-                                           placeholder="envoyer un message" required/>
+                                           placeholder="envoyer un message" required
+                                           onClick={() => gameInstance.current.input.keyboard.enabled = false}/>
                                     <button type="submit" style={{background: "none", border: "none"}}>
                                         <img
                                             width="35"
@@ -485,14 +493,33 @@ const Home = () => {
                         </div>
                     </div>
                     {/*<div ref={pixiContainer} className="phaser"></div>*/}
-                    <div style={{display: "flex", alignItems: "center"}} onClick={() => document.getElementById("inputMessage").blur()}>
+                    <div style={{display: "flex", alignItems: "center"}}
+                         onClick={() => document.getElementById("inputMessage").blur()}>
                         <div ref={gameContainer}/>
                     </div>
                     <div>
                         <ToastContainer/>
                     </div>
+                    {isActive === false ? (
+                        <div className="modal">
+                            <div className="modal-content2">
+                                <div style={{
+                                    flexDirection: "column",
+                                    alignItems: "center",
+                                    display: "flex",
+                                    fontSize: "19px",
+                                    color: "white"
+                                }}>
+                                    <p>Votre compte n'est pas activer</p>
+                                    <p>Allez dans vos mail activer le liens pour activer votre compte</p>
+                                    <button>Renvoyer un lien</button>
+                                </div>
+                            </div>
+                        </div>
+                    ) : (<></>)}
                 </div>
-            </div>
+        </div>
+        )
     </div>);
 };
 

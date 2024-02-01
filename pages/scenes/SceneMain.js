@@ -60,7 +60,6 @@ export class SceneMain extends Phaser.Scene {
         this.cursors = this.input.keyboard.createCursorKeys();
 
         this.input.on('pointerdown', () => {
-            this.isGameFocused = true;
             this.cursors.left.enabled = true;
             this.cursors.right.enabled = true;
             this.cursors.up.enabled = true;
@@ -68,7 +67,6 @@ export class SceneMain extends Phaser.Scene {
         });
 
         window.addEventListener('blur', () => {
-            this.isGameFocused = false;
             this.cursors.left.enabled = false;
             this.cursors.right.enabled = false;
             this.cursors.up.enabled = false;

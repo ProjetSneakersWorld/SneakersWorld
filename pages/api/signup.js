@@ -6,7 +6,7 @@ const supabase = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL, process.env.
 
 export default async function handler(req, res) {
     if (req.method === 'POST') {
-        const {name, lastName, pseudo, newPassword} = req.body;
+        const {name, lastName, pseudo, email, newPassword} = req.body;
 
         try {
 // Vérifiez si le pseudo existe déjà
@@ -21,9 +21,16 @@ export default async function handler(req, res) {
                 bcrypt.hash(newPassword, 10, async function (err, hash) {
                     const {error} = await supabase
                         .from('connexion')
-                        .insert({name: name, lastName: lastName, pseudo: pseudo, mdp: hash});
+                        .insert({
+                            name: name,
+                            lastName: lastName,
+                            pseudo: pseudo,
+                            email: email,
+                            mdp: hash,
+                            isActive: false
+                        });
                 });
-                res.status(200).json({ message: "Compte créé avec succès" });
+                res.status(200).json({message: "Compte créé avec succès"});
             }
 
         } catch (error) {

@@ -150,7 +150,7 @@ body {
 }
 
 .button:hover:enabled, select:hover, .button:hover {
-    background: rgba(145, 208, 43, 0.7);
+    background: rgba(105, 208, 49, 0.7);
     transition: all .3s;
 }
 
@@ -191,7 +191,7 @@ option {
 }
 
 .error {
-    color: #c13838;
+    color: #ff0000;
 }
 
 

@@ -9,7 +9,7 @@ const Signup = () => {
     const [isLoading, setIsLoading] = useState(false);
     const checkPseudo = async (event) => {
         document.getElementById("validInscription").disabled = true;
-        const pseudo = event.target.value;
+        const pseudo = document.getElementById("Pseudo").value;
 
         const response = await fetch("/api/checkPseudo", {
             method: "POST",
@@ -21,7 +21,8 @@ const Signup = () => {
 
         if (response.status === 409) {
             setPseudoError("Ce pseudo existe déjà");
-        } else {
+        }
+        else {
             document.getElementById("validInscription").disabled = false;
             setPseudoError("");
         }
@@ -33,6 +34,7 @@ const Signup = () => {
         const name = document.getElementById("Name").value;
         const lastName = document.getElementById("LastName").value;
         const pseudo = document.getElementById("Pseudo").value;
+        const email = document.getElementById("Email").value;
         const newPassword = document.getElementById("NewPassword").value;
 
         const response = await fetch("/api/signup", {
@@ -40,7 +42,7 @@ const Signup = () => {
             headers: {
                 "Content-Type": "application/json",
             },
-            body: JSON.stringify({name, lastName, pseudo, newPassword}),
+            body: JSON.stringify({name, lastName, pseudo, email, newPassword}),
         });
 
         let idf = pseudo;
@@ -61,12 +63,15 @@ const Signup = () => {
                     // Rediriger vers la page de connexion réussie
                     await router.push("/connected");
                 } else if (response.status === 401) {
+                    setIsLoading(false);
                     document.getElementById("error").innerText = "Erreur lors de la requete a la base de données !";
                 }
             }, 2000); // 2000 millisecondes = 2 secondes
         } else if (response.status === 401) {
+            setIsLoading(false);
             document.getElementById("error").innerText = "erreur";
         } else if (response.status === 409) {
+            setIsLoading(false);
             document.getElementById("error").innerText = "pseudo deja existant";
         }
     };
@@ -128,6 +133,7 @@ const Signup = () => {
                             <label className="labelsSignup" form="name">Name</label>
                             <label className="labelsSignup" form="lastName">LastName</label>
                             <label className="labelsSignup" form="pseudo">Pseudo</label>
+                            <label className="labelsSignup" form="email">Email</label>
                             <label style={{paddingTop: pseudoError ? "35px" : "0.8rem"}} className="labelsSignup"
                                    form="password">Password</label>
                         </div>
@@ -139,6 +145,7 @@ const Signup = () => {
                             <div>
                                 <p style={{color: "red", fontSize: "15px", margin: "0"}}>{pseudoError}</p>
                             </div>
+                            <input className="inputsSignup" type='email' id="Email" maxLength="23" required/>
                             <input className="inputsSignup" type="password" id="NewPassword" maxLength="19" required
                                    autoComplete="current-password"/>
                         </div>
