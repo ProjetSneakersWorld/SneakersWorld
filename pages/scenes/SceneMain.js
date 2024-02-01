@@ -51,29 +51,40 @@ export class SceneMain extends Phaser.Scene {
         colision.setCollisionByExclusion([-1]);
         this.physics.add.collider(this.player, colision, this.handleCollision, null, this);
         // Align.scaleToGameW(this.player,0.15,this)
-        this.cursors = this.input.keyboard.createCursorKeys()
+
         this.cameras.main.setBounds(0, 0, map.widthInPixels, map.heightInPixels);
         this.cameras.main.startFollow(this.player);
         this.physics.add.collider(this.player, colision);
-        this.cameras.main.startFollow(this.player);
         this.cameras.main.setFollowOffset(-100, -100);
-
         this.player.setScale(1.5);
+        this.cursors = this.input.keyboard.createCursorKeys();
 
+        this.input.on('pointerdown', () => {
+            this.isGameFocused = true;
+            this.cursors.left.enabled = true;
+            this.cursors.right.enabled = true;
+            this.cursors.up.enabled = true;
+            this.cursors.down.enabled = true;
+        });
+
+        window.addEventListener('blur', () => {
+            this.isGameFocused = false;
+            this.cursors.left.enabled = false;
+            this.cursors.right.enabled = false;
+            this.cursors.up.enabled = false;
+            this.cursors.down.enabled = false;
+        });
     }
-
-
-    handleCollision(player, collisionLayer) {
-        if (Math.abs(this.player.x >= 925) && Math.abs(this.player.x <= 975)
-            && Math.abs(this.player.y >= 1177) && Math.abs(this.player.y <= 1180)) {
-            // Charger la nouvelle carte
-            router.push('/scenes/SceneShop');
-        }
-    }
-
-
 
     update() {
+        const { isInputFocused } = this.game.context; // Accédez au contexte via this.game.context
+
+        if (isInputFocused) {
+            return;
+        }
+
+        this.cursors = this.cursors || this.input.keyboard.createCursorKeys();
+
         this.player.setVelocity(0);
 
         if (this.cursors.up.isDown) {
@@ -99,8 +110,19 @@ export class SceneMain extends Phaser.Scene {
             // Optionally, set to a default frame without movement
             this.player.setFrame(5);
         }
-
     }
+
+
+    handleCollision(player, collisionLayer) {
+        if (Math.abs(this.player.x >= 925) && Math.abs(this.player.x <= 975)
+            && Math.abs(this.player.y >= 1177) && Math.abs(this.player.y <= 1180)) {
+            // Charger la nouvelle carte
+            router.push('/scenes/SceneShop');
+        }
+    }
+
+
+
 }
 
 export default SceneMain;

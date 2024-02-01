@@ -12,8 +12,12 @@ import {toast, ToastContainer} from "react-toastify";
 const supabase = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY);
 import 'react-toastify/dist/ReactToastify.css';
 import Head from "next/head";
+
+export const InputFocusContext = React.createContext();
+
 const Home = () => {
     const gameContainer = useRef(null);
+    const gameInstance = useRef(null);
     const loadingMessage = useRef(null);
     const notify = (text) => toast(text);
 
@@ -29,16 +33,16 @@ const Home = () => {
                 }
             };
 
-            const game = new Phaser.Game(config);
+            gameInstance.current = new Phaser.Game(config); // Modifiez cette ligne
 
-            game.scene.scenes.forEach(scene => {
+            gameInstance.current.scene.scenes.forEach(scene => {
                 scene.events.on('create', () => {
                     // Ajustez ces valeurs en fonction de la taille de votre carte
                     const mapWidth = 2208;
                     const mapHeight = 1408;
 
                     scene.cameras.main.setBounds(0, 0, mapWidth, mapHeight, true);
-                    scene.cameras.main.setZoom(Math.min(game.scale.width / mapWidth, game.scale.height / mapHeight));
+                    scene.cameras.main.setZoom(Math.min(gameInstance.current.scale.width / mapWidth, gameInstance.current.scale.height / mapHeight));
                     scene.cameras.main.centerOn(mapWidth / 2, mapHeight / 2);
 
                     // Masquer le message de chargement une fois que la carte est chargée
@@ -48,9 +52,24 @@ const Home = () => {
 
             return () => {
                 // Destroy the game instance when the component is unmounted
-                game.destroy(true);
+                gameInstance.current.destroy(true);
             };
         });
+    }, []);
+
+    useEffect(() => {
+        const checkInputElement = setInterval(() => {
+            const inputElement = document.getElementById("inputMessage");
+            if (inputElement) {
+                inputElement.addEventListener('focus', () => {
+                    gameInstance.current.input.keyboard.enabled = false;
+                });
+                inputElement.addEventListener('blur', () => {
+                    gameInstance.current.input.keyboard.enabled = true;
+                });
+                clearInterval(checkInputElement);
+            }
+        }, 100);
     }, []);
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -260,8 +279,7 @@ const Home = () => {
                 .storage
                 .from('SneakersWorld')
                 .upload('avatar1.png', imageBlob, {
-                    cacheControl: '3600',
-                    upsert: true,
+                    cacheControl: '3600', upsert: true,
                 })
 
             if (error) {
@@ -312,6 +330,7 @@ const Home = () => {
                             place: 'home'
                         },])
                         .select()
+                    gameInstance.current.input.keyboard.enabled = false;
                 } catch (error) {
                     console.error("Une erreur s'est produite lors de la récupération des données :", error);
                 }
@@ -387,92 +406,93 @@ const Home = () => {
 
 
     return (<div>
-            <Head>
-                <title>Map principal</title>
-                <meta name="viewport" content="initial-scale=1.0, width=device-width"/>
-            </Head>
-        <div style={{background: "black"}}>
-            <div className="divPixi">
-                <div className="pixiContainerTitle">
-                    <p className="titre">Sneakers World</p>
-                    <p id="PseudoName" className="pseudo"></p>
-                </div>
-                <div style={{display: "flex", alignItems: "center"}}>
+        <Head>
+            <title>Map principal</title>
+            <meta name="viewport" content="initial-scale=1.0, width=device-width"/>
+        </Head>
+            <div style={{background: "black"}}>
+                <div className="divPixi">
+                    <div className="pixiContainerTitle">
+                        <p className="titre">Sneakers World</p>
+                        <p id="PseudoName" className="pseudo"></p>
+                    </div>
+                    <div style={{display: "flex", alignItems: "center"}}>
                     <div style={{marginLeft: "auto", paddingRight: "15px", display: "flex", alignItems: "center"}}>
-                        <div style={{marginLeft: "auto", paddingRight: "15px", display: "flex", alignItems: "center"}}
-                             onClick={() => router.push('/logout')}>
-                            <button className="buttonLogout">Logout</button>
-                        </div>
-                        <div className="buttonProfil">
-                            {isLoadAvatar ? (
-                                Rolling(50, 50)
-                            ) : (
-                                <img
-                                    src={`https://ysrnyjbfemojpnptzrrz.supabase.co/storage/v1/object/public/SneakersWorld/${pseudoCookies}_avatar.png?${new Date().getTime()}`}
-                                    width="50" height="50" alt=""/>
-                            )}
-                        </div>
-
-                    </div>
-                </div>
-            </div>
-
-            <div className="pixiContainer">
-                <div className="chatContainer">
-                    <div style={{display: "flex", justifyContent: "center", flexDirection: "column"}}>
-                        <div style={{display: "flex", justifyContent: "center", fontFamily: "Arial"}}>
-                            <p style={{fontSize: "20px"}}>Chat Principal</p>
-                        </div>
-                        {isLoading ? (<div>
-                            {Rolling(60, 60)}
-                            <p id="textMessage" style={{
-                                margin: "0",
+                            <div style={{
+                                marginLeft: "auto",
+                                paddingRight: "15px",
                                 display: "flex",
-                                justifyContent: "center",
-                                fontFamily: "Arial,ui-serif",
-                                fontSize: "18px"
-                            }}>{isSendMessage ? "Envoie ..." : "Chargement ..."}</p>
-                        </div>) : (<div className="chatContainer3">
-                            <form style={{display: "flex", alignItems: "center"}} onSubmit={(e) => {
-                                e.preventDefault(); // Empêche le rechargement de la page
-                                sendMessage();
-                            }}>
-                                <input className="inputsChat" maxLength="75" id="inputMessage"
-                                       placeholder="envoyer un message" required/>
-                                <button type="submit" style={{background: "none", border: "none"}}>
-                                    <img
-                                        width="35"
-                                        height="35"
-                                        style={{display: "flex", alignItems: "center", cursor: "pointer"}}
-                                        src={sendImage}
-                                        alt="external-send-user-interface-febrian-hidayat-gradient-febrian-hidayat"
-                                    />
-                                </button>
-                            </form>
-                        </div>)}
-                        <div className="chatContainer2" style={{height: isLoading ? "0" : "72VH"}}>
-                            <div className="messageAuthor">
-                                <p id="messageAuthor" style={{margin: 0}}></p>
+                                alignItems: "center"
+                            }}
+                                 onClick={() => router.push('/logout')}>
+                                <button className="buttonLogout">Logout</button>
                             </div>
-                            <div id="messageContainer"
-                                 style={{paddingBottom: "3rem", width: "-webkit-fill-available"}}>
+                            <div className="buttonProfil">
+                                {isLoadAvatar ? (Rolling(50, 50)) : (<img
+                                        src={`https://ysrnyjbfemojpnptzrrz.supabase.co/storage/v1/object/public/SneakersWorld/${pseudoCookies}_avatar.png?${new Date().getTime()}`}
+                                        width="50" height="50" alt=""/>)}
+                            </div>
 
-                            </div>
-                        </div>
-                        <div className="chatContainer4">
-                            <p id="erreurSend"></p>
                         </div>
                     </div>
                 </div>
-                {/*<div ref={pixiContainer} className="phaser"></div>*/}
-                <div style={{display: "flex", alignItems: "center"}}>
-                    <div ref={gameContainer}/>
-                </div>
-                <div>
-                    <ToastContainer/>
+
+                <div className="pixiContainer">
+                    <div className="chatContainer">
+                        <div style={{display: "flex", justifyContent: "center", flexDirection: "column"}}>
+                            <div style={{display: "flex", justifyContent: "center", fontFamily: "Arial"}}>
+                                <p style={{fontSize: "20px"}}>Chat Principal</p>
+                            </div>
+                            {isLoading ? (<div>
+                                {Rolling(60, 60)}
+                                <p id="textMessage" style={{
+                                    margin: "0",
+                                    display: "flex",
+                                    justifyContent: "center",
+                                    fontFamily: "Arial,ui-serif",
+                                    fontSize: "18px"
+                                }}>{isSendMessage ? "Envoie ..." : "Chargement ..."}</p>
+                            </div>) : (<div className="chatContainer3">
+                                <form style={{display: "flex", alignItems: "center"}} onSubmit={(e) => {
+                                    e.preventDefault(); // Empêche le rechargement de la page
+                                    sendMessage();
+                                }}>
+                                    <input className="inputsChat" maxLength="75" id="inputMessage"
+                                           placeholder="envoyer un message" required/>
+                                    <button type="submit" style={{background: "none", border: "none"}}>
+                                        <img
+                                            width="35"
+                                            height="35"
+                                            style={{display: "flex", alignItems: "center", cursor: "pointer"}}
+                                            src={sendImage}
+                                            alt="external-send-user-interface-febrian-hidayat-gradient-febrian-hidayat"
+                                        />
+                                    </button>
+                                </form>
+                            </div>)}
+                            <div className="chatContainer2" style={{height: isLoading ? "0" : "72VH"}}>
+                                <div className="messageAuthor">
+                                    <p id="messageAuthor" style={{margin: 0}}></p>
+                                </div>
+                                <div id="messageContainer"
+                                     style={{paddingBottom: "3rem", width: "-webkit-fill-available"}}>
+
+                                </div>
+                            </div>
+                            <div className="chatContainer4">
+                                <p id="erreurSend"></p>
+                            </div>
+                        </div>
+                    </div>
+                    {/*<div ref={pixiContainer} className="phaser"></div>*/}
+                    <div style={{display: "flex", alignItems: "center"}} onClick={() => document.getElementById("inputMessage").blur()}>
+                        <div ref={gameContainer}/>
+                    </div>
+                    <div>
+                        <ToastContainer/>
+                    </div>
                 </div>
             </div>
-        </div>
     </div>);
 };
 
