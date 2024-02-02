@@ -11,17 +11,6 @@ function Index() {
         router.push(route);
     };
 
-    if (typeof window !== 'undefined') {
-        // Vérifiez si HTMLVideoElement est défini
-        if (typeof HTMLVideoElement === 'undefined') {
-            // Si ce n'est pas le cas, créez un polyfill
-            window.HTMLVideoElement = function() {
-                // Implémentez les méthodes et les propriétés nécessaires ici
-            };
-        }
-    }
-
-
     return (
         <div>
             <Head>

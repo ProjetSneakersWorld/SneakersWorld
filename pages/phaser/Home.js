@@ -22,45 +22,43 @@ const Home = () => {
     const notify = (text) => toast(text);
 
     useEffect(() => {
-        if (typeof window !== "undefined") { // Vérifiez si window est défini
-            import('phaser').then(Phaser => {
-                const SceneMain = require('../scenes/SceneMain').default;
-                const config = {
-                    type: Phaser.AUTO, parent: gameContainer.current, width: "75%", // Utilisez la largeur de la fenêtre
-                    height: "84%", // Utilisez la hauteur de la fenêtre
-                    scene: [SceneMain], // Utilisez un tableau pour la scène
-                    physics: {
-                        default: 'arcade', arcade: {}
-                    }
-                };
+        import('phaser').then(Phaser => {
+            const SceneMain = require('../scenes/SceneMain').default;
+            const config = {
+                type: Phaser.AUTO, parent: gameContainer.current, width: "75%", // Utilisez la largeur de la fenêtre
+                height: "84%", // Utilisez la hauteur de la fenêtre
+                scene: [SceneMain], // Utilisez un tableau pour la scène
+                physics: {
+                    default: 'arcade', arcade: {}
+                }
+            };
 
-                gameInstance.current = new Phaser.Game(config);
-                gameContainer.current.style.borderRadius = '15px';
-                gameContainer.current.style.overflow = 'hidden';
-                gameContainer.current.addEventListener('click', () => {
-                    gameInstance.current.input.keyboard.enabled = true;
-                });
-                gameInstance.current.scene.scenes.forEach(scene => {
-                    scene.events.on('create', () => {
-                        // Ajustez ces valeurs en fonction de la taille de votre carte
-                        const mapWidth = 2208;
-                        const mapHeight = 1408;
-
-                        scene.cameras.main.setBounds(0, 0, mapWidth, mapHeight, true);
-                        scene.cameras.main.setZoom(Math.min(gameInstance.current.scale.width / mapWidth, gameInstance.current.scale.height / mapHeight));
-                        scene.cameras.main.centerOn(mapWidth / 2, mapHeight / 2);
-
-                        // Masquer le message de chargement une fois que la carte est chargée
-                        loadingMessage.current.style.display = 'none';
-                    });
-                });
-
-                return () => {
-                    // Destroy the game instance when the component is unmounted
-                    gameInstance.current.destroy(true);
-                };
+            gameInstance.current = new Phaser.Game(config);
+            gameContainer.current.style.borderRadius = '15px';
+            gameContainer.current.style.overflow = 'hidden';
+            gameContainer.current.addEventListener('click', () => {
+                gameInstance.current.input.keyboard.enabled = true;
             });
-        }
+            gameInstance.current.scene.scenes.forEach(scene => {
+                scene.events.on('create', () => {
+                    // Ajustez ces valeurs en fonction de la taille de votre carte
+                    const mapWidth = 2208;
+                    const mapHeight = 1408;
+
+                    scene.cameras.main.setBounds(0, 0, mapWidth, mapHeight, true);
+                    scene.cameras.main.setZoom(Math.min(gameInstance.current.scale.width / mapWidth, gameInstance.current.scale.height / mapHeight));
+                    scene.cameras.main.centerOn(mapWidth / 2, mapHeight / 2);
+
+                    // Masquer le message de chargement une fois que la carte est chargée
+                    loadingMessage.current.style.display = 'none';
+                });
+            });
+
+            return () => {
+                // Destroy the game instance when the component is unmounted
+                gameInstance.current.destroy(true);
+            };
+        });
     }, []);
 
 
@@ -183,7 +181,7 @@ const Home = () => {
             })
             // A chaque mise à jour dans la table connexion
             .on('postgres_changes', {event: 'UPDATE', schema: 'public', table: 'connexion'}, async (payload) => {
-                if (payload.new.isActive === true) {
+                if(payload.new.isActive === true){
                     setIsActive(true);
                 }
             })
@@ -503,13 +501,7 @@ const Home = () => {
                     {isActive === false ? (
                         <div className="modal">
                             <div className="modal-content2">
-                                <div style={{
-                                    flexDirection: "column",
-                                    alignItems: "center",
-                                    display: "flex",
-                                    fontSize: "19px",
-                                    color: "white"
-                                }}>
+                                <div style={{flexDirection: "column", alignItems: "center",display: "flex", fontSize: "19px", color: "white"}}>
                                     <p>Votre compte n'est pas activer</p>
                                     <p>Allez dans vos mail activer le liens pour activer votre compte</p>
                                     <button>Renvoyer un lien</button>

@@ -14,25 +14,7 @@ export class SceneMain extends Phaser.Scene {
         this.load.spritesheet('character', '/assets/perso.png', { frameWidth: 32, frameHeight: 32 });
     }
 
-    create() {
-        const map = this.make.tilemap({key: "map", tileWidth: 16, tileHeight: 16});
-        const tileset = map.addTilesetImage("tiles1", "tiles");
-        const layer = map.createLayer("Calque de Tuiles 1", tileset, 0, 0);
-        const colision = map.createLayer("Collision", tileset, 0, 0)
-        this.player = this.physics.add.sprite(785,655,"character").setFrame(5);
-        // this.player = this.physics.add.sprite(926,1177,"character").setFrame(5);
-        this.anims.create({
-            key: 'up',
-            frames: this.anims.generateFrameNumbers('character', { frames: [0, 2] }),
-            frameRate: 10,
-            repeat: -1,
-        });
-        this.anims.create({
-            key: 'down',
-            frames: this.anims.generateFrameNumbers('character', { frames: [5, 8] }),
-            frameRate: 10,
-            repeat: -1,
-        });
+    update() {
 
         this.anims.create({
             key: 'right',
