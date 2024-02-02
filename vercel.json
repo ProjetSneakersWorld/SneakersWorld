@@ -1,0 +1,6 @@
+{
+  "version": 2,
+  "name": "SneakersWorld",
+  "builds": [{ "src": "package.json", "use": "@vercel/next" }],
+  "routes": [{ "src": "/(.*)", "dest": "/.next/static/$1" }]
+}

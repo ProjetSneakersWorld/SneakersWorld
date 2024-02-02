@@ -26,7 +26,9 @@ const Home = () => {
             const Phaser = await import('phaser');
             const SceneMain = require('../scenes/SceneMain').default;
             const config = {
-                type: Phaser.AUTO, parent: gameContainer.current, width: "75%", // Utilisez la largeur de la fenêtre
+                type: Phaser.AUTO,
+                parent: gameContainer.current,
+                width: "75%", // Utilisez la largeur de la fenêtre
                 height: "84%", // Utilisez la hauteur de la fenêtre
                 scene: [SceneMain], // Utilisez un tableau pour la scène
                 physics: {

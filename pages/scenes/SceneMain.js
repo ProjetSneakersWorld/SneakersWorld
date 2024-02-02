@@ -118,9 +118,6 @@ export class SceneMain extends Phaser.Scene {
             router.push('/scenes/SceneShop');
         }
     }
-
-
-
 }
 
 export default SceneMain;
