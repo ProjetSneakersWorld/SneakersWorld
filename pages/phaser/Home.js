@@ -22,7 +22,8 @@ const Home = () => {
     const notify = (text) => toast(text);
 
     useEffect(() => {
-        import('phaser').then(Phaser => {
+        const loadGame = async () => {
+            const Phaser = await import('phaser');
             const SceneMain = require('../scenes/SceneMain').default;
             const config = {
                 type: Phaser.AUTO, parent: gameContainer.current, width: "75%", // Utilisez la largeur de la fenêtre
@@ -58,7 +59,8 @@ const Home = () => {
                 // Destroy the game instance when the component is unmounted
                 gameInstance.current.destroy(true);
             };
-        });
+        }
+        loadGame();
     }, []);
 
 
