@@ -6,7 +6,7 @@ const speed = 700;
 // Importez Phaser dynamiquement avec SSR désactivé
 const Phaser = dynamic(() => import('phaser'), { ssr: false });
 
-export default function GameComponent() {
+function GameComponent() {
     const gameContainer = useRef(null);
 
     useEffect(() => {
@@ -74,9 +74,16 @@ export default function GameComponent() {
                 type: Phaser.AUTO, parent: gameContainer.current, width: "75%", // Utilisez la largeur de la fenêtre
                 height: "84%", // Utilisez la hauteur de la fenêtre
                 scene: [SceneShop], // Utilisez un tableau pour la scène
+                audio: {
+                    disableWebAudio: true,
+                },
                 physics: {
-                    default: 'arcade', arcade: {}
-                }
+                    default: 'arcade',
+                    arcade: {
+                        fps: 60,
+                        gravity: {y: 0},
+                    }
+                },
             };
 
             const game = new Phaser.Game(config);
@@ -102,3 +109,5 @@ export default function GameComponent() {
 
     return <div ref={gameContainer} />;
 }
+
+export default GameComponent;

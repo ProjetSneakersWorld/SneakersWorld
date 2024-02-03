@@ -12,58 +12,66 @@ import {toast, ToastContainer} from "react-toastify";
 const supabase = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY);
 import 'react-toastify/dist/ReactToastify.css';
 import Head from "next/head";
-
-export const InputFocusContext = React.createContext();
+import GameComponent from "../scenes/SceneShop"
 
 const Home = () => {
-    const gameContainer = useRef(null);
-    const gameInstance = useRef(null);
-    const loadingMessage = useRef(null);
+    // const gameContainer = useRef(null);
+    // const gameInstance = useRef(null);
+    // const loadingMessage = useRef(null);
     const notify = (text) => toast(text);
-
-    useEffect(() => {
-        const loadGame = async () => {
-            const Phaser = await import('phaser');
-            const SceneMain = require('../scenes/SceneMain').default;
-            const config = {
-                type: Phaser.AUTO,
-                parent: gameContainer.current,
-                width: "75%", // Utilisez la largeur de la fenêtre
-                height: "84%", // Utilisez la hauteur de la fenêtre
-                scene: [SceneMain], // Utilisez un tableau pour la scène
-                physics: {
-                    default: 'arcade', arcade: {}
-                }
-            };
-
-            gameInstance.current = new Phaser.Game(config);
-            gameContainer.current.style.borderRadius = '15px';
-            gameContainer.current.style.overflow = 'hidden';
-            gameContainer.current.addEventListener('click', () => {
-                gameInstance.current.input.keyboard.enabled = true;
-            });
-            gameInstance.current.scene.scenes.forEach(scene => {
-                scene.events.on('create', () => {
-                    // Ajustez ces valeurs en fonction de la taille de votre carte
-                    const mapWidth = 2208;
-                    const mapHeight = 1408;
-
-                    scene.cameras.main.setBounds(0, 0, mapWidth, mapHeight, true);
-                    scene.cameras.main.setZoom(Math.min(gameInstance.current.scale.width / mapWidth, gameInstance.current.scale.height / mapHeight));
-                    scene.cameras.main.centerOn(mapWidth / 2, mapHeight / 2);
-
-                    // Masquer le message de chargement une fois que la carte est chargée
-                    loadingMessage.current.style.display = 'none';
-                });
-            });
-
-            return () => {
-                // Destroy the game instance when the component is unmounted
-                gameInstance.current.destroy(true);
-            };
-        }
-        loadGame();
-    }, []);
+    // const isSSR = typeof window === 'undefined';
+    // useEffect(() => {
+    //     if (!isSSR) {
+    //         const loadGame = async () => {
+    //             const Phaser = await import('phaser');
+    //             const SceneMain = require('../scenes/SceneMain').default;
+    //             const config = {
+    //                 type: Phaser.AUTO,
+    //                 parent: gameContainer.current,
+    //                 width: "75%", // Utilisez la largeur de la fenêtre
+    //                 height: "84%", // Utilisez la hauteur de la fenêtre
+    //                 scene: [SceneMain], // Utilisez un tableau pour la scène
+    //                 audio: {
+    //                     disableWebAudio: true,
+    //                 },
+    //                 physics: {
+    //                     default: 'arcade',
+    //                     arcade: {
+    //                         fps: 60,
+    //                         gravity: {y: 0},
+    //                     }
+    //                 },
+    //             };
+    //
+    //             gameInstance.current = new Phaser.Game(config);
+    //             gameContainer.current.style.borderRadius = '15px';
+    //             gameContainer.current.style.overflow = 'hidden';
+    //             gameContainer.current.addEventListener('click', () => {
+    //                 gameInstance.current.input.keyboard.enabled = true;
+    //             });
+    //             gameInstance.current.scene.scenes.forEach(scene => {
+    //                 scene.events.on('create', () => {
+    //                     // Ajustez ces valeurs en fonction de la taille de votre carte
+    //                     const mapWidth = 2208;
+    //                     const mapHeight = 1408;
+    //
+    //                     scene.cameras.main.setBounds(0, 0, mapWidth, mapHeight, true);
+    //                     scene.cameras.main.setZoom(Math.min(gameInstance.current.scale.width / mapWidth, gameInstance.current.scale.height / mapHeight));
+    //                     scene.cameras.main.centerOn(mapWidth / 2, mapHeight / 2);
+    //
+    //                     // Masquer le message de chargement une fois que la carte est chargée
+    //                     loadingMessage.current.style.display = 'none';
+    //                 });
+    //             });
+    //
+    //             return () => {
+    //                 // Destroy the game instance when the component is unmounted
+    //                 gameInstance.current.destroy(true);
+    //             };
+    //         }
+    //         loadGame();
+    //     }
+    // }, []);
 
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -345,7 +353,6 @@ const Home = () => {
                             place: 'home'
                         },])
                         .select()
-                    gameInstance.current.input.keyboard.enabled = false;
                 } catch (error) {
                     console.error("Une erreur s'est produite lors de la récupération des données :", error);
                 }
@@ -467,8 +474,7 @@ const Home = () => {
                                     sendMessage();
                                 }}>
                                     <input className="inputsChat" maxLength="75" id="inputMessage"
-                                           placeholder="envoyer un message" required
-                                           onClick={() => gameInstance.current.input.keyboard.enabled = false}/>
+                                           placeholder="envoyer un message" required/>
                                     <button type="submit" style={{background: "none", border: "none"}}>
                                         <img
                                             width="35"
@@ -497,7 +503,8 @@ const Home = () => {
                     {/*<div ref={pixiContainer} className="phaser"></div>*/}
                     <div style={{display: "flex", alignItems: "center"}}
                          onClick={() => document.getElementById("inputMessage").blur()}>
-                        <div ref={gameContainer}/>
+                        {/*<div ref={gameContainer}/>*/}
+                        <GameComponent />
                     </div>
                     <div>
                         <ToastContainer/>
