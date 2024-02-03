@@ -1,7 +1,6 @@
 import React, {useEffect, useRef, useState} from 'react';
 import jwt from 'jsonwebtoken';
 import '/public/Home.css';
-import {router} from "next/router";
 
 const sendImage = "/images/send.png"
 import {createClient} from "@supabase/supabase-js";
@@ -13,12 +12,24 @@ const supabase = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL, process.env.
 import 'react-toastify/dist/ReactToastify.css';
 import Head from "next/head";
 import GameComponent from "../scenes/SceneShop"
+import {useRouter} from "next/router";
 
 const Home = () => {
     // const gameContainer = useRef(null);
     // const gameInstance = useRef(null);
     // const loadingMessage = useRef(null);
     const notify = (text) => toast(text);
+    const router = useRouter();
+    useEffect(() => {
+        const token = document.cookie.replace(/(?:(?:^|.*;\s*)TOKEN\s*\=\s*([^;]*).*$)|^.*$/, "$1");
+
+        try {
+            jwt.verify(token, 'secret_key');
+        } catch (err) {
+            // Redirigez vers la page d'accueil si le token n'est pas valide
+            router.push('/');
+        }
+    }, []);
     // const isSSR = typeof window === 'undefined';
     // useEffect(() => {
     //     if (!isSSR) {
@@ -525,33 +536,6 @@ const Home = () => {
         )
     </div>);
 };
-
-export async function getServerSideProps(context) {
-    const {req} = context;
-    const token = req.cookies.TOKEN;
-    if (!token) {
-        return {
-            redirect: {
-                destination: '/', permanent: false,
-            },
-        };
-    } else {
-        try {
-            jwt.verify(token, 'secret_key');
-        } catch (err) {
-            // console.error('Error verifying token:', err);
-            return {
-                redirect: {
-                    destination: '/', permanent: false,
-                },
-            };
-        }
-    }
-
-    return {
-        props: {},
-    };
-}
 
 export default Home;
 
