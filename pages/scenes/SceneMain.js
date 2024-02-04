@@ -119,7 +119,9 @@ function SceneMain() {
                         // Charger la nouvelle carte
                         console.log("ENTRER")
                         game.destroy(true);
-                        router.push('/scenes/SceneShop');
+                        document.body.style.display = 'none';
+                        router.push('/phaser/SceneShop');
+                        document.body.style.display = 'block';
                     }
                 }
 

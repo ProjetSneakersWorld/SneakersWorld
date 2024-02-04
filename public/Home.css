@@ -59,7 +59,7 @@ body {
     color: white;
 }
 
-.pixiContainer {
+.ContainerPrincipale {
     height: 89VH;
     gap: 2rem;
     display: flex;
@@ -96,7 +96,7 @@ body {
     margin: 5px;
     display: flex;
     flex-direction: column;
-    align-items: flex-start;
+    align-items: center;
     overflow-y: auto;
 }
 
@@ -124,8 +124,8 @@ body {
 
 .chatContainer3 {
     position: absolute;
-    bottom: 15px;
-    margin: 5px;
+    bottom: 0;
+    margin-bottom: 2VH;
     display: flex;
     align-items: center;
 }

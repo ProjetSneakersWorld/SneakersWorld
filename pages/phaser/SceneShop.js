@@ -7,9 +7,9 @@ import {toast, ToastContainer} from "react-toastify";
 const supabase = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY);
 import 'react-toastify/dist/ReactToastify.css';
 import Head from "next/head";
-import GameComponent from "../scenes/SceneMain"
-import {useRouter} from "next/router";
+import GameComponent from "../scenes/SceneShop"
 import Chat from "../chat/chat"
+import {useRouter} from "next/router";
 
 const Home = () => {
     const [isToken, setIsToken] = useState(false);
@@ -39,7 +39,7 @@ const Home = () => {
 
     useEffect(() => {
         if (isToken) {
-            document.getElementById("PseudoName").innerText = "Welcome, " + pseudoCookies;
+            document.getElementById("PseudoName").innerText = "Shop";
             // Récupérer l'id du pseudo
             const fetchId_Pseudo = async () => {
                 // console.log(pseudoCookies)
@@ -154,15 +154,15 @@ const Home = () => {
         </div>);
     } else {
         return (
-            <div id="pagePrincipale">
+            <div>
                 <Head>
-                    <title>Map principal</title>
+                    <title>Shop</title>
                     <meta name="viewport" content="initial-scale=1.0, width=device-width"/>
                 </Head>
                 <div style={{background: "black", height: "100Vh"}}>
                     <div className="divPixi">
                         <div className="pixiContainerTitle">
-                            <p className="titre">Sneakers World</p>
+                            <p className="titre">Shop</p>
                             <p id="PseudoName" className="pseudo"></p>
                         </div>
                         <div style={{display: "flex", alignItems: "center"}}>
@@ -175,8 +175,8 @@ const Home = () => {
                                 <div style={{
                                     marginLeft: "auto", paddingRight: "15px", display: "flex", alignItems: "center"
                                 }}
-                                     onClick={() => router.push('/logout')}>
-                                    <button className="buttonLogout">Logout</button>
+                                     onClick={() => router.push('/phaser/Home')}>
+                                    <button className="buttonLogout">Retour</button>
                                 </div>
                                 <div className="buttonProfil">
                                     {isLoadAvatar ? Rolling(50, 50) :
@@ -187,7 +187,7 @@ const Home = () => {
                     </div>
 
                     <div className="ContainerPrincipale">
-                        <Chat place="home" nameChat="Chat Principal" />
+                        <Chat place="shop" nameChat="Shop"/>
                         <div style={{display: "flex", alignItems: "center"}}>
                             <GameComponent/>
                         </div>
@@ -204,7 +204,7 @@ const Home = () => {
                         </div>
                     </div>
                 </div>) : (<></>)}
-    </div>);
+            </div>);
     }
 };
 
