@@ -229,7 +229,7 @@ option {
     width: 35px;
     height: 35px;
     rotate: -5deg;
-    animation: 1.3s ease-in-out 0s 1 slideInFromBottom;
+    animation: 1.8s ease-in-out 0s 1 slideInFromBottom;
 }
 
 .avatar{
@@ -238,7 +238,7 @@ option {
     left: 0;
     width: 100%;
     height: 100%;
-    animation: 1s ease-in-out 0s 1 slideInFromBottom;
+    animation: 1.5s ease-in-out 0s 1 slideInFromBottom;
 }
 @keyframes opacite {
     0% {
