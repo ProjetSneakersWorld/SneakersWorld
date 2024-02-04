@@ -34,7 +34,7 @@ const Logout = () => {
                     paddingTop: "25px",
                     fontSize: "35px",
                     fontFamily: "Calibri"
-                }}>Please wait ...</p>
+                }}>Déconnexion ...</p>
             </div>
         </div>
     ) : null;

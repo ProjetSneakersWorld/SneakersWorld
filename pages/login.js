@@ -94,6 +94,10 @@ const Login = ({defaultIdf = '', defaultMdp = ''}) => {
         router.push(route);
     };
 
+    const changeInput = () => {
+        document.getElementById("error").innerText = "";
+    }
+
     return (
         <div>
             <Head>
@@ -107,7 +111,7 @@ const Login = ({defaultIdf = '', defaultMdp = ''}) => {
                         <div>
                             {searchCookies ? (<div style={{padding: "1px 5rem"}}>
                                     {Rolling(120, 120)}
-                                    <p>Connexion ...</p>
+                                <p>Reconnexion ...</p>
                                 </div>) : (<div>
                                     <div className="form-group">
                                         <div className="formlabel">
@@ -117,18 +121,20 @@ const Login = ({defaultIdf = '', defaultMdp = ''}) => {
                                         <div className="formlabel">
                                             <input className="inputs" type='text' id="idf" name="idf" maxLength="19"
                                                    required
-                                                   autoComplete="username" defaultValue={defaultIdf}/>
+                                                   autoComplete="username" defaultValue={defaultIdf} onClick={changeInput}/>
                                             <input className="inputs" type="password" id="mdp" name="mdp" maxLength="19"
                                                    required
-                                                   autoComplete="current-password" defaultValue={defaultMdp}/>
+                                                   autoComplete="current-password" defaultValue={defaultMdp} onClick={changeInput}/>
                                         </div>
                                     </div>
-                                    <button className="button" id="validInscription" type='submit' disabled={isLoading}>
-                                        {isLoading ? (<div>
+                                <button className="button" type='submit' disabled={isLoading}
+                                        style={{padding: isLoading ? "7px" : "20px"}}>
+                                    {isLoading ? (<div>
                                                 {Rolling(50, 50)}
                                             </div>) : (<>Connexion</>)}
                                     </button>
-                                    <p id="error" className="error"></p>
+                                {isLoading ? (<div><p>Connexion...</p></div>) : (<></>)}
+                                <p id="error" className="error"></p>
                                 </div>)}
                         </div>
                         <br/>

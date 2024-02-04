@@ -47,8 +47,10 @@ const Signup = () => {
         if (response.status === 409) {
             setEmailError("Cette email existe déjà");
         } else {
-            document.getElementById("validInscription").disabled = false;
-            setEmailError("");
+            if(document.getElementById("validInscription")){
+                document.getElementById("validInscription").disabled = false;
+                setEmailError("");
+            }
         }
     };
     const submitSignup = async (event) => {
@@ -191,17 +193,16 @@ const Signup = () => {
             <div className="box">
                 <p className="title">Signup</p>
                 <form action="/api/home" method="post" onSubmit={submitSignup}>
-                    <div style={{display: "flex", alignItems: "center", justifyContent: "center"}}>
+                    <div className="avatarContainer" onClick={() => fileInput.current.click()}>
                         <div style={{display: "flex", alignItems: "center", justifyContent: "center"}}>
-                            {/*<p id="" style={{margin: 0}}>Avatar</p>*/}
                         </div>
-                        <div style={{position: 'relative', width: '85px', height: '85px', cursor: "pointer"}}
-                             onClick={() => fileInput.current.click()}>
-                            <img src={avatar} alt=""
-                                 style={{position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', objectFit: selectedFile ? "scale-down": "cover"}}/>
-                            <img src={edit} alt=""
-                                 style={{position: 'absolute', top: 50, left: 48, width: '35px', height: '35px'}}/>
+                        <div style={{position: 'relative', width: '85px', height: '85px'}}>
+                            <img src={avatar} alt="" className="avatar"
+                                 style={{objectFit: selectedFile ? "scale-down" : "cover",}}/>
+                            <img src={edit} alt="" className="edit"
+                                 style={{visibility: selectedFile ? "hidden" : "visible"}}/>
                         </div>
+                        <p style={{margin: 0,paddingTop: "2px"}}>Avatar</p>
                         <input ref={fileInput} type="file" style={{display: 'none'}} accept=".png, .jpeg"
                                onChange={loadAvatar}/>
                     </div>
