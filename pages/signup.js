@@ -1,11 +1,15 @@
 // pages/signup.js
-import React, {useState} from 'react';
+import React, {useRef, useState} from 'react';
 import "../public/style.css"
 import {router} from "next/router";
 import Head from "next/head";
+import {createClient} from "@supabase/supabase-js";
+const supabase = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY);
+const edit = "/images/edit.png"
 
 const Signup = () => {
     const [pseudoError, setPseudoError] = useState("");
+    const [emailError, setEmailError] = useState("");
     const [isLoading, setIsLoading] = useState(false);
     const checkPseudo = async (event) => {
         document.getElementById("validInscription").disabled = true;
@@ -27,10 +31,30 @@ const Signup = () => {
             setPseudoError("");
         }
     };
+
+    const checkEmail = async (event) => {
+        document.getElementById("validInscription").disabled = true;
+        const email = document.getElementById("Email").value;
+
+        const response = await fetch("/api/checkEmail", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({email}),
+        });
+
+        if (response.status === 409) {
+            setEmailError("Cette email existe déjà");
+        } else {
+            document.getElementById("validInscription").disabled = false;
+            setEmailError("");
+        }
+    };
     const submitSignup = async (event) => {
         setIsLoading(true);
         event.preventDefault();
-
+        await uploadImage();
         const name = document.getElementById("Name").value;
         const lastName = document.getElementById("LastName").value;
         const pseudo = document.getElementById("Pseudo").value;
@@ -119,6 +143,45 @@ const Signup = () => {
         </svg>
     );
 
+    const fileInput = useRef(null);
+    const [selectedFile, setSelectedFile] = useState(null);
+    const [avatar, setAvatar] = useState('/images/avatar.svg');
+
+    const loadAvatar = (event) => {
+        const file = event.target.files[0];
+
+        if (file) {
+            setSelectedFile(file);
+            const fileUrl = URL.createObjectURL(file);
+            setAvatar(fileUrl);
+        }
+    };
+
+    const uploadImage = async () => {
+        let fileToUpload = selectedFile;
+
+        if (!fileToUpload) {
+            console.log('Aucun avatar sélectionné, chargement de l\'avatar par défaut');
+            // Utilisez fetch pour obtenir le contenu de l'image
+            const response = await fetch(avatar);
+            fileToUpload = await response.blob();
+        }
+
+        const {data, error} = await supabase
+            .storage
+            .from('SneakersWorld')
+            .upload(document.getElementById("Pseudo").value +"_avatar.png", fileToUpload, {
+                cacheControl: '3600', upsert: true,
+            })
+
+        if (error) {
+            console.error('Erreur lors de l\'upload de l\'image : ', error)
+        } else {
+            console.log('Image uploadée avec succès : ', data)
+        }
+    };
+
+
     return (<div>
         <Head>
             <title>Sneakers World</title>
@@ -128,12 +191,27 @@ const Signup = () => {
             <div className="box">
                 <p className="title">Signup</p>
                 <form action="/api/home" method="post" onSubmit={submitSignup}>
+                    <div style={{display: "flex", alignItems: "center", justifyContent: "center"}}>
+                        <div style={{display: "flex", alignItems: "center", justifyContent: "center"}}>
+                            {/*<p id="" style={{margin: 0}}>Avatar</p>*/}
+                        </div>
+                        <div style={{position: 'relative', width: '85px', height: '85px', cursor: "pointer"}}
+                             onClick={() => fileInput.current.click()}>
+                            <img src={avatar} alt=""
+                                 style={{position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', objectFit: selectedFile ? "scale-down": "cover"}}/>
+                            <img src={edit} alt=""
+                                 style={{position: 'absolute', top: 50, left: 48, width: '35px', height: '35px'}}/>
+                        </div>
+                        <input ref={fileInput} type="file" style={{display: 'none'}} accept=".png, .jpeg"
+                               onChange={loadAvatar}/>
+                    </div>
                     <div className="form-group">
                         <div className="formlabel">
                             <label className="labelsSignup" form="name">Name</label>
                             <label className="labelsSignup" form="lastName">LastName</label>
                             <label className="labelsSignup" form="pseudo">Pseudo</label>
-                            <label className="labelsSignup" form="email">Email</label>
+                            <label style={{paddingTop: emailError ? "35px" : "0.8rem"}} className="labelsSignup"
+                                   form="email">Email</label>
                             <label style={{paddingTop: pseudoError ? "35px" : "0.8rem"}} className="labelsSignup"
                                    form="password">Password</label>
                         </div>
@@ -145,7 +223,11 @@ const Signup = () => {
                             <div>
                                 <p style={{color: "red", fontSize: "15px", margin: "0"}}>{pseudoError}</p>
                             </div>
-                            <input className="inputsSignup" type='email' id="Email" maxLength="23" required/>
+                            <input className="inputsSignup" type='email' id="Email" maxLength="23" required
+                                   onChange={checkEmail}/>
+                            <div>
+                                <p style={{color: "red", fontSize: "15px", margin: "0"}}>{emailError}</p>
+                            </div>
                             <input className="inputsSignup" type="password" id="NewPassword" maxLength="19" required
                                    autoComplete="current-password"/>
                         </div>

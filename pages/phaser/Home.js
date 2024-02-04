@@ -3,7 +3,6 @@ import jwt from 'jsonwebtoken';
 import '/public/Home.css';
 import {createClient} from "@supabase/supabase-js";
 import Cookies from "js-cookie";
-import {toast, ToastContainer} from "react-toastify";
 const supabase = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY);
 import 'react-toastify/dist/ReactToastify.css';
 import Head from "next/head";
@@ -61,31 +60,6 @@ const Home = () => {
             }
 
             fetchId_Pseudo();
-
-
-            // // Fonction pour uploader une image
-            // async function uploadImage() {
-            //     // Utilisez fetch pour obtenir le contenu de l'image
-            //     const response = await fetch("/images/sneakers.png");
-            //     const imageBlob = await response.blob();
-            //
-            //     const {data, error} = await supabase
-            //         .storage
-            //         .from('SneakersWorld')
-            //         .upload('avatar1.png', imageBlob, {
-            //             cacheControl: '3600', upsert: true,
-            //         })
-            //
-            //     if (error) {
-            //         console.error('Erreur lors de l\'upload de l\'image : ', error)
-            //         setIsLoadAvatar(false);
-            //     } else {
-            //         setIsLoadAvatar(false);
-            //         console.log('Image uploadée avec succès : ', data)
-            //     }
-            // }
-            //
-            // uploadImage();
 
 
             // // Obtenez l'URL publique de l'image

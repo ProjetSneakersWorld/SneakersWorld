@@ -1,6 +1,5 @@
 import React, {useEffect, useState} from 'react';
 import '/public/Home.css';
-
 const sendImage = "/images/send.png"
 import {createClient} from "@supabase/supabase-js";
 import Cookies from "js-cookie";
@@ -90,7 +89,10 @@ const chat = (place) => {
             let {data: users, error} = await supabase
                 .from('connexion')
                 .select('pseudo, dateOnline');
-
+            if (error) {
+                console.error('Erreur lors de la récupération id du pseudo :', error);
+                return;
+            }
             // Crée un objet pour stocker les datesOnline par pseudo
             dateOnlineByPseudo = {};
             users.forEach(user => {
@@ -364,7 +366,6 @@ const chat = (place) => {
             <div>
                 <ToastContainer/>
             </div>
-            )
         </div>);
 };
 

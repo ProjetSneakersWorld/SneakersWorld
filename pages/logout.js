@@ -3,6 +3,7 @@ import React, {useEffect} from 'react';
 import {useRouter} from 'next/router';
 import {useState} from 'react';
 import Head from "next/head";
+import '/public/Home.css';
 
 const Logout = () => {
     const router = useRouter();
