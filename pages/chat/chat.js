@@ -251,6 +251,7 @@ const chat = (place) => {
                 newMessageDiv.style.background = "rgb(50, 121, 249)";
 
                 newMessageDiv.className = "messageContainer";
+
                 // Créer un nouveau paragraphe pour le message
                 const newMessageP = document.createElement("p");
                 newMessageP.id = "message";
@@ -262,7 +263,7 @@ const chat = (place) => {
 
                 // Ajouter la nouvelle div à l'élément messageContainer
                 messageContainer.appendChild(newMessageDiv);
-
+                document.querySelector('.chatContainer2').scrollTop = document.querySelector('.chatContainer2').scrollHeight;
                 setIsSendMessage(true);
                 setIsLoading(true);
                 try {
@@ -347,13 +348,13 @@ const chat = (place) => {
     </svg>);
 
     return (
-        <div style={{display: "flex", alignItems: "stretch"}}>
+        <div style={{display: "flex", alignItems: "stretch"}} id="chatContainer">
             <div className="chatContainer">
                 <div style={{display: "flex", justifyContent: "center", flexDirection: "column"}}>
                     <div style={{display: "flex", justifyContent: "center", fontFamily: "Arial"}}>
                         <p style={{fontSize: "20px"}}>{place.nameChat}</p>
                     </div>
-                    <div className="chatContainer2" style={{height: "75VH"}}>
+                    <div className="chatContainer2" style={{height: "73VH", paddingTop: "10px"}}>
                         <div className="messageAuthor">
                             <p id="messageAuthor" style={{margin: 0}}></p>
                         </div>

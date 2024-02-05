@@ -72,9 +72,6 @@ function GameComponent() {
                     } else {
                         // If no cursor is down, stop the animation
                         this.player.anims.stop();
-
-                        // Optionally, set to a default frame without movement
-                        this.player.setFrame(5);
                     }
                 }
 

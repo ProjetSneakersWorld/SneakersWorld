@@ -26,7 +26,6 @@ function SceneMain() {
                     const layer = map.createLayer("Calque de Tuiles 1", tileset, 0, 0);
                     const colision = map.createLayer("Collision", tileset, 0, 0)
                     this.player = this.physics.add.sprite(785, 655, "character").setFrame(5);
-                    // this.player = this.physics.add.sprite(926,1177,"character").setFrame(5);
                     this.anims.create({
                         key: 'up',
                         frames: this.anims.generateFrameNumbers('character', {frames: [0, 2]}),
@@ -42,13 +41,13 @@ function SceneMain() {
 
                     this.anims.create({
                         key: 'right',
-                        frames: this.anims.generateFrameNumbers('character', {frames: [1, 4]}), // Replace [0, 1] with the actual frame numbers you want to use
+                        frames: this.anims.generateFrameNumbers('character', {frames: [1, 4]}),
                         frameRate: 10,
                         repeat: -1
                     });
                     this.anims.create({
                         key: 'left',
-                        frames: this.anims.generateFrameNumbers('character', {frames: [3, 6]}), // Replace [0, 1] with the actual frame numbers you want to use
+                        frames: this.anims.generateFrameNumbers('character', {frames: [3, 6]}),
                         frameRate: 10,
                         repeat: -1
                     });
@@ -64,26 +63,12 @@ function SceneMain() {
                     this.cameras.main.setFollowOffset(-100, -100);
                     this.player.setScale(1.5);
                     this.cursors = this.input.keyboard.createCursorKeys();
-
-                    this.input.on('pointerdown', () => {
-                        this.cursors.left.enabled = true;
-                        this.cursors.right.enabled = true;
-                        this.cursors.up.enabled = true;
-                        this.cursors.down.enabled = true;
-                    });
-
-                    window.addEventListener('blur', () => {
-                        this.cursors.left.enabled = false;
-                        this.cursors.right.enabled = false;
-                        this.cursors.up.enabled = false;
-                        this.cursors.down.enabled = false;
-                    });
                 }
 
                 update = () => {
-                    if (isInputFocused) {
-                        return;
-                    }
+                    // console.log(isInputFocused)
+                    this.game.canvas.style.border = "5px solid white";
+                    this.game.canvas.style.borderRadius = "15px";
 
                     this.cursors = this.cursors || this.input.keyboard.createCursorKeys();
 
@@ -104,9 +89,6 @@ function SceneMain() {
                     } else {
                         // If no cursor is down, stop the animation
                         this.player.anims.stop();
-
-                        // Optionally, set to a default frame without movement
-                        this.player.setFrame(5);
                     }
                 }
 
@@ -137,26 +119,13 @@ function SceneMain() {
                 physics: {
                     default: 'arcade',
                     arcade: {
-                        fps: 60,
+                        fps: 120,
                     }
                 },
             };
 
 
             const game = new Phaser.Game(config);
-            gameContainer.current.style.borderRadius = '15px';
-            gameContainer.current.style.overflow = 'hidden';
-            game.scene.scenes.forEach(scene => {
-                scene.events.on('create', () => {
-                    // Ajustez ces valeurs en fonction de la taille de votre carte
-                    // const mapWidth = 2208;
-                    // const mapHeight = 1408;
-                    // scene.cameras.main.setBounds(0, 0, mapWidth, mapHeight, true);
-                    // scene.cameras.main.setZoom(Math.min(game.current.scale.width / mapWidth, game.current.scale.height / mapHeight));
-                    // scene.cameras.main.centerOn(mapWidth / 2, mapHeight / 2);
-                });
-            });
-
 
             return () => {
                 // Destroy the game instance when the component is unmounted
