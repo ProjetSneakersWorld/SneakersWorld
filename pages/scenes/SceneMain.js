@@ -1,10 +1,10 @@
-import {useEffect, useRef} from "react";
+import React, {useEffect, useRef} from "react";
 import {router} from "next/router";
-
+import {InputFocusContext} from "../InputFocusContext";
 const speed = 250;
 function SceneMain() {
     const gameContainer = useRef(null);
-
+    const { isInputFocused } = React.useContext(InputFocusContext);
     useEffect(() => {
         if (typeof window !== "undefined") { // Vérifiez si le code s'exécute dans un navigateur
             const Phaser = require('phaser');
@@ -80,9 +80,7 @@ function SceneMain() {
                     });
                 }
 
-                update() {
-                    const {isInputFocused} = this.game.context; // Accédez au contexte via this.game.context
-
+                update = () => {
                     if (isInputFocused) {
                         return;
                     }

@@ -1,5 +1,6 @@
 import React, {useEffect, useState} from 'react';
 import '/public/Home.css';
+
 const sendImage = "/images/send.png"
 import {createClient} from "@supabase/supabase-js";
 import Cookies from "js-cookie";
@@ -8,8 +9,10 @@ import {toast, ToastContainer} from "react-toastify";
 
 const supabase = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY);
 import 'react-toastify/dist/ReactToastify.css';
+import {InputFocusContext} from "../InputFocusContext";
 
 const chat = (place) => {
+    const { setInputFocused } = React.useContext(InputFocusContext);
     let lastAuthor = null;
     let pseudoCookies = Cookies.get('Pseudo')
     const notify = (text) => toast(text);
@@ -17,6 +20,7 @@ const chat = (place) => {
     const [isActive, setIsActive] = useState('null');
     const [isLoading, setIsLoading] = useState(true);
     const [isSendMessage, setIsSendMessage] = useState(false);
+    const [displayMessagePseudo, setDisplayMessagePseudo] = useState(true);
 
     useEffect(() => {
         //choper le cookies pseudo
@@ -109,6 +113,7 @@ const chat = (place) => {
                 const date = new Date();
                 displayMessage(pseudo, date.getHours() + "h" + date.getMinutes(), payload.new);
                 setIsLoading(false);
+                setDisplayMessagePseudo(true);
             })
             // A chaque mise à jour dans la table connexion
             .on('postgres_changes', {event: 'UPDATE', schema: 'public', table: 'connexion'}, async (payload) => {
@@ -135,61 +140,63 @@ const chat = (place) => {
 
         // Fonction pour afficher un message
         const displayMessage = (pseudo, dateMessage, message) => {
-            // Si l'auteur du message est différent du dernier auteur
-            if (pseudo !== lastAuthor) {
-                // Créer une nouvelle div pour l'auteur du message
-                const newAuthorDiv = document.createElement("div");
-                newAuthorDiv.className = "messageAuthor";
+            if (displayMessagePseudo) {
+                // Si l'auteur du message est différent du dernier auteur
+                if (pseudo !== lastAuthor) {
+                    // Créer une nouvelle div pour l'auteur du message
+                    const newAuthorDiv = document.createElement("div");
+                    newAuthorDiv.className = "messageAuthor";
 
-                // Créer un nouveau paragraphe pour l'auteur du message
-                const newAuthorP = document.createElement("p");
-                newAuthorP.style.color = "white";
-                newAuthorP.id = "messageAuthor";
-                const newAuthorContent = document.createTextNode(pseudo + " " + dateMessage);
-                newAuthorP.appendChild(newAuthorContent);
+                    // Créer un nouveau paragraphe pour l'auteur du message
+                    const newAuthorP = document.createElement("p");
+                    newAuthorP.style.color = "white";
+                    newAuthorP.id = "messageAuthor";
+                    const newAuthorContent = document.createTextNode(pseudo + " " + dateMessage);
+                    newAuthorP.appendChild(newAuthorContent);
 
-                // Ajouter le paragraphe à la div de l'auteur du message
-                newAuthorDiv.appendChild(newAuthorP);
+                    // Ajouter le paragraphe à la div de l'auteur du message
+                    newAuthorDiv.appendChild(newAuthorP);
+
+                    // Ajouter la nouvelle div à l'élément messageContainer
+                    messageContainer.appendChild(newAuthorDiv);
+
+                    // Mettre à jour l'auteur du dernier message
+                    lastAuthor = pseudo;
+                }
+
+                // Créer une nouvelle div pour le message
+                const newMessageDiv = document.createElement("div");
+                newMessageDiv.style.background = "rgb(103, 194, 98)";
+                newMessageDiv.style.color = "white";
+
+                // Si le message vient de l'utilisateur actuel, changer la couleur de fond
+                if (pseudo === pseudoCookies) {
+                    newMessageDiv.style.background = "rgb(50, 121, 249)";
+                }
+
+                newMessageDiv.className = "messageContainer";
+                // Créer un nouveau paragraphe pour le message
+                const newMessageP = document.createElement("p");
+                newMessageP.id = "message";
+                const newMessageContent = document.createTextNode(message.message);
+                newMessageP.appendChild(newMessageContent);
+
+                // Ajouter le paragraphe à la div du message
+                newMessageDiv.appendChild(newMessageP);
 
                 // Ajouter la nouvelle div à l'élément messageContainer
-                messageContainer.appendChild(newAuthorDiv);
-
-                // Mettre à jour l'auteur du dernier message
-                lastAuthor = pseudo;
-            }
-
-            // Créer une nouvelle div pour le message
-            const newMessageDiv = document.createElement("div");
-            newMessageDiv.style.background = "rgb(103, 194, 98)";
-            newMessageDiv.style.color = "white";
-
-            // Si le message vient de l'utilisateur actuel, changer la couleur de fond
-            if (pseudo === pseudoCookies) {
-                newMessageDiv.style.background = "rgb(50, 121, 249)";
-            }
-
-            newMessageDiv.className = "messageContainer";
-            // Créer un nouveau paragraphe pour le message
-            const newMessageP = document.createElement("p");
-            newMessageP.id = "message";
-            const newMessageContent = document.createTextNode(message.message);
-            newMessageP.appendChild(newMessageContent);
-
-            // Ajouter le paragraphe à la div du message
-            newMessageDiv.appendChild(newMessageP);
-
-            // Ajouter la nouvelle div à l'élément messageContainer
-            messageContainer.appendChild(newMessageDiv);
-            if (message.length !== 0) {
-                // Après avoir ajouté un nouveau message au conteneur
-                let chatContainer = document.querySelector('.chatContainer2');
-                if (chatContainer) {
-                    chatContainer.scrollTop = chatContainer.scrollHeight;
+                messageContainer.appendChild(newMessageDiv);
+                if (message.length !== 0) {
+                    // Après avoir ajouté un nouveau message au conteneur
+                    let chatContainer = document.querySelector('.chatContainer2');
+                    if (chatContainer) {
+                        chatContainer.scrollTop = chatContainer.scrollHeight;
+                    }
                 }
             }
             setIsLoading(false);
         };
-    }, []);
+    }, [displayMessagePseudo]);
 
     useEffect(() => {
         // Récupérer l'id du pseudo
@@ -229,6 +236,30 @@ const chat = (place) => {
             if (msg === "") {
                 document.getElementById("erreurSend").innerText = "Message vide !";
             } else {
+                setDisplayMessagePseudo(false);
+                // Créer une nouvelle div pour le message
+                let messageContainer = document.getElementById('messageContainer');
+
+                const newMessageDiv = document.createElement("div");
+                newMessageDiv.style.background = "rgb(103, 194, 98)";
+                newMessageDiv.style.color = "white";
+
+                //le message vient de l'utilisateur actuel, changer la couleur de fond
+                newMessageDiv.style.background = "rgb(50, 121, 249)";
+
+                newMessageDiv.className = "messageContainer";
+                // Créer un nouveau paragraphe pour le message
+                const newMessageP = document.createElement("p");
+                newMessageP.id = "message";
+                const newMessageContent = document.createTextNode(msg);
+                newMessageP.appendChild(newMessageContent);
+
+                // Ajouter le paragraphe à la div du message
+                newMessageDiv.appendChild(newMessageP);
+
+                // Ajouter la nouvelle div à l'élément messageContainer
+                messageContainer.appendChild(newMessageDiv);
+
                 setIsSendMessage(true);
                 setIsLoading(true);
                 try {
@@ -312,7 +343,6 @@ const chat = (place) => {
         </style>
     </svg>);
 
-
     return (
         <div style={{display: "flex", alignItems: "stretch"}}>
             <div className="chatContainer">
@@ -345,8 +375,21 @@ const chat = (place) => {
                                 e.preventDefault(); // Empêche le rechargement de la page
                                 sendMessage();
                             }}>
-                                <input className="inputsChat" maxLength="75" id="inputMessage"
-                                       placeholder="envoyer un message" required/>
+                                <input
+                                    className="inputsChat"
+                                    maxLength="75"
+                                    id="inputMessage"
+                                    placeholder="envoyer un message"
+                                    required
+                                    onFocus={() => setInputFocused(true)}
+                                    onBlur={() => setInputFocused(false)}
+                                    onKeyDown={(event) => {
+                                        // Arrête la propagation de l'événement pour empêcher le jeu de le recevoir
+                                        event.stopPropagation();
+                                    }}
+                                />
+
+
                                 <button type="submit" style={{background: "none", border: "none"}}>
                                     <img
                                         width="35"

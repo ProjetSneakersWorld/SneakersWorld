@@ -3,15 +3,18 @@ import jwt from 'jsonwebtoken';
 import '/public/Home.css';
 import {createClient} from "@supabase/supabase-js";
 import Cookies from "js-cookie";
+
 const supabase = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY);
 import 'react-toastify/dist/ReactToastify.css';
 import Head from "next/head";
 import GameComponent from "../scenes/SceneMain"
 import {useRouter} from "next/router";
 import Chat from "../chat/chat"
+import {InputFocusContext} from '../InputFocusContext';
 
 const Home = () => {
     const [isToken, setIsToken] = useState(false);
+    const [isInputFocused, setInputFocused] = React.useState(false);
     const router = useRouter();
 
     useEffect(() => {
@@ -48,7 +51,9 @@ const Home = () => {
                         .select('id, isActive') // Ajoutez isActive ici
                         .eq('pseudo', pseudoCookies);
 
-                    if (error) throw error; // Si une erreur est renvoyée par supabase, la propager
+                    if (error) {
+                        console.log("erreur : " + error)
+                    }
 
                     setIsActive(id[0].isActive);
                     if (isActive) {
@@ -59,18 +64,6 @@ const Home = () => {
                 }
             }
 
-            fetchId_Pseudo();
-
-
-            // // Obtenez l'URL publique de l'image
-            // async function fetchImage() {
-            //
-            //     const publicUrl = supabase.storage.from('SneakersWorld').getPublicUrl('avatar1.png')
-            //
-            //     console.log(publicUrl)
-            // }
-
-
             async function fetchImage() {
                 const img = new Image();
                 img.src = `https://ysrnyjbfemojpnptzrrz.supabase.co/storage/v1/object/public/SneakersWorld/${pseudoCookies}_avatar.png?${new Date().getTime()}`;
@@ -80,6 +73,7 @@ const Home = () => {
                 };
             }
 
+            fetchId_Pseudo();
             fetchImage();
         }
     }, [isToken]);
@@ -119,11 +113,7 @@ const Home = () => {
 
     if (isToken === false) {
         return (<div><p style={{
-            textAlign: "center",
-            color: "white",
-            paddingTop: "25px",
-            fontSize: "35px",
-            fontFamily: "Calibri"
+            textAlign: "center", color: "black", paddingTop: "25px", fontSize: "35px", fontFamily: "Calibri"
         }}>Chargement ...</p>
         </div>);
     } else {
@@ -133,44 +123,50 @@ const Home = () => {
                     <title>Map principal</title>
                     <meta name="viewport" content="initial-scale=1.0, width=device-width"/>
                 </Head>
-                <div style={{background: "black", height: "100Vh"}}>
-                    <div className="divPixi">
-                        <div className="pixiContainerTitle">
-                            <p className="titre">Sneakers World</p>
-                            <p id="PseudoName" className="pseudo"></p>
-                        </div>
-                        <div style={{display: "flex", alignItems: "center"}}>
-                            <div style={{
-                                marginLeft: "auto",
-                                paddingRight: "15px",
-                                display: "flex",
-                                alignItems: "center"
-                            }}>
+                <InputFocusContext.Provider value={{isInputFocused, setInputFocused}}>
+                    <div style={{background: "black", height: "100Vh"}}>
+                        <div className="divPixi">
+                            <div className="pixiContainerTitle">
+                                <p className="titre">Sneakers World</p>
+                                <p id="PseudoName" className="pseudo"></p>
+                            </div>
+                            <div style={{display: "flex", alignItems: "center"}}>
                                 <div style={{
-                                    marginLeft: "auto", paddingRight: "15px", display: "flex", alignItems: "center"
-                                }}
-                                     onClick={() => router.push('/logout')}>
-                                    <button className="buttonLogout">Logout</button>
-                                </div>
-                                <div className="buttonProfil">
-                                    {isLoadAvatar ? Rolling(50, 50) :
-                                        <img src={avatarSrc} width="50" height="50" alt=""/>}
+                                    marginLeft: "auto",
+                                    paddingRight: "15px",
+                                    display: "flex",
+                                    alignItems: "center"
+                                }}>
+                                    <div style={{
+                                        marginLeft: "auto", paddingRight: "15px", display: "flex", alignItems: "center"
+                                    }}
+                                         onClick={() => router.push('/logout')}>
+                                        <button className="buttonLogout">Logout</button>
+                                    </div>
+                                    <div className="buttonProfil">
+                                        {isLoadAvatar ? Rolling(50, 50) :
+                                            <img src={avatarSrc} width="50" height="50" alt=""/>}
+                                    </div>
                                 </div>
                             </div>
                         </div>
-                    </div>
-
-                    <div className="ContainerPrincipale">
-                        <Chat place="home" nameChat="Chat Principal" />
-                        <div style={{display: "flex", alignItems: "center"}}>
-                            <GameComponent/>
+                        <div className="ContainerPrincipale">
+                            <Chat place="home" nameChat="Chat Principal"/>
+                            <div style={{display: "flex", alignItems: "center"}} onClick={() => {document.getElementById("inputMessage").blur()}}>
+                                <GameComponent/>
+                            </div>
                         </div>
                     </div>
-                </div>)
+                </InputFocusContext.Provider>
+                )
                 {isActive === false ? (<div className="modal">
                     <div className="modal-content2">
                         <div style={{
-                            flexDirection: "column", alignItems: "center", display: "flex", fontSize: "19px", color: "white"
+                            flexDirection: "column",
+                            alignItems: "center",
+                            display: "flex",
+                            fontSize: "19px",
+                            color: "white"
                         }}>
                             <p>Votre compte n'est pas activer</p>
                             <p>Allez dans vos mail activer le liens pour activer votre compte</p>
@@ -178,7 +174,7 @@ const Home = () => {
                         </div>
                     </div>
                 </div>) : (<></>)}
-    </div>);
+            </div>);
     }
 };
 

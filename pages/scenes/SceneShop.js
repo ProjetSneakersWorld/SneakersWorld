@@ -1,6 +1,6 @@
-import {useEffect, useRef } from "react";
+import React, {useEffect, useRef } from "react";
 import dynamic from 'next/dynamic';
-
+import {InputFocusContext} from "../InputFocusContext";
 const speed = 700;
 
 // Importez Phaser dynamiquement avec SSR désactivé
@@ -8,7 +8,7 @@ const Phaser = dynamic(() => import('phaser'), { ssr: false });
 
 function GameComponent() {
     const gameContainer = useRef(null);
-
+    const { isInputFocused } = React.useContext(InputFocusContext);
     useEffect(() => {
         if (typeof window !== "undefined") { // Vérifiez si le code s'exécute dans un navigateur
             const Phaser = require('phaser');
@@ -48,23 +48,33 @@ function GameComponent() {
                 handleCollision(player, collisionLayer) {
 
                 }
-                update() {
+                update = () => {
+                    if (isInputFocused) {
+                        return;
+                    }
 
-                    this.player.setVelocity(0,0);
-                    if(this.cursors.up.isDown === true){
+                    this.cursors = this.cursors || this.input.keyboard.createCursorKeys();
+
+                    this.player.setVelocity(0);
+
+                    if (this.cursors.up.isDown) {
                         this.player.setVelocityY(-speed);
-                    }
-                    else if(this.cursors.left.isDown === true ){
+                        this.player.anims.play('up', true);
+                    } else if (this.cursors.left.isDown) {
                         this.player.setVelocityX(-speed);
-                    }
-                    else if(this.cursors.right.isDown === true){
+                        this.player.anims.play('left', true);
+                    } else if (this.cursors.right.isDown) {
                         this.player.setVelocityX(speed);
-                    }
-                    else if(this.cursors.down.isDown === true){
+                        this.player.anims.play('right', true);
+                    } else if (this.cursors.down.isDown) {
                         this.player.setVelocityY(speed);
-                    }
-                    if(this.cursors.space.isDown === true){
-                        console.log(this.player.x,this.player.y);
+                        this.player.anims.play('down', true);
+                    } else {
+                        // If no cursor is down, stop the animation
+                        this.player.anims.stop();
+
+                        // Optionally, set to a default frame without movement
+                        this.player.setFrame(5);
                     }
                 }
 

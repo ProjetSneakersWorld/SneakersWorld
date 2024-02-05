@@ -188,13 +188,16 @@ const Home = () => {
 
                     <div className="ContainerPrincipale">
                         <Chat place="shop" nameChat="Shop"/>
-                        <div style={{display: "flex", alignItems: "center"}}>
+                        <div style={{display: "flex", alignItems: "center"}} onClick={() => {
+                            document.getElementById("inputMessage").blur()
+                        }}>
                             <GameComponent/>
                         </div>
                     </div>
-                </div>)
+                </div>
+                )
                 {isActive === false ? (<div className="modal">
-                    <div className="modal-content2">
+                <div className="modal-content2">
                         <div style={{
                             flexDirection: "column", alignItems: "center", display: "flex", fontSize: "19px", color: "white"
                         }}>
