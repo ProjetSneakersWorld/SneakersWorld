@@ -10,7 +10,7 @@ import Head from "next/head";
 import GameComponent from "../scenes/SceneMain"
 import {useRouter} from "next/router";
 import Chat from "../chat/chat"
-import {InputFocusContext} from '../InputFocusContext';
+import {InputFocusContext} from "../../src/InputFocusContext";
 
 const Home = () => {
     const [isToken, setIsToken] = useState(false);
