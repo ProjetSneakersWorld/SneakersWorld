@@ -81,7 +81,7 @@ const chat = (place) => {
                 const date = new Date(message.timestamp);
                 // console.log(date.getHours() + "h" + date.getMinutes());
                 if (pseudo) {
-                    displayMessage(pseudo, date.getHours() + "h" + date.getMinutes(), message);
+                    displayMessage(pseudo, date.getHours() + "h" + date.getMinutes(), message, true);
                 }
             }
         };
@@ -111,9 +111,11 @@ const chat = (place) => {
             .on('postgres_changes', {event: 'INSERT', schema: 'public', table: 'message'}, async (payload) => {
                 const pseudo = await pseudoMessage(payload.new.id_user);
                 const date = new Date();
-                displayMessage(pseudo, date.getHours() + "h" + date.getMinutes(), payload.new);
+                if (payload.new.id_user !== id_USER) {
+                    console.log("C'est toi qui a envoyé : " + payload.new.id_user);
+                    displayMessage(pseudo, date.getHours() + "h" + date.getMinutes(), payload.new, false);
+                }
                 setIsLoading(false);
-                setDisplayMessagePseudo(true);
             })
             // A chaque mise à jour dans la table connexion
             .on('postgres_changes', {event: 'UPDATE', schema: 'public', table: 'connexion'}, async (payload) => {
@@ -139,8 +141,8 @@ const chat = (place) => {
 
 
         // Fonction pour afficher un message
-        const displayMessage = (pseudo, dateMessage, message) => {
-            if (displayMessagePseudo) {
+        const displayMessage = (pseudo, dateMessage, message, firstMessage) => {
+            if (pseudo !== pseudoCookies || firstMessage === true) {
                 // Si l'auteur du message est différent du dernier auteur
                 if (pseudo !== lastAuthor) {
                     // Créer une nouvelle div pour l'auteur du message
@@ -195,8 +197,9 @@ const chat = (place) => {
                 }
             }
             setIsLoading(false);
-        };
-    }, [displayMessagePseudo]);
+        }
+
+    }, []);
 
     useEffect(() => {
         // Récupérer l'id du pseudo

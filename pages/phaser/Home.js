@@ -68,10 +68,15 @@ const Home = () => {
                 const img = new Image();
                 img.src = `https://ysrnyjbfemojpnptzrrz.supabase.co/storage/v1/object/public/SneakersWorld/${pseudoCookies}_avatar.png?${new Date().getTime()}`;
                 img.onload = () => {
-                    setIsLoadAvatar(false);
                     setAvatarSrc(img.src);
+                    setIsLoadAvatar(false);
+                };
+                img.onerror = (error) => {
+                    setAvatarSrc('/images/avatar.svg');
+                    setIsLoadAvatar(false);
                 };
             }
+
 
             fetchId_Pseudo();
             fetchImage();
