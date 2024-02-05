@@ -157,13 +157,48 @@ const Home = () => {
                         </div>
                         <div className="ContainerPrincipale">
                             <Chat place="home" nameChat="Chat Principal"/>
-                            <div style={{display: "flex", alignItems: "center"}} onClick={() => {document.getElementById("inputMessage").blur()}}>
+                            <div style={{display: "flex", alignItems: "center"}} onClick={() => {
+                                if (document.getElementById("inputMessage")) {
+                                    document.getElementById("inputMessage").blur()
+                                }
+                            }}>
                                 <GameComponent/>
                             </div>
+                        </div>
+                        <div className="help"
+                             onClick={() => document.getElementById('modalHelp').style.display = "block"}>
+                            <img src="/images/aide.png" width="75" height="75" alt=""/>
                         </div>
                     </div>
                 </InputFocusContext.Provider>
                 )
+                <div className="modal" id="modalHelp" style={{display: "none"}}>
+                    <div className="modal-content2">
+                        <div style={{
+                            flexDirection: "column",
+                            alignItems: "center",
+                            display: "flex",
+                            fontSize: "19px",
+                            color: "white",
+                        }}>
+                            <p>Aide</p>
+                            <p>blablabla</p>
+                            <div style={{display: "flex"}}>
+                                <img src="/images/up.png" width="75" height="75" alt=""/>
+                                <img src="/images/up.png" width="75" height="75" alt="" style={{rotate: '180deg'}}/>
+                                <img src="/images/up.png" width="75" height="75" alt="" style={{rotate: '90deg'}}/>
+                                <img src="/images/up.png" width="75" height="75" alt="" style={{rotate: '270deg'}}/>
+                            </div>
+                        </div>
+                        <div className="modal-content-close">
+                            <button className="buttonChat"
+                                    onClick={() => document.getElementById('modalHelp').style.display = "none"}>
+                                X
+                            </button>
+                        </div>
+
+                    </div>
+                </div>
                 {isActive === false ? (<div className="modal">
                     <div className="modal-content2">
                         <div style={{

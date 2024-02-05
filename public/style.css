@@ -1,5 +1,5 @@
 body {
-    overflow-x: hidden;
+    overflow: hidden;
     height: 100Vh;
     background: repeating-linear-gradient(85deg, #b75190, #2d3e8f) fixed !important;
 }
@@ -7,17 +7,17 @@ body {
 @keyframes slideInFromRight {
     0% {
         opacity: 0.7;
-        transform: translateX(100%);
+        scale: 0.5;
     }
     100% {
         opacity: 1;
-        transform: translateX(0);
+        scale: 1;
     }
 }
 
 
 .body {
-    animation: 1s ease-out 0s 1 slideInFromRight;
+    animation: 0.7s ease-out 0s 0.7 slideInFromRight;
     height: 100Vh;
     display: flex;
     justify-content: center;

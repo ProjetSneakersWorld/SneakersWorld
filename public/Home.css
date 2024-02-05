@@ -125,7 +125,7 @@ body {
 .chatContainer3 {
     position: absolute;
     bottom: 0;
-    margin-bottom: 2VH;
+    margin: 6px 6px 2VH;
     display: flex;
     align-items: center;
 }
@@ -214,4 +214,22 @@ body {
     border: 1px solid #9b9b9b;
     width: 60%;
     border-radius: 20px;
+}
+
+.modal-content-close {
+    color: #ee0000;
+    font-size: 20px;
+    font-weight: bold;
+    position: absolute;
+    top: 20px;
+    right: 30px;
+    cursor: pointer;
+}
+
+.help{
+    cursor: pointer;
+    display: block;
+    position: absolute;
+    bottom: 15px;
+    right: 15px;
 }
