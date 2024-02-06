@@ -7,7 +7,7 @@ import Cookies from "js-cookie";
 const supabase = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY);
 import 'react-toastify/dist/ReactToastify.css';
 import Head from "next/head";
-import GameComponent from "../scenes/SceneMain"
+import GameComponent from "../../src/scenes/SceneMain"
 import {useRouter} from "next/router";
 import Chat from "../chat/chat"
 import {InputFocusContext} from "../../src/InputFocusContext";

@@ -1,6 +1,6 @@
 import React, {useEffect, useRef} from "react";
 import {router} from "next/router";
-import {InputFocusContext} from "../../src/InputFocusContext";
+import {InputFocusContext} from "../InputFocusContext";
 const speed = 250;
 function SceneMain() {
     const gameContainer = useRef(null);

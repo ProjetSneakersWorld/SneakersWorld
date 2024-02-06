@@ -1,6 +1,6 @@
 import React, {useEffect, useRef } from "react";
 import dynamic from 'next/dynamic';
-import {InputFocusContext} from "../../src/InputFocusContext";
+import {InputFocusContext} from "../InputFocusContext";
 const speed = 700;
 
 // Importez Phaser dynamiquement avec SSR désactivé

@@ -1,18 +1,16 @@
 import React, {useEffect, useState} from 'react';
 import '/public/Home.css';
-
 const sendImage = "/images/send.png"
 import {createClient} from "@supabase/supabase-js";
 import Cookies from "js-cookie";
 import moment from 'moment-timezone';
 import {toast, ToastContainer} from "react-toastify";
-
 const supabase = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY);
 import 'react-toastify/dist/ReactToastify.css';
 import {InputFocusContext} from "../../src/InputFocusContext";
 
 const chat = (place) => {
-    const { setInputFocused } = React.useContext(InputFocusContext);
+    const {isInputFocused,setInputFocused} = React.useContext(InputFocusContext);
     let lastAuthor = null;
     let pseudoCookies = Cookies.get('Pseudo')
     const notify = (text) => toast(text);
@@ -143,38 +141,27 @@ const chat = (place) => {
         // Fonction pour afficher un message
         const displayMessage = (pseudo, dateMessage, message, firstMessage) => {
             if (pseudo !== pseudoCookies || firstMessage === true) {
-                // Si l'auteur du message est différent du dernier auteur
-                if (pseudo !== lastAuthor) {
-                    // Créer une nouvelle div pour l'auteur du message
-                    const newAuthorDiv = document.createElement("div");
-                    newAuthorDiv.className = "messageAuthor";
+                // Créer une nouvelle div pour l'auteur du message
+                const newAuthorDiv = document.createElement("div");
+                newAuthorDiv.className = "messageAuthor";
 
-                    // Créer un nouveau paragraphe pour l'auteur du message
-                    const newAuthorP = document.createElement("p");
-                    newAuthorP.style.color = "white";
-                    newAuthorP.id = "messageAuthor";
-                    const newAuthorContent = document.createTextNode(pseudo + " " + dateMessage);
-                    newAuthorP.appendChild(newAuthorContent);
+                // Créer un nouveau paragraphe pour l'auteur du message
+                const newAuthorP = document.createElement("p");
+                newAuthorP.style.color = "white";
+                newAuthorP.id = "messageAuthor";
+                const newAuthorContent = document.createTextNode(pseudo + " " + dateMessage);
+                newAuthorP.appendChild(newAuthorContent);
 
-                    // Ajouter le paragraphe à la div de l'auteur du message
-                    newAuthorDiv.appendChild(newAuthorP);
+                // Ajouter le paragraphe à la div de l'auteur du message
+                newAuthorDiv.appendChild(newAuthorP);
 
-                    // Ajouter la nouvelle div à l'élément messageContainer
-                    messageContainer.appendChild(newAuthorDiv);
-
-                    // Mettre à jour l'auteur du dernier message
-                    lastAuthor = pseudo;
-                }
+                // Mettre à jour l'auteur du dernier message
+                lastAuthor = pseudo;
 
                 // Créer une nouvelle div pour le message
                 const newMessageDiv = document.createElement("div");
                 newMessageDiv.style.background = "rgb(103, 194, 98)";
                 newMessageDiv.style.color = "white";
-
-                // Si le message vient de l'utilisateur actuel, changer la couleur de fond
-                if (pseudo === pseudoCookies) {
-                    newMessageDiv.style.background = "rgb(50, 121, 249)";
-                }
 
                 newMessageDiv.className = "messageContainer";
                 // Créer un nouveau paragraphe pour le message
@@ -186,8 +173,25 @@ const chat = (place) => {
                 // Ajouter le paragraphe à la div du message
                 newMessageDiv.appendChild(newMessageP);
 
+                // Créer une nouvelle div pour contenir l'auteur et le message
+                const newParentDiv = document.createElement("div");
+                newParentDiv.className = "parentContainer";
+                newParentDiv.style.display = "flex";
+                newParentDiv.style.flexDirection = "column";
+                newParentDiv.style.alignItems = "flex-start";
+
+                // Si le message vient de l'utilisateur actuel, changer la couleur de fond
+                if (pseudo === pseudoCookies) {
+                    newMessageDiv.style.background = "rgb(50, 121, 249)";
+                    newParentDiv.style.alignItems = "flex-end";
+                }
+
+                // Ajouter l'auteur et le message à la div parente
+                newParentDiv.appendChild(newAuthorDiv);
+                newParentDiv.appendChild(newMessageDiv);
+
                 // Ajouter la nouvelle div à l'élément messageContainer
-                messageContainer.appendChild(newMessageDiv);
+                messageContainer.appendChild(newParentDiv);
                 if (message.length !== 0) {
                     // Après avoir ajouté un nouveau message au conteneur
                     let chatContainer = document.querySelector('.chatContainer2');
@@ -244,7 +248,6 @@ const chat = (place) => {
                 let messageContainer = document.getElementById('messageContainer');
 
                 const newMessageDiv = document.createElement("div");
-                newMessageDiv.style.background = "rgb(103, 194, 98)";
                 newMessageDiv.style.color = "white";
 
                 //le message vient de l'utilisateur actuel, changer la couleur de fond
@@ -261,8 +264,19 @@ const chat = (place) => {
                 // Ajouter le paragraphe à la div du message
                 newMessageDiv.appendChild(newMessageP);
 
+                // Créer une nouvelle div pour contenir l'auteur et le message
+                const newParentDiv = document.createElement("div");
+                newParentDiv.className = "parentContainer";
+                newParentDiv.style.display = "flex";
+                newParentDiv.style.flexDirection = "column";
+                newParentDiv.style.alignItems = "flex-end";
+
+                // Ajouter l'auteur et le message à la div parente
+                newParentDiv.appendChild(newMessageDiv);
+
                 // Ajouter la nouvelle div à l'élément messageContainer
-                messageContainer.appendChild(newMessageDiv);
+                messageContainer.appendChild(newParentDiv);
+
                 document.querySelector('.chatContainer2').scrollTop = document.querySelector('.chatContainer2').scrollHeight;
                 setIsSendMessage(true);
                 setIsLoading(true);
@@ -349,18 +363,20 @@ const chat = (place) => {
 
     return (
         <div style={{display: "flex", alignItems: "stretch"}} id="chatContainer">
-            <div className="chatContainer">
+            <div className="chatContainer" style={{border: isInputFocused ? "5px solid white" : ""}}>
                 <div style={{display: "flex", justifyContent: "center", flexDirection: "column"}}>
                     <div style={{display: "flex", justifyContent: "center", fontFamily: "Arial"}}>
                         <p style={{fontSize: "20px"}}>{place.nameChat}</p>
                     </div>
                     <div className="chatContainer2" style={{height: "73VH", paddingTop: "10px"}}>
-                        <div className="messageAuthor">
-                            <p id="messageAuthor" style={{margin: 0}}></p>
-                        </div>
-                        <div id="messageContainer"
-                             style={{paddingBottom: "3rem", width: "-webkit-fill-available"}}>
+                        <div id="chatContainerMessage" style={{display: "contents"}}>
+                            <div className="messageAuthor">
+                                <p id="messageAuthor" style={{margin: 0}}></p>
+                            </div>
+                            <div id="messageContainer"
+                                 style={{paddingBottom: "3rem", width: "-webkit-fill-available"}}>
 
+                            </div>
                         </div>
                     </div>
                     {isLoading ? (

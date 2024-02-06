@@ -7,7 +7,7 @@ import {toast, ToastContainer} from "react-toastify";
 const supabase = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY);
 import 'react-toastify/dist/ReactToastify.css';
 import Head from "next/head";
-import GameComponent from "../scenes/SceneShop"
+import GameComponent from "../../src/scenes/SceneShop"
 import Chat from "../chat/chat"
 import {useRouter} from "next/router";
 
