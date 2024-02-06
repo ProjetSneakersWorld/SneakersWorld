@@ -89,7 +89,7 @@ const Signup = () => {
                 if (response.status === 200) {
                     setIsLoading(false);
                     // Rediriger vers la page de connexion réussie
-                    await sendEmailConfirmation();
+                    await sendEmailConfirmation
                     await router.push("/connected");
                 } else if (response.status === 401) {
                     setIsLoading(false);
