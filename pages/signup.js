@@ -3,7 +3,9 @@ import React, {useRef, useState} from 'react';
 import "../public/style.css"
 import {router} from "next/router";
 import Head from "next/head";
+import * as emailjs from "emailjs-com";
 import {createClient} from "@supabase/supabase-js";
+import CryptoJS from "crypto-js";
 const supabase = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY);
 const edit = "/images/edit.png"
 
@@ -87,6 +89,7 @@ const Signup = () => {
                 if (response.status === 200) {
                     setIsLoading(false);
                     // Rediriger vers la page de connexion réussie
+                    await sendEmailConfirmation();
                     await router.push("/connected");
                 } else if (response.status === 401) {
                     setIsLoading(false);
@@ -101,6 +104,39 @@ const Signup = () => {
             document.getElementById("error").innerText = "pseudo deja existant";
         }
     };
+
+    const sendEmailConfirmation =  async () => {
+        console.log(document.getElementById('Pseudo').value)
+        // get link activate
+        const response = await fetch("/api/linkAccount", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({pseudo: document.getElementById('Pseudo').value}),
+        });
+
+        const data = await response.json();
+
+        if (response.status === 500) {
+            console.log('erreur : '+response.status)
+        } else {
+            // console.log("liens : " +data.data)
+        }
+        const cipherPseudo = CryptoJS.AES.encrypt(document.getElementById('Pseudo').value, 'CléSecreTpour0Chiffrer1lePSeudo').toString();
+        // send mail
+        await emailjs.send("service_lkdqtpi", "template_s8i75vu", {
+            to_name: document.getElementById('Pseudo').value,
+            link: `https://sae0.vercel.app/active?token=${encodeURIComponent(cipherPseudo)}`,
+            to_email: document.getElementById('Email').value,
+
+        }, '3i0sNCTzHsxtb0REv')
+            .then(() => {
+                console.log('Sent!');
+            }, (err) => {
+                console.log(JSON.stringify(err));
+            });
+    }
 
     const handleClick = (route) => {
         router.push(route);
@@ -224,7 +260,7 @@ const Signup = () => {
                             <div>
                                 <p style={{color: "red", fontSize: "15px", margin: "0"}}>{pseudoError}</p>
                             </div>
-                            <input className="inputsSignup" type='email' id="Email" maxLength="23" required
+                            <input className="inputsSignup" type='email' id="Email" maxLength="26" required
                                    onChange={checkEmail}/>
                             <div>
                                 <p style={{color: "red", fontSize: "15px", margin: "0"}}>{emailError}</p>

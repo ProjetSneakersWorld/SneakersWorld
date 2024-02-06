@@ -1,30 +1,24 @@
-// pages/api/activeAccount.js
+// pages/api/
 import {createClient} from "@supabase/supabase-js";
 const supabase = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY);
-export default async function activeAccountSupabase(req, res) {
+import CryptoJS from "crypto-js";
+
+export default async function linkAccount(req, res) {
     if (req.method === 'POST') {
         const { pseudo } = req.body;
 
         try {
-            const { data, error } = await supabase
-                .from('connexion')
-                .update({isActive: "TRUE"})
-                .eq('pseudo', pseudo)
-                .select()
+            const cipherPseudo = CryptoJS.AES.encrypt(pseudo, 'CléSecreTpour0Chiffrer1lePSeudo').toString();
 
-            if (data) {
-                // console.log("Réussi");
-                res.status(200).json({message: "Compte activer"});
-            } else {
-                // console.log("Échec");
-                res.status(500).json({error: "Une erreur s'est produite lors de l'activation du compte !"});
-            }
+            const link = `/active?token=${encodeURIComponent(cipherPseudo)}`;
+            console.log(link);
+            res.status(200).json({data: link});
+
         } catch (error) {
             // Gestion des erreurs lors de la connexion à la base de données
             console.error(error);
             res.status(500).json({error: "Une erreur s'est produite lors de la connexion à la base de données"});
         }
-
     } else {
         // Gérer les autres méthodes HTTP
         res.setHeader('Allow', ['POST']);

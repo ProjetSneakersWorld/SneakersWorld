@@ -121,7 +121,28 @@ const Home = () => {
             textAlign: "center", color: "black", paddingTop: "25px", fontSize: "35px", fontFamily: "Calibri"
         }}>Chargement ...</p>
         </div>);
-    } else {
+    } else if(isActive === false){
+        return (
+            <div className="modal">
+                <div className="modal-content2">
+                    <div style={{
+                        flexDirection: "column",
+                        alignItems: "center",
+                        display: "flex",
+                        fontSize: "19px",
+                        color: "white"
+                    }}>
+                        <p>Votre compte n'est pas activer !</p>
+                        <p>Des indications vous on était envoyé sur votre mail</p>
+                        <p>Veuillez suivre le lien pour activer pour activer votre compte</p>
+                        {/*<button>Renvoyer un lien</button>*/}
+                        <button className="buttonModal" onClick={()=> window.location.reload()}>Recharger la page</button>
+                    </div>
+                </div>
+            </div>
+        )
+    }
+    else {
         return (
             <div id="pagePrincipale">
                 <Head>
@@ -199,21 +220,6 @@ const Home = () => {
 
                     </div>
                 </div>
-                {isActive === false ? (<div className="modal">
-                    <div className="modal-content2">
-                        <div style={{
-                            flexDirection: "column",
-                            alignItems: "center",
-                            display: "flex",
-                            fontSize: "19px",
-                            color: "white"
-                        }}>
-                            <p>Votre compte n'est pas activer</p>
-                            <p>Allez dans vos mail activer le liens pour activer votre compte</p>
-                            <button>Renvoyer un lien</button>
-                        </div>
-                    </div>
-                </div>) : (<></>)}
             </div>);
     }
 };
