@@ -18,7 +18,6 @@ const chat = (place) => {
     const [isActive, setIsActive] = useState('null');
     const [isLoading, setIsLoading] = useState(true);
     const [isSendMessage, setIsSendMessage] = useState(false);
-    const [displayMessagePseudo, setDisplayMessagePseudo] = useState(true);
 
     useEffect(() => {
         //choper le cookies pseudo
@@ -243,10 +242,9 @@ const chat = (place) => {
             if (msg === "") {
                 document.getElementById("erreurSend").innerText = "Message vide !";
             } else {
-                setDisplayMessagePseudo(false);
                 // Créer une nouvelle div pour le message
                 let messageContainer = document.getElementById('messageContainer');
-
+                messageContainer.style.width = "100%"
                 const newMessageDiv = document.createElement("div");
                 newMessageDiv.style.color = "white";
 
