@@ -78,23 +78,24 @@ const Signup = () => {
         if (response.status === 200) {
             // Introduire un délai de 2 secondes avant de tenter de se connecter
             setTimeout(async () => {
-                const response = await fetch("/api/home", {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json",
-                    },
-                    body: JSON.stringify({idf, mdp}),
-                });
-
-                if (response.status === 200) {
-                    setIsLoading(false);
-                    // Rediriger vers la page de connexion réussie
-                    await sendEmailConfirmation
-                    await router.push("/connected");
-                } else if (response.status === 401) {
-                    setIsLoading(false);
-                    document.getElementById("error").innerText = "Erreur lors de la requete a la base de données !";
-                }
+                console.log("Reussi")
+                // const response = await fetch("/api/home", {
+                //     method: "POST",
+                //     headers: {
+                //         "Content-Type": "application/json",
+                //     },
+                //     body: JSON.stringify({idf, mdp}),
+                // });
+                //
+                // if (response.status === 200) {
+                //     setIsLoading(false);
+                //     // Rediriger vers la page de connexion réussie
+                //     await sendEmailConfirmation
+                //     await router.push("/connected");
+                // } else if (response.status === 401) {
+                //     setIsLoading(false);
+                //     document.getElementById("error").innerText = "Erreur lors de la requete a la base de données !";
+                // }
             }, 2000); // 2000 millisecondes = 2 secondes
         } else if (response.status === 401) {
             setIsLoading(false);
