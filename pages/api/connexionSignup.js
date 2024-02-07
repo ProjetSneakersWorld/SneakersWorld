@@ -1,5 +1,8 @@
 import jwt from "jsonwebtoken";
 import {serialize} from "cookie";
+import moment from "moment-timezone";
+import {createClient} from "@supabase/supabase-js";
+const supabase = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY);
 
 export default async function handler(req, res) {
     if (req.method === 'POST') {
@@ -14,14 +17,29 @@ export default async function handler(req, res) {
                 sameSite: 'strict',
                 maxAge: 3600,
                 path: '/',
-            }), serialize('Pseudo', "me", {
+            }), serialize('Pseudo', pseudo, {
                 httpOnly: false,
                 secure: process.env.NODE_ENV !== 'development',
                 sameSite: 'strict',
                 maxAge: 3600,
                 path: '/',
             })]);
-            res.status(200).json({message: 'Success'});
+            try {
+                const { data, error } = await supabase
+                    .from('connexion')
+                    .update({
+                        dateOnline: moment().tz('Europe/Paris').format(),
+                    })
+                    .eq('pseudo', pseudo); // Met à jour uniquement les lignes où le pseudo est 'admin'
+                if (error) {
+                    console.error("Une erreur s'est produite : ", error);
+                } else {
+                    res.status(200).json({message: 'Success'});
+                    console.log("Mise à jour réussie de la dateOnline");
+                }
+            } catch (error) {
+                console.error("Une erreur s'est produite : ", error);
+            }
         } catch (error) {
             console.log("erreur : " + error)
         }

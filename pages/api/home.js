@@ -44,21 +44,21 @@ export default async function handler(req, res) {
                     }
                 )]);
                 // //upadte date
-                // try {
-                //     const { data, error } = await supabase
-                //         .from('connexion')
-                //         .update({
-                //             dateOnline: moment().tz('Europe/Paris').format(),
-                //         })
-                //         .eq('pseudo', idf); // Met à jour uniquement les lignes où le pseudo est 'admin'
-                //     if (error) {
-                //         console.error("Une erreur s'est produite : ", error);
-                //     } else {
-                //         console.log("Mise à jour réussie de la dateOnline");
-                //     }
-                // } catch (error) {
-                //     console.error("Une erreur s'est produite : ", error);
-                // }
+                try {
+                    const { data, error } = await supabase
+                        .from('connexion')
+                        .update({
+                            dateOnline: moment().tz('Europe/Paris').format(),
+                        })
+                        .eq('pseudo', idf); // Met à jour uniquement les lignes où le pseudo est 'admin'
+                    if (error) {
+                        console.error("Une erreur s'est produite : ", error);
+                    } else {
+                        console.log("Mise à jour réussie de la dateOnline");
+                    }
+                } catch (error) {
+                    console.error("Une erreur s'est produite : ", error);
+                }
 
                 res.status(200).json({success: true, pseudo: user.name});
             } else {

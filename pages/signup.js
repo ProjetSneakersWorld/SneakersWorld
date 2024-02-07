@@ -81,7 +81,7 @@ const Signup = () => {
                 const response = await fetch("/api/connexionSignup", {
                     method: "POST", headers: {
                         "Content-Type": "application/json",
-                    }, body: JSON.stringify({pseudo : "me"}),
+                    }, body: JSON.stringify({pseudo : document.getElementById("Pseudo").value}),
                 });
                 if(response.status === 200){
                     console.log("Réussi !!");
