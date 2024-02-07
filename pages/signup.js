@@ -74,11 +74,22 @@ const Signup = () => {
         });
 
         let idf = pseudo;
-        let mdp = newPassword;
         if (response.status === 200) {
             // Introduire un délai de 2 secondes avant de tenter de se connecter
             setTimeout(async () => {
                 console.log("Reussi")
+                const response = await fetch("/api/connexionSignup", {
+                    method: "POST", headers: {
+                        "Content-Type": "application/json",
+                    }, body: JSON.stringify({pseudo : "me"}),
+                });
+                if(response.status === 200){
+                    console.log("Réussi !!");
+                    await router.push("/connected");
+                }else {
+                    console.log("ERREUR !!! Connexion");
+                }
+                // await sendEmailConfirmation
                 // const response = await fetch("/api/home", {
                 //     method: "POST",
                 //     headers: {
