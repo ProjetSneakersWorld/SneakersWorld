@@ -19,11 +19,11 @@ export default async function handler(req, res) {
                 .eq('pseudo', idf) // Utiliser le champ correct pour l'identifiant
                 .single();
 
-            // console.log("hi, PSEUDO : "+user.pseudo);
-
             if (error || !user) {
+                console.log('User not found or error querying the database');
                 return res.status(401).json({error: "identifiant ou mot de passe incorrect"});
             }
+
             // Comparez le mot de passe avec le mot de passe haché stocké dans la base de données
             if (bcrypt.compareSync(mdp, user.mdp)) {
                 // Authentification réussie : Générez un token
@@ -43,26 +43,27 @@ export default async function handler(req, res) {
                         path: '/',
                     }
                 )]);
-                //upadte date
-                try {
-                    const { data, error } = await supabase
-                        .from('connexion')
-                        .update({
-                            dateOnline: moment().tz('Europe/Paris').format(),
-                        })
-                        .eq('pseudo', idf); // Met à jour uniquement les lignes où le pseudo est 'admin'
-                    if (error) {
-                        console.error("Une erreur s'est produite : ", error);
-                    } else {
-                        // console.log("Mise à jour réussie de la dateOnline");
-                    }
-                } catch (error) {
-                    console.error("Une erreur s'est produite : ", error);
-                }
+                // //upadte date
+                // try {
+                //     const { data, error } = await supabase
+                //         .from('connexion')
+                //         .update({
+                //             dateOnline: moment().tz('Europe/Paris').format(),
+                //         })
+                //         .eq('pseudo', idf); // Met à jour uniquement les lignes où le pseudo est 'admin'
+                //     if (error) {
+                //         console.error("Une erreur s'est produite : ", error);
+                //     } else {
+                //         console.log("Mise à jour réussie de la dateOnline");
+                //     }
+                // } catch (error) {
+                //     console.error("Une erreur s'est produite : ", error);
+                // }
 
                 res.status(200).json({success: true, pseudo: user.name});
             } else {
                 // Échec de l'authentification
+                console.log('Password does not match');
                 res.status(401).json({error: "identifiant ou mot de passe incorrect"});
             }
         } catch (error) {

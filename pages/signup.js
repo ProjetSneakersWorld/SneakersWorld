@@ -13,7 +13,7 @@ const Signup = () => {
     const [pseudoError, setPseudoError] = useState("");
     const [emailError, setEmailError] = useState("");
     const [isLoading, setIsLoading] = useState(false);
-    const checkPseudo = async (event) => {
+    const checkPseudo = async () => {
         document.getElementById("validInscription").disabled = true;
         const pseudo = document.getElementById("Pseudo").value;
 
@@ -34,7 +34,7 @@ const Signup = () => {
         }
     };
 
-    const checkEmail = async (event) => {
+    const checkEmail = async () => {
         document.getElementById("validInscription").disabled = true;
         const email = document.getElementById("Email").value;
 
@@ -90,7 +90,7 @@ const Signup = () => {
                     setIsLoading(false);
                     // Rediriger vers la page de connexion réussie
                     await sendEmailConfirmation
-                    // await router.push("/connected");
+                    await router.push("/connected");
                 } else if (response.status === 401) {
                     setIsLoading(false);
                     document.getElementById("error").innerText = "Erreur lors de la requete a la base de données !";
@@ -115,8 +115,6 @@ const Signup = () => {
             },
             body: JSON.stringify({pseudo: document.getElementById('Pseudo').value}),
         });
-
-        const data = await response.json();
 
         if (response.status === 500) {
             console.log('erreur : '+response.status)
