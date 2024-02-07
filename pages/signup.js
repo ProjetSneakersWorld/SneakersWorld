@@ -90,7 +90,7 @@ const Signup = () => {
                     setIsLoading(false);
                     // Rediriger vers la page de connexion réussie
                     await sendEmailConfirmation
-                    await router.push("/connected");
+                    // await router.push("/connected");
                 } else if (response.status === 401) {
                     setIsLoading(false);
                     document.getElementById("error").innerText = "Erreur lors de la requete a la base de données !";

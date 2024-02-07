@@ -373,8 +373,7 @@ const chat = (place) => {
                             <div className="messageAuthor">
                                 <p id="messageAuthor" style={{margin: 0}}></p>
                             </div>
-                            <div id="messageContainer"
-                                 style={{paddingBottom: "3rem", width: "-webkit-fill-available"}}>
+                            <div id="messageContainer" className="containerChatMessage">
 
                             </div>
                         </div>
