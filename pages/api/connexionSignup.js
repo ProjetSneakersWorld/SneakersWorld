@@ -7,7 +7,7 @@ const supabase = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL, process.env.
 export default async function handler(req, res) {
     if (req.method === 'POST') {
         const {pseudo} = req.body;
-        console.log("recu pseudo : "+pseudo)
+        // console.log("recu pseudo : "+pseudo)
         try {
             const token = jwt.sign({pseudo}, 'secret_key', {expiresIn: '24h'});
             // Définissez le cookie avec le token
@@ -24,8 +24,9 @@ export default async function handler(req, res) {
                 maxAge: 3600,
                 path: '/',
             })]);
+            //mettre a jour la date de dateOnline
             try {
-                const { data, error } = await supabase
+                const { error } = await supabase
                     .from('connexion')
                     .update({
                         dateOnline: moment().tz('Europe/Paris').format(),

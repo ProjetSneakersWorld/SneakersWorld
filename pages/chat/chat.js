@@ -5,8 +5,8 @@ import {createClient} from "@supabase/supabase-js";
 import Cookies from "js-cookie";
 import moment from 'moment-timezone';
 import {toast, ToastContainer} from "react-toastify";
-const supabase = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY);
 import 'react-toastify/dist/ReactToastify.css';
+const supabase = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY);
 import {InputFocusContext} from "../../src/InputFocusContext";
 
 const chat = (place) => {

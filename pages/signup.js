@@ -6,6 +6,8 @@ import Head from "next/head";
 import * as emailjs from "emailjs-com";
 import {createClient} from "@supabase/supabase-js";
 import CryptoJS from "crypto-js";
+import {toast, ToastContainer} from "react-toastify";
+import 'react-toastify/dist/ReactToastify.css';
 const supabase = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY);
 const edit = "/images/edit.png"
 
@@ -73,41 +75,25 @@ const Signup = () => {
             body: JSON.stringify({name, lastName, pseudo, email, newPassword}),
         });
 
-        let idf = pseudo;
         if (response.status === 200) {
-            // Introduire un délai de 2 secondes avant de tenter de se connecter
-            setTimeout(async () => {
-                console.log("Reussi")
+
                 const response = await fetch("/api/connexionSignup", {
                     method: "POST", headers: {
                         "Content-Type": "application/json",
                     }, body: JSON.stringify({pseudo : document.getElementById("Pseudo").value}),
                 });
                 if(response.status === 200){
-                    console.log("Réussi !!");
-                    await router.push("/connected");
+                    await sendEmailConfirmation();
+                    // console.log("Réussi !!");
+                    // Introduire un délai de 2 secondes avant de tenter de se connecter
+                    // setTimeout(async () => {
+                    //     await router.push("/connected");
+                    // }, 2000); // 2000 millisecondes = 2 secondes
+
                 }else {
                     console.log("ERREUR !!! Connexion");
                 }
-                // await sendEmailConfirmation
-                // const response = await fetch("/api/home", {
-                //     method: "POST",
-                //     headers: {
-                //         "Content-Type": "application/json",
-                //     },
-                //     body: JSON.stringify({idf, mdp}),
-                // });
-                //
-                // if (response.status === 200) {
-                //     setIsLoading(false);
-                //     // Rediriger vers la page de connexion réussie
-                //     await sendEmailConfirmation
-                //     await router.push("/connected");
-                // } else if (response.status === 401) {
-                //     setIsLoading(false);
-                //     document.getElementById("error").innerText = "Erreur lors de la requete a la base de données !";
-                // }
-            }, 2000); // 2000 millisecondes = 2 secondes
+
         } else if (response.status === 401) {
             setIsLoading(false);
             document.getElementById("error").innerText = "erreur";
@@ -128,23 +114,31 @@ const Signup = () => {
             body: JSON.stringify({pseudo: document.getElementById('Pseudo').value}),
         });
 
+        const data = await response.json();
+
         if (response.status === 500) {
             console.log('erreur : '+response.status)
         } else {
-            // console.log("liens : " +data.data)
+            console.log("liens : " +data.data)
         }
-        const cipherPseudo = CryptoJS.AES.encrypt(document.getElementById('Pseudo').value, 'CléSecreTpour0Chiffrer1lePSeudo').toString();
         // send mail
         await emailjs.send("service_lkdqtpi", "template_s8i75vu", {
             to_name: document.getElementById('Pseudo').value,
-            link: `https://sae0.vercel.app/active?token=${encodeURIComponent(cipherPseudo)}`,
+            link: `https://sae0.vercel.app${data.data}`,
             to_email: document.getElementById('Email').value,
 
         }, '3i0sNCTzHsxtb0REv')
             .then(() => {
-                console.log('Sent!');
+                const notify = () => toast("Email Envoyé");
+                notify();
+                document.getElementById("validInscription").innerHTML = '<img width="35" height="35" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAGAAAABgCAYAAADimHc4AAAACXBIWXMAAAsTAAALEwEAmpwYAAACuUlEQVR4nO2cy24TMRSGR5QV0B2SYZXjcrHUlyg8BA+BBGxhV5ZIbGNHgT5BX4BLxUVN+w4I2KOqG/DprpRBHkgVFBHl4pkzyfk/yVLVVIrP93vsGcdNUQAAAAAAAAAAAAAAAAAAAIAxOt2Taxu9H7fczvH6+KugFra2y4sU+BF5/moDl1Xz8af18UOnx3fqeVdQsdk9ukI+vj0XP9biGYX4+M9fg6yY598up1H+f/n/tGd53105Zjb5CCH7tBN4MKP8qm2E+CRrZ7SxuYD88zXBxy3pOpTK56qRj++ka1Er36YAQjxNa4h0TSrl27/tRvf7Tem61Mq3gcvb/XhVurbW43aO1+uQbz1/kq5Nr/xQ3Yrel65PrXwb4qtit1yTrnHVnnDLqe5+PB9gl3QCkC+IwciHfJUYjHzIV4nById8lRiMfMhvjPTUl87IpLMyq7y9QJ73065p0RY6nu/awB+rszHDTgb+Qp4fpjM0TffHaZKfPnS2Pv6asBn1pskOO03yreenU3U88GETm1JG04I7rfymQjCa5FfTzjyFBB7UcQk7fQtuPJu7oMCDnKPJaZKfyHGZ5wrBaZOfCh691ZQMwWmTn0gPWVkLnTMEp1F+wr5kk73gGUNwWuUPIc+fpUJw2uUnbI8f1CIgTA4B8ofslmvWx9dNhuDSyPd8oHrkj3K9X16yIb6vKYTD0RBUPeG2LQQD+dP8xyDv1zU6CdOO7JVgMe3IT0cWc/5qhEDLvOAuewikQX5bQyBN8tsWAmmU35YQSLN86RAI8uVCIMiXuxII8uWmI4J8uTWBIF9uYSbInzOEHMdbPG4152bRvX6CfLkQCPLlQiDIlwuBIF8uBIL8pr6tKu6NyQ9xb+mOjiwt2+UFG/ieDfzCBu6nn9PvpLsFAAAAAAAAAAAAAAAAAAAAACgW5DfQ3rK+XjmIMQAAAABJRU5ErkJggg==" alt=""/>';
+                document.getElementById("Name").value = '';
+                document.getElementById("LastName").value = '';
+                document.getElementById("Pseudo").value = '';
+                document.getElementById("Email").value = '';
+                document.getElementById("NewPassword").value = '';
             }, (err) => {
-                console.log(JSON.stringify(err));
+                console.log("Erreur : "+JSON.stringify(err));
             });
     }
 
@@ -248,7 +242,7 @@ const Signup = () => {
                             <img src={edit} alt="" className="edit"
                                  style={{visibility: selectedFile ? "hidden" : "visible"}}/>
                         </div>
-                        <p style={{margin: 0,paddingTop: "2px"}}>Avatar</p>
+                        <p style={{margin: 0, paddingTop: "2px"}}>Avatar</p>
                         <input ref={fileInput} type="file" style={{display: 'none'}} accept=".png, .jpeg"
                                onChange={loadAvatar}/>
                     </div>
@@ -292,6 +286,9 @@ const Signup = () => {
             </div>
             <div style={{paddingTop: "15px"}}>
                 <button className="button" onClick={() => handleClick('/')}>Retour</button>
+            </div>
+            <div>
+                <ToastContainer/>
             </div>
         </div>
     </div>);
