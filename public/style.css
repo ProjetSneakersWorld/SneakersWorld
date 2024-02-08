@@ -27,16 +27,8 @@ body {
     font-family: arial, sans-serif;
 }
 
-.body2 {
-    padding-top: 15px;
-    height: 100Vh;
-    display: flex;
-    justify-content: center;
-    font-family: arial, sans-serif;
-    align-items: flex-start;
-}
-
 .welcomDiv{
+    user-select: none;
     gap: 15px;
     display: flex;
     flex-wrap: nowrap;
@@ -51,6 +43,7 @@ body {
 }
 
 .titreBox{
+    user-select: none;
     padding-top: 5rem;
 }
 

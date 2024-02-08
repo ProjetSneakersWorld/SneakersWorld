@@ -14,6 +14,13 @@ body {
     display: flex;
     background: black;
     justify-content: center;
+    padding-top: 15px;
+}
+
+.parentContainer .arrow {
+    content: '';
+    position: absolute;
+    z-index: 10; /* Placer derrière le texte */
 }
 
 .buttonLogout {
@@ -52,7 +59,7 @@ body {
     display: flex;
     font-family: "Arial", ui-serif;
     font-size: 37px;
-    padding-top: 15px;
+    /*padding-top: 15px;*/
 }
 
 .pseudo {
@@ -111,15 +118,13 @@ body {
     font-family: "Arial", ui-serif;
     margin: 0.1rem;
     background: rgb(218, 226, 231);
-    border-radius: 15px;
     padding: 1px 15px;
     justify-content: flex-start;
     align-items: center;
 }
 
 .messageAuthor {
-    padding-top: 1px;
-    padding-left: 15px;
+    padding: 0 8px;
     font-family: "Arial", ui-serif;
     font-size: 15px;
     font-style: italic;

@@ -1,0 +1,27 @@
+.body2 {
+    padding-top: 15px;
+    height: 100Vh;
+    display: flex;
+    justify-content: center;
+    font-family: arial, sans-serif;
+    align-items: flex-start;
+}
+
+.copyrightContainer {
+    user-select: none;
+    font-family: "Arial", ui-serif;
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+    text-align: center;
+    padding: 1rem 0;
+}
+
+.legalMentions {
+
+    display: inline-block;
+    padding: 0.5rem 1rem;
+    border-radius: 3px;
+    font-size: 0.75rem;
+    cursor: pointer;
+}

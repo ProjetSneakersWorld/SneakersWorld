@@ -1,10 +1,6 @@
 import React, {useEffect, useState} from 'react';
-import jwt from 'jsonwebtoken';
 import '/public/Home.css';
-import {createClient} from "@supabase/supabase-js";
 import Cookies from "js-cookie";
-
-const supabase = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY);
 import 'react-toastify/dist/ReactToastify.css';
 import Head from "next/head";
 import GameComponent from "../../src/scenes/SceneMain"
@@ -18,24 +14,37 @@ const Home = () => {
     const router = useRouter();
 
     useEffect(() => {
-        const token = document.cookie.replace(/(?:^|.*;\s*)TOKEN\s*=\s*([^;]*).*$|^.*$/, "$1");
-
-        try {
-            jwt.verify(token, 'secret_key');
-            setIsToken(true);
-        } catch (err) {
-            // Redirigez vers la page d'accueil si le token n'est pas valide
-            router.push('/login');
-            setIsToken(false);
-        }
+        isAuth().catch((error) => {
+            console.error(error);
+            router.push("/login");
+        });
     }, []);
+
+    async function isAuth() {
+        const token = document.cookie.replace(/(?:^|.*;\s*)TOKEN\s*=\s*([^;]*).*$|^.*$/, "$1");
+        const response = await fetch("/api/checkToken", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({token}),
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+            throw new Error(data?.message || "Failed to authenticate.");
+        }
+
+        setIsToken(data.valid);
+    }
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     //CODE Chat et gestion de le BD supabase
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
     let pseudoCookies = Cookies.get('Pseudo')
-    const [isActive, setIsActive] = useState('null');
+    const [isActive, setIsActive] = useState("null");
     const [avatarSrc, setAvatarSrc] = useState(null);
     const [isLoadAvatar, setIsLoadAvatar] = useState(true);
 
@@ -45,22 +54,20 @@ const Home = () => {
             // Récupérer l'id du pseudo
             const fetchId_Pseudo = async () => {
                 // console.log(pseudoCookies)
-                try {
-                    let {data: id, error} = await supabase
-                        .from('connexion')
-                        .select('id, isActive') // Ajoutez isActive ici
-                        .eq('pseudo', pseudoCookies);
+                const response = await fetch("/api/isActiveAccount", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify({pseudoCookies}),
+                });
 
-                    if (error) {
-                        console.log("erreur : " + error)
-                    }
-
-                    setIsActive(id[0].isActive);
-                    if (isActive) {
-                    }
-                } catch (error) {
-                    console.error('Une erreur est survenue lors de la récupération de l\'ID :', error);
-                    // Gérer l'erreur comme vous le souhaitez
+                if (response.status === 200) {
+                    setIsActive(true);
+                } else if (response.status === 401) {
+                    setIsActive(false);
+                } else {
+                    console.error('Une erreur est survenue lors de la récupération de l\'ID')
                 }
             }
 
@@ -118,10 +125,10 @@ const Home = () => {
 
     if (isToken === false) {
         return (<div><p style={{
-            textAlign: "center", color: "black", paddingTop: "25px", fontSize: "35px", fontFamily: "Calibri"
+            textAlign: "center", color: "white", background: "black",paddingTop: "25px", fontSize: "35px", fontFamily: "Calibri"
         }}>Chargement ...</p>
         </div>);
-    } else if(isActive === false){
+    } else if (isActive === false) {
         return (
             <div className="modal">
                 <div className="modal-content2">
@@ -136,13 +143,13 @@ const Home = () => {
                         <p>Des indications vous on était envoyé sur votre mail</p>
                         <p>Veuillez suivre le lien pour activer pour activer votre compte</p>
                         {/*<button>Renvoyer un lien</button>*/}
-                        <button className="buttonModal" onClick={()=> window.location.reload()}>Recharger la page</button>
+                        <button className="buttonModal" onClick={() => window.location.reload()}>Recharger la page
+                        </button>
                     </div>
                 </div>
             </div>
         )
-    }
-    else {
+    } else {
         return (
             <div id="pagePrincipale">
                 <Head>

@@ -10,31 +10,32 @@ function ConnectedPage() {
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        const token = Cookies.get('TOKEN');
-        // console.log("TEST token : "+token)
-        if (!token) {
-            // S'il n'y a pas de token, rediriger vers la page de connexion
-            router.push('/login');
-        } else {
+        const verifyToken = async () => {
             try {
-                jwt.verify(token, 'secret_key', (err) => {
-                    if (err) {
-                        // console.error('Error verifying token:', err);
-                        router.push('/login');
-                    } else {
-                        //aller chercher les infos user
-                        // console.log('Token verified successfully:', decoded);
-                        router.push('/phaser/Home');
-                    }
+                const response = await fetch('/api/checkToken', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({token: Cookies.get('TOKEN')}),
                 });
-            } catch (err) {
-                // En cas d'erreur de vérification, rediriger également vers la page de connexion
-                // console.error("Error verifying token:", err);
+
+                const { valid } = await response.json();
+
+                if (valid) {
+                    // Token valide, rediriger vers la page phaser Home
+                    await router.push('/phaser/Home');
+                } else {
+                    // Token invalide ou expiré, rediriger vers la page de connexion
+                    await router.push('/login');
+                }
+            } catch (error) {
+                console.error('Error while checking token: ', error);
                 router.push('/login');
             } finally {
                 setLoading(false);
             }
-        }
+        };
+
+        verifyToken();
     }, [router]);
 
     if (loading) {

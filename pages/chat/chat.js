@@ -1,16 +1,18 @@
 import React, {useEffect, useState} from 'react';
 import '/public/Home.css';
+
 const sendImage = "/images/send.png"
 import {createClient} from "@supabase/supabase-js";
 import Cookies from "js-cookie";
 import moment from 'moment-timezone';
 import {toast, ToastContainer} from "react-toastify";
 import 'react-toastify/dist/ReactToastify.css';
+
 const supabase = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY);
 import {InputFocusContext} from "../../src/InputFocusContext";
 
 const chat = (place) => {
-    const {isInputFocused,setInputFocused} = React.useContext(InputFocusContext);
+    const {isInputFocused, setInputFocused} = React.useContext(InputFocusContext);
     let lastAuthor = null;
     let pseudoCookies = Cookies.get('Pseudo')
     const notify = (text) => toast(text);
@@ -72,13 +74,12 @@ const chat = (place) => {
             // Trier les messages par timestamp
             messages.sort((a, b) => new Date(a.timestamp) - new Date(b.timestamp));
 
-            // Afficher tous les messages
             for (let message of messages) {
                 const pseudo = usersById[message.id_user];
                 const date = new Date(message.timestamp);
-                // console.log(date.getHours() + "h" + date.getMinutes());
+                let formattedTime = `${date.getHours()}h${date.getMinutes().toString().padStart(2, '0')}`;
                 if (pseudo) {
-                    displayMessage(pseudo, date.getHours() + "h" + date.getMinutes(), message, true);
+                    displayMessage(pseudo, formattedTime, message, true);
                 }
             }
         };
@@ -179,10 +180,14 @@ const chat = (place) => {
                 newParentDiv.style.flexDirection = "column";
                 newParentDiv.style.alignItems = "flex-start";
 
-                // Si le message vient de l'utilisateur actuel, changer la couleur de fond
+                let fontSize = window.getComputedStyle(document.body).getPropertyValue('font-size');
+                fontSize = parseFloat(fontSize);
                 if (pseudo === pseudoCookies) {
                     newMessageDiv.style.background = "rgb(50, 121, 249)";
                     newParentDiv.style.alignItems = "flex-end";
+                    newMessageDiv.style.borderRadius = Math.ceil(fontSize * 1.35) + "px " + Math.ceil(fontSize * 1.35) + "px 0px " + Math.ceil(fontSize * 1.35) + "px";
+                } else {
+                    newMessageDiv.style.borderRadius = Math.ceil(fontSize * 1.35) + "px " + Math.ceil(fontSize * 1.35) + "px " + Math.ceil(fontSize * 1.35) + "px 0px";
                 }
 
                 // Ajouter l'auteur et le message à la div parente
@@ -250,6 +255,9 @@ const chat = (place) => {
 
                 //le message vient de l'utilisateur actuel, changer la couleur de fond
                 newMessageDiv.style.background = "rgb(50, 121, 249)";
+                let fontSize = '16';
+                newMessageDiv.style.borderRadius = Math.ceil(fontSize * 1.35) + "px " + Math.ceil(fontSize * 1.35) + "px 0px " + Math.ceil(fontSize * 1.35) + "px";
+
 
                 newMessageDiv.className = "messageContainer";
 
