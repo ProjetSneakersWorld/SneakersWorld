@@ -5,10 +5,11 @@ export default async function handler(req, res) {
     if (req.method === "POST") {
         try {
             const pseudoCookies = req.body.pseudoCookies
+            console.log(pseudoCookies)
             let {data: id, error} = await supabase
                 .from('connexion')
                 .select('id, isActive') // Ajoutez isActive ici
-                .eq('pseudo', 'admin');
+                .eq('pseudo', pseudoCookies);
 
             if (error) {
                 console.log("erreur : " + error)
@@ -18,10 +19,8 @@ export default async function handler(req, res) {
                 return res.status(200).json({ valid: true });
             }
             else {
-                console.log(false)
                 return res.status(401).json({ message: "Account is not active." });
             }
-
         } catch (error) {
             console.log("Error during active account verification");
             return res.status(404).json({ message: "Error contacting BD" });

@@ -50,7 +50,6 @@ const Home = () => {
 
     useEffect(() => {
         if (isToken) {
-            document.getElementById("PseudoName").innerText = "Welcome, " + pseudoCookies;
             // Récupérer l'id du pseudo
             const fetchId_Pseudo = async () => {
                 // console.log(pseudoCookies)
@@ -65,6 +64,7 @@ const Home = () => {
                 if (response.status === 200) {
                     setIsActive(true);
                 } else if (response.status === 401) {
+                    console.log("pas actif")
                     setIsActive(false);
                 } else {
                     console.error('Une erreur est survenue lors de la récupération de l\'ID')
@@ -89,6 +89,12 @@ const Home = () => {
             fetchImage();
         }
     }, [isToken]);
+
+    useEffect(() =>{
+        if(isActive===true && isActive !== "null"){
+            document.getElementById("PseudoName").innerText = "Welcome, " + pseudoCookies;
+        }
+    }, [isActive]);
     const Rolling = (w, h) => (<svg
         xmlns="http://www.w3.org/2000/svg"
         xmlnsXlink="http://www.w3.org/1999/xlink"
@@ -123,7 +129,7 @@ const Home = () => {
     </svg>);
 
 
-    if (isToken === false) {
+    if (isToken === false || isActive === "null") {
         return (<div><p style={{
             textAlign: "center", color: "white", background: "black",paddingTop: "25px", fontSize: "35px", fontFamily: "Calibri"
         }}>Chargement ...</p>
@@ -141,9 +147,11 @@ const Home = () => {
                     }}>
                         <p>Votre compte n'est pas activer !</p>
                         <p>Des indications vous on était envoyé sur votre mail</p>
-                        <p>Veuillez suivre le lien pour activer pour activer votre compte</p>
                         {/*<button>Renvoyer un lien</button>*/}
-                        <button className="buttonModal" onClick={() => window.location.reload()}>Recharger la page
+                        <button className="buttonModal" style={{marginTop: "5px",marginBottom: "15px"}} onClick={() => window.location.reload()}>Recharger la page
+                        </button>
+
+                        <button className="buttonModal"  onClick={() => router.push('/logout')}>Deconnexion
                         </button>
                     </div>
                 </div>
@@ -152,7 +160,7 @@ const Home = () => {
     } else {
         return (
             <div id="pagePrincipale">
-                <Head>
+            <Head>
                     <title>Map principal</title>
                     <meta name="viewport" content="initial-scale=1.0, width=device-width"/>
                 </Head>
