@@ -130,7 +130,8 @@ const Home = () => {
 
 
     if (isToken === false || isActive === "null") {
-        return (<div><p style={{
+        return (
+            <div><p style={{
             textAlign: "center", color: "white", background: "black",paddingTop: "25px", fontSize: "35px", fontFamily: "Calibri"
         }}>Chargement ...</p>
         </div>);

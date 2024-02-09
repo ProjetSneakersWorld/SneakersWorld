@@ -1,4 +1,5 @@
 .body2 {
+    background: repeating-linear-gradient(85deg, #b75190, #2d3e8f) fixed;
     padding-top: 15px;
     height: 100Vh;
     display: flex;

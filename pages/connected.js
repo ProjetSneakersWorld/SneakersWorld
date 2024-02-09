@@ -1,5 +1,4 @@
 // connected.js
-import jwt from 'jsonwebtoken';
 import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
 import Cookies from 'js-cookie';
@@ -29,7 +28,7 @@ function ConnectedPage() {
                 }
             } catch (error) {
                 console.error('Error while checking token: ', error);
-                router.push('/login');
+                await router.push('/login');
             } finally {
                 setLoading(false);
             }
@@ -38,15 +37,23 @@ function ConnectedPage() {
         verifyToken();
     }, [router]);
 
-    if (loading) {
+    if (!loading) {
         // Vous pouvez afficher un indicateur de chargement ici si nécessaire
         return (
-            <div>
+            <div style={{height: "100VH",overflow: "hidden", background: "black"}}>
                 <Head>
                     <title>Loading ...</title>
                     <meta name="viewport" content="initial-scale=1.0, width=device-width"/>
                 </Head>
-                <div>Loading...</div>
+                <div><p style={{
+                    textAlign: "center",
+                    color: "white",
+                    background: "black",
+                    paddingTop: "25px",
+                    fontSize: "35px",
+                    fontFamily: "Calibri"
+                }}>Chargement ...</p>
+                </div>
             </div>
         );
     }
