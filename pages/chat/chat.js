@@ -279,7 +279,6 @@ const chat = (place) => {
         fetchId_Pseudo();
     }, []);
 
-
     const sendMessage = async () => {
         let msg = document.getElementById('inputMessage').value;
         document.getElementById('messageContainer').className = "";
@@ -411,7 +410,6 @@ const chat = (place) => {
                   `}
         </style>
     </svg>);
-    const [showEmojiPicker, setShowEmojiPicker] = useState(false);
 
     return (
         <div style={{display: "flex", alignItems: "stretch"}} id="chatContainer">
@@ -425,7 +423,7 @@ const chat = (place) => {
                             <div className="messageAuthor">
                                 <p id="messageAuthor" style={{margin: 0}}></p>
                             </div>
-                            <div id="messageContainer" className="containerChatMessage" onClick={()=>setShowEmojiPicker(true)}>
+                            <div id="messageContainer" className="containerChatMessage">
 
                             </div>
 
