@@ -244,9 +244,7 @@ const chat = (place) => {
     const createEmojiComponent = () => {
         const emojiContainer = document.createElement("span");
         emojiContainer.classList.add("emoji-container");
-        // Remplacez ceci par n'importe quel ensemble d'émoticônes que vous souhaitez utiliser
         const emojis = ["😀", "😂", "😍", "😎", "😴"];
-
         for (let i = 0; i < emojis.length; i++) {
             const emojiSpan = document.createElement("span");
             emojiSpan.className= "emojisSpan";
