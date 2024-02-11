@@ -1,6 +1,5 @@
 import React, {useEffect, useState} from 'react';
 import '/public/Home.css';
-
 const sendImage = "/images/send.png"
 import {createClient} from "@supabase/supabase-js";
 import Cookies from "js-cookie";
@@ -79,7 +78,7 @@ const chat = (place) => {
                 const date = new Date(message.timestamp);
                 let formattedTime = `${date.getHours()}h${date.getMinutes().toString().padStart(2, '0')}`;
                 if (pseudo) {
-                    displayMessage(pseudo, formattedTime, message, true);
+                    displayMessage(message.id, pseudo, formattedTime, message, true);
                 }
             }
         };
@@ -111,7 +110,7 @@ const chat = (place) => {
                 const date = new Date();
                 if (payload.new.id_user !== id_USER) {
                     console.log("C'est toi qui a envoyé : " + payload.new.id_user);
-                    displayMessage(pseudo, date.getHours() + "h" + date.getMinutes(), payload.new, false);
+                    displayMessage(payload.new.id, pseudo, date.getHours() + "h" + date.getMinutes(), payload.new, false);
                 }
                 setIsLoading(false);
             })
@@ -139,7 +138,7 @@ const chat = (place) => {
 
 
         // Fonction pour afficher un message
-        const displayMessage = (pseudo, dateMessage, message, firstMessage) => {
+        const displayMessage = (idMessage, pseudo, dateMessage, message, firstMessage) => {
             if (pseudo !== pseudoCookies || firstMessage === true) {
                 // Créer une nouvelle div pour l'auteur du message
                 const newAuthorDiv = document.createElement("div");
@@ -190,12 +189,45 @@ const chat = (place) => {
                     newMessageDiv.style.borderRadius = Math.ceil(fontSize * 1.35) + "px " + Math.ceil(fontSize * 1.35) + "px " + Math.ceil(fontSize * 1.35) + "px 0px";
                 }
 
-                // Ajouter l'auteur et le message à la div parente
+                // Obtenez l'ID du message courant
+                const getCurrentMessageId = () => {
+                    return idMessage;
+                };
+
+                // Imprimez l'emoji et l'ID du message dans la console
+                const logEmojiAndMessageId = (event) => {
+                    const clickedEmoji = event.target.innerText;
+                    const currentMessageId = getCurrentMessageId();
+                    console.log(`Clicked emoji: ${clickedEmoji}, Message ID: ${currentMessageId}`);
+                };
+
+                // Liez un écouteur d'événement 'click' à chaque émoji
+                const bindEmojiClickListener = (emojiContainer) => {
+                    const emojisSpans = emojiContainer.querySelectorAll(".emojisSpan");
+                    emojisSpans.forEach((emojiSpan) => {
+                        emojiSpan.addEventListener("click", logEmojiAndMessageId);
+                    });
+                };
+
+                // Utilisation de createEmojiComponent()
                 newParentDiv.appendChild(newAuthorDiv);
                 newParentDiv.appendChild(newMessageDiv);
-
-                // Ajouter la nouvelle div à l'élément messageContainer
                 messageContainer.appendChild(newParentDiv);
+                newParentDiv.appendChild(createEmojiComponent());
+                const emojiElement = newParentDiv.querySelector(".emoji-container");
+                emojiElement.className = "emojisContainer";
+                bindEmojiClickListener(emojiElement); // Liaison de l'écouteur d'événement click
+                emojiElement.className = "emojisContainer"
+                newParentDiv.addEventListener("mouseover", () => showEmoji(emojiElement));
+                newParentDiv.addEventListener("mouseout", () => hideEmoji(emojiElement));
+                
+                function showEmoji(element) {
+                    element.style.visibility = "visible";
+                }
+                function hideEmoji(element) {
+                    element.style.visibility = "hidden";
+                }
+
                 if (message.length !== 0) {
                     // Après avoir ajouté un nouveau message au conteneur
                     let chatContainer = document.querySelector('.chatContainer2');
@@ -208,6 +240,21 @@ const chat = (place) => {
         }
 
     }, []);
+
+    const createEmojiComponent = () => {
+        const emojiContainer = document.createElement("span");
+        emojiContainer.classList.add("emoji-container");
+        // Remplacez ceci par n'importe quel ensemble d'émoticônes que vous souhaitez utiliser
+        const emojis = ["😀", "😂", "😍", "😎", "😴"];
+
+        for (let i = 0; i < emojis.length; i++) {
+            const emojiSpan = document.createElement("span");
+            emojiSpan.className= "emojisSpan";
+            emojiSpan.textContent = emojis[i];
+            emojiContainer.append(emojiSpan);
+        }
+        return emojiContainer;
+    };
 
     useEffect(() => {
         // Récupérer l'id du pseudo
@@ -366,6 +413,7 @@ const chat = (place) => {
                   `}
         </style>
     </svg>);
+    const [showEmojiPicker, setShowEmojiPicker] = useState(false);
 
     return (
         <div style={{display: "flex", alignItems: "stretch"}} id="chatContainer">
@@ -379,9 +427,10 @@ const chat = (place) => {
                             <div className="messageAuthor">
                                 <p id="messageAuthor" style={{margin: 0}}></p>
                             </div>
-                            <div id="messageContainer" className="containerChatMessage">
+                            <div id="messageContainer" className="containerChatMessage" onClick={()=>setShowEmojiPicker(true)}>
 
                             </div>
+
                         </div>
                     </div>
                     {isLoading ? (

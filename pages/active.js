@@ -64,7 +64,7 @@ const active = () => {
     }, []);
 
     return (
-        <div style={{height: "100Vh"}}>
+        <div style={{height: "100Vh", background: "black"}}>
             <Head>
                 <title>Activation de compte</title>
                 <meta name="viewport" content="initial-scale=1.0, width=device-width"/>
@@ -78,7 +78,7 @@ const active = () => {
                             fontSize: "25px",
                             paddingTop: "15px",
                             paddingBottom: "32px"
-                        }}>Bonjour {originalPseudo}</p>
+                        }}>Bonjour {originalPseudo},</p>
                     </div>
                     <div>
                         <button style={buttonStyle} onClick={() => active()}>Activer mon compte</button>
