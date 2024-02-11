@@ -66,6 +66,7 @@ function SceneMain() {
                 }
 
                 update = () => {
+                    console.log("X: "+this.player.x + " Y:"+ this.player.y)
                     // console.log(isInputFocused)
                     this.game.canvas.style.border = "5px solid white";
                     this.game.canvas.style.borderRadius = "15px";
@@ -91,13 +92,11 @@ function SceneMain() {
                         this.player.anims.stop();
                     }
                 }
-
-
                 handleCollision(player, collisionLayer) {
-                    if (Math.abs(this.player.x >= 925) && Math.abs(this.player.x <= 975)
-                        && Math.abs(this.player.y >= 1177) && Math.abs(this.player.y <= 1180)) {
+                    if (Math.abs(this.player.x >= 912) && Math.abs(this.player.x <= 974)
+                        && Math.abs(this.player.y >= 1177) && Math.abs(this.player.y <= 1208)) {
                         // Charger la nouvelle carte
-                        console.log("ENTRER")
+                        console.log("ENTRER");
                         game.destroy(true);
                         document.body.style.display = 'none';
                         router.push('/phaser/SceneShop');

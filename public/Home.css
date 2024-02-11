@@ -17,6 +17,16 @@ body {
     padding-top: 15px;
 }
 
+.ChargementText{
+    margin-bottom: 25px;
+    text-align: center;
+    color: white;
+    background: black;
+    padding-top: 25px;
+    font-size: 35px;
+    font-family: "Arial", ui-serif;
+}
+
 .parentContainer .arrow {
     content: '';
     position: absolute;
@@ -205,10 +215,11 @@ body {
 }
 
 .buttonChat {
+    border-radius: 111px;
     background: red;
-    border: 10px solid white;
-    border-radius: 15px;
-    width: 150px;
+    border: 5px solid white;
+    width: 46px;
+    height: 45px;
     font-size: 15px;
     cursor: pointer;
     text-align: center;

@@ -90,12 +90,12 @@ const Home = () => {
         }
     }, [isToken]);
 
-    useEffect(() =>{
-        if(isActive===true && isActive !== "null"){
+    useEffect(() => {
+        if (isActive === true && isActive !== "null") {
             document.getElementById("PseudoName").innerText = "Welcome, " + pseudoCookies;
         }
     }, [isActive]);
-    const Rolling = (w, h) => (<svg
+    const Rolling = (w, h, color) => (<svg
         xmlns="http://www.w3.org/2000/svg"
         xmlnsXlink="http://www.w3.org/1999/xlink"
         style={{
@@ -110,7 +110,7 @@ const Home = () => {
             cx="50"
             cy="50"
             fill="none"
-            stroke="#000000"
+            stroke={color}
             strokeWidth="6"
             r="28"
             strokeDasharray="110 40"
@@ -131,10 +131,10 @@ const Home = () => {
 
     if (isToken === false || isActive === "null") {
         return (
-            <div><p style={{
-            textAlign: "center", color: "white", background: "black",paddingTop: "25px", fontSize: "35px", fontFamily: "Calibri"
-        }}>Chargement ...</p>
-        </div>);
+            <div>
+                <p className="ChargementText">Chargement ...</p>
+                {Rolling(80, 80, "#ffffff")}
+            </div>);
     } else if (isActive === false) {
         return (
             <div className="modal">
@@ -149,10 +149,11 @@ const Home = () => {
                         <p>Votre compte n'est pas activer !</p>
                         <p>Des indications vous on était envoyé sur votre mail</p>
                         {/*<button>Renvoyer un lien</button>*/}
-                        <button className="buttonModal" style={{marginTop: "5px",marginBottom: "15px"}} onClick={() => window.location.reload()}>Recharger la page
+                        <button className="buttonModal" style={{marginTop: "5px", marginBottom: "15px"}}
+                                onClick={() => window.location.reload()}>Recharger la page
                         </button>
 
-                        <button className="buttonModal"  onClick={() => router.push('/logout')}>Deconnexion
+                        <button className="buttonModal" onClick={() => router.push('/logout')}>Deconnexion
                         </button>
                     </div>
                 </div>
@@ -161,7 +162,7 @@ const Home = () => {
     } else {
         return (
             <div id="pagePrincipale">
-            <Head>
+                <Head>
                     <title>Map principal</title>
                     <meta name="viewport" content="initial-scale=1.0, width=device-width"/>
                 </Head>
@@ -186,7 +187,7 @@ const Home = () => {
                                         <button className="buttonLogout">Logout</button>
                                     </div>
                                     <div className="buttonProfil">
-                                        {isLoadAvatar ? Rolling(50, 50) :
+                                        {isLoadAvatar ? Rolling(50, 50, "#000000") :
                                             <img src={avatarSrc} width="50" height="50" alt=""/>}
                                     </div>
                                 </div>
