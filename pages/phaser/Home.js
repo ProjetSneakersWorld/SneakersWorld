@@ -212,13 +212,7 @@ const Home = () => {
                 )
                 <div className="modal" id="modalHelp" style={{display: "none"}}>
                     <div className="modal-content2">
-                        <div style={{
-                            flexDirection: "column",
-                            alignItems: "center",
-                            display: "flex",
-                            fontSize: "19px",
-                            color: "white",
-                        }}>
+                        <div className="modal-content2-bis">
                             <p>Aide</p>
                             <p>blablabla</p>
                             <div style={{display: "flex"}}>

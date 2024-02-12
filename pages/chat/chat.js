@@ -194,7 +194,6 @@ const chat = (place) => {
                     return idMessage;
                 };
 
-                // Imprimez l'emoji et l'ID du message dans la console
                 const logEmojiAndMessageId = (event) => {
                     const clickedEmoji = event.target.innerText;
                     const currentMessageId = getCurrentMessageId();
@@ -208,19 +207,18 @@ const chat = (place) => {
                         emojiSpan.addEventListener("click", logEmojiAndMessageId);
                     });
                 };
-
-                // Utilisation de createEmojiComponent()
                 newParentDiv.appendChild(newAuthorDiv);
                 newParentDiv.appendChild(newMessageDiv);
                 messageContainer.appendChild(newParentDiv);
+
+                // Utilisation de createEmojiComponent()
                 newParentDiv.appendChild(createEmojiComponent());
                 const emojiElement = newParentDiv.querySelector(".emoji-container");
-                emojiElement.className = "emojisContainer";
-                bindEmojiClickListener(emojiElement); // Liaison de l'écouteur d'événement click
                 emojiElement.className = "emojisContainer"
+                bindEmojiClickListener(emojiElement); // Liaison de l'écouteur d'événement click
                 newParentDiv.addEventListener("mouseover", () => showEmoji(emojiElement));
                 newParentDiv.addEventListener("mouseout", () => hideEmoji(emojiElement));
-                
+
                 function showEmoji(element) {
                     element.style.visibility = "visible";
                 }

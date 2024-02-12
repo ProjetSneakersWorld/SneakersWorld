@@ -21,6 +21,39 @@ const Logout = () => {
         }, 2000); // 3000 millisecondes équivalent à 3 secondes
     }, []);
 
+    const Rolling = (w, h, color) => (<svg
+        xmlns="http://www.w3.org/2000/svg"
+        xmlnsXlink="http://www.w3.org/1999/xlink"
+        style={{
+            margin: "auto", display: "block", shapeRendering: "auto",
+        }}
+        width={w}
+        height={h}
+        viewBox="0 0 100 100"
+        preserveAspectRatio="xMidYMid"
+    >
+        <circle
+            cx="50"
+            cy="50"
+            fill="none"
+            stroke={color}
+            strokeWidth="6"
+            r="28"
+            strokeDasharray="110 40"
+            style={{
+                animation: "rotate 1s infinite", transformOrigin: "50% 50%", strokeLinecap: "round",
+            }}
+        />
+        <style>
+            {`
+                @keyframes rotate {
+                  0% { transform: rotate(0deg); }
+                  100% { transform: rotate(360deg); }
+                    }
+                  `}
+        </style>
+    </svg>);
+
     return loading ? (
         <div>
             <Head>
@@ -28,13 +61,8 @@ const Logout = () => {
                 <meta name="viewport" content="initial-scale=1.0, width=device-width"/>
             </Head>
             <div>
-                <p style={{
-                    textAlign: "center",
-                    color: "white",
-                    paddingTop: "25px",
-                    fontSize: "35px",
-                    fontFamily: "Calibri"
-                }}>Déconnexion ...</p>
+                <p className="ChargementText">Déconnexion ...</p>
+                {Rolling(80, 80, "#ffffff")}
             </div>
         </div>
     ) : null;

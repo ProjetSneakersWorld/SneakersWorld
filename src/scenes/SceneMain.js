@@ -66,7 +66,7 @@ function SceneMain() {
                 }
 
                 update = () => {
-                    console.log("X: "+this.player.x + " Y:"+ this.player.y)
+                    // console.log("X: "+this.player.x + " Y:"+ this.player.y)
                     // console.log(isInputFocused)
                     this.game.canvas.style.border = "5px solid white";
                     this.game.canvas.style.borderRadius = "15px";
