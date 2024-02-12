@@ -1,14 +1,15 @@
 import React, {useEffect, useState} from 'react';
 import '/public/Home.css';
-const sendImage = "/images/send.png"
 import {createClient} from "@supabase/supabase-js";
 import Cookies from "js-cookie";
 import moment from 'moment-timezone';
 import {toast, ToastContainer} from "react-toastify";
 import 'react-toastify/dist/ReactToastify.css';
+import {InputFocusContext} from "../../src/InputFocusContext";
+
+const sendImage = "/images/send.png"
 
 const supabase = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY);
-import {InputFocusContext} from "../../src/InputFocusContext";
 
 const chat = (place) => {
     const {isInputFocused, setInputFocused} = React.useContext(InputFocusContext);
@@ -160,6 +161,7 @@ const chat = (place) => {
                 // Créer une nouvelle div pour le message
                 const newMessageDiv = document.createElement("div");
                 newMessageDiv.style.background = "rgb(103, 194, 98)";
+                newMessageDiv.style.userSelect = "none";
                 newMessageDiv.style.color = "white";
 
                 newMessageDiv.className = "messageContainer";
@@ -188,16 +190,12 @@ const chat = (place) => {
                 } else {
                     newMessageDiv.style.borderRadius = Math.ceil(fontSize * 1.35) + "px " + Math.ceil(fontSize * 1.35) + "px " + Math.ceil(fontSize * 1.35) + "px 0px";
                 }
-
-                // Obtenez l'ID du message courant
-                const getCurrentMessageId = () => {
-                    return idMessage;
-                };
+                newParentDiv.appendChild(newAuthorDiv);
+                newParentDiv.appendChild(newMessageDiv);
 
                 const logEmojiAndMessageId = (event) => {
                     const clickedEmoji = event.target.innerText;
-                    const currentMessageId = getCurrentMessageId();
-                    console.log(`Clicked emoji: ${clickedEmoji}, Message ID: ${currentMessageId}`);
+                    console.log(`Clicked emoji: ${clickedEmoji}, Message ID: ${idMessage}`);
                 };
 
                 // Liez un écouteur d'événement 'click' à chaque émoji
@@ -207,21 +205,26 @@ const chat = (place) => {
                         emojiSpan.addEventListener("click", logEmojiAndMessageId);
                     });
                 };
-                newParentDiv.appendChild(newAuthorDiv);
-                newParentDiv.appendChild(newMessageDiv);
-                messageContainer.appendChild(newParentDiv);
 
-                // Utilisation de createEmojiComponent()
-                newParentDiv.appendChild(createEmojiComponent());
-                const emojiElement = newParentDiv.querySelector(".emoji-container");
-                emojiElement.className = "emojisContainer"
-                bindEmojiClickListener(emojiElement); // Liaison de l'écouteur d'événement click
-                newParentDiv.addEventListener("mouseover", () => showEmoji(emojiElement));
-                newParentDiv.addEventListener("mouseout", () => hideEmoji(emojiElement));
+                // Créer un nouveau composant avec des emojis
+                const emojiComponent = createEmojiComponent();
+                emojiComponent.className = "emojisContainer";
+                bindEmojiClickListener(emojiComponent); // Liaison de l'écouteur d'événement click
+
+                // Ajouter le composant emoji à newMessageDiv au lieu de newParentDiv
+                newParentDiv.appendChild(emojiComponent);
+
+                // Ajouter des écouteurs d'événements 'mouseover' et 'mouseout' à newMessageDiv au lieu de newParentDiv
+                newMessageDiv.addEventListener("mouseover", () => showEmoji(emojiComponent));
+                newMessageDiv.addEventListener("mouseout", () => hideEmoji(emojiComponent));
+                // Ajouter des écouteurs d'événements 'mouseover' et 'mouseout' à emojiComponent
+                emojiComponent.addEventListener("mouseover", () => showEmoji(emojiComponent));
+                emojiComponent.addEventListener("mouseout", () => hideEmoji(emojiComponent));
 
                 function showEmoji(element) {
                     element.style.visibility = "visible";
                 }
+
                 function hideEmoji(element) {
                     element.style.visibility = "hidden";
                 }
@@ -233,6 +236,8 @@ const chat = (place) => {
                         chatContainer.scrollTop = chatContainer.scrollHeight;
                     }
                 }
+
+                messageContainer.appendChild(newParentDiv);
             }
             setIsLoading(false);
         }
@@ -299,8 +304,7 @@ const chat = (place) => {
                 newMessageDiv.style.background = "rgb(50, 121, 249)";
                 let fontSize = '16';
                 newMessageDiv.style.borderRadius = Math.ceil(fontSize * 1.35) + "px " + Math.ceil(fontSize * 1.35) + "px 0px " + Math.ceil(fontSize * 1.35) + "px";
-
-
+                newMessageDiv.style.userSelect = "none";
                 newMessageDiv.className = "messageContainer";
 
                 // Créer un nouveau paragraphe pour le message

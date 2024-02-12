@@ -164,6 +164,7 @@ body {
     display: flex;
     background: white;
     border-radius: 15px;
+    margin-top: -10px;
     padding: 5px;
     gap: 5px;
 }
