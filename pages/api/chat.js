@@ -22,30 +22,23 @@ const chat = (place) => {
     const [isSendMessage, setIsSendMessage] = useState(false);
 
     useEffect(() => {
-        //choper le cookies pseudo
         let messageContainer = document.getElementById('messageContainer');
 
         const fetchMessagesAndUsers = async () => {
-            // Récupérer tous les messages
             let currentDate = new Date();
             let pastDate = new Date();
-
-            // Set the pastDate to 24 hours ago
             pastDate.setHours(currentDate.getHours() - 24);
 
-            let {data: messages, error2} = await supabase
-                .from('message')
-                .select('*')
-                .eq('place', place.place)
-                .gte('timestamp', pastDate.toISOString().slice(0, 19).replace('T', ' '));
+            // Appeler la fonction fetch_messages_users_reactions
+            let {data: results, error} = await supabase
+                .rpc('fetch_messages_users_reactions', { place: place.place });
 
-            if (error2) {
-                console.error('Erreur lors de la récupération des messages:', error2);
+            if (error) {
+                console.error('Erreur lors de la récupération des données:', error);
                 return;
             }
-            // Si aucun message n'est disponible, afficher un message
-            if (messages.length === 0) {
-                // Afficher un message si aucun message n'est disponible
+
+            if (results.length === 0) {
                 messageContainer.className = "messageVide";
                 const messageVideP = document.createElement("p");
                 messageVideP.id = "messageVideP";
@@ -57,30 +50,23 @@ const chat = (place) => {
                 return;
             }
 
-            // Récupérer tous les utilisateurs
-            let {data: users, error} = await supabase
-                .from('connexion')
-                .select('*');
-            if (error) {
-                console.error('Erreur lors de la récupération des utilisateurs:', error);
-                return;
-            }
-
-            // Créer un objet pour faciliter la recherche des pseudos
-            const usersById = users.reduce((acc, user) => ({
-                ...acc, [user.id]: user.pseudo
-            }), {});
-
-            // Trier les messages par timestamp
-            messages.sort((a, b) => new Date(a.timestamp) - new Date(b.timestamp));
-
-            for (let message of messages) {
-                const pseudo = usersById[message.id_user];
-                const date = new Date(message.timestamp);
+            results.sort((a, b) => new Date(a.timestamp) - new Date(b.timestamp));
+            console.log(results)
+            for (let result of results) {
+                const pseudo = result.author_pseudo;
+                const date = new Date(result.message_timestamp);
                 let formattedTime = `${date.getHours()}h${date.getMinutes().toString().padStart(2, '0')}`;
-                if (pseudo) {
-                    displayMessage(message.id, pseudo, formattedTime, message, true);
+
+                // Récupérer les emojis associés au message
+                const emojis = result.emojis;
+
+                if (emojis) {
+                    console.log(`Message: ${result.message}, id : ${result.id}, Emojis: ${emojis}`);
                 }
+
+
+                displayMessage(result.id, pseudo, formattedTime, result.message, emojis,true);
+
             }
         };
 
@@ -103,6 +89,23 @@ const chat = (place) => {
         }
 
         fetchPseudoAndDateOnline();
+        //
+        // const fetchAllReactions = async () => {
+        //     let {data: reactions, error} = await supabase
+        //         .rpc('fetch_all_reactions');
+        //
+        //     if (error) {
+        //         console.error('Erreur lors de la récupération des réactions:', error);
+        //         return;
+        //     }
+        //
+        //     console.log(reactions);
+        // };
+        //
+        // fetchAllReactions();
+
+
+
         // Créer un canal pour écouter les changements
         supabase.channel('custom-all-channel')
             //a chaque insertion dans la table message
@@ -139,7 +142,8 @@ const chat = (place) => {
 
 
         // Fonction pour afficher un message
-        const displayMessage = (idMessage, pseudo, dateMessage, message, firstMessage) => {
+        const displayMessage = (idMessage, pseudo, dateMessage, message, emojis,firstMessage) => {
+            console.log(pseudo)
             if (pseudo !== pseudoCookies || firstMessage === true) {
                 // Créer une nouvelle div pour l'auteur du message
                 const newAuthorDiv = document.createElement("div");
@@ -168,7 +172,7 @@ const chat = (place) => {
                 // Créer un nouveau paragraphe pour le message
                 const newMessageP = document.createElement("p");
                 newMessageP.id = "message";
-                const newMessageContent = document.createTextNode(message.message);
+                const newMessageContent = document.createTextNode(message);
                 newMessageP.appendChild(newMessageContent);
 
                 // Ajouter le paragraphe à la div du message
@@ -201,8 +205,11 @@ const chat = (place) => {
 
                 //
                 const divEmojisChat = document.createElement("div");
+                divEmojisChat.id = idMessage;
+                divEmojisChat.style.display = "flex";
+                divEmojisChat.style.alignItems = "center";
                 const emojisChat = document.createElement("p");
-                emojisChat.innerText = "😂"
+                emojisChat.innerText = emojis;
                 divEmojisChat.appendChild(emojisChat);
                 divMessageContainer.appendChild(divEmojisChat);
 
@@ -250,6 +257,7 @@ const chat = (place) => {
                 messageContainer.appendChild(newParentDiv);
             }
             setIsLoading(false);
+            // emojisMessage();
         }
 
     }, []);
@@ -378,6 +386,14 @@ const chat = (place) => {
         }
     }
 
+    // const emojisMessage = async () => {
+    //     let { data: reaction, error } = await supabase
+    //         .from('reaction')
+    //         .select('emojis,message_id')
+    //
+    //     console.log(reaction);
+    // }
+
     const logEmojiAndMessageId = async (event, idMessage) => {
         const clickedEmoji = event.target.innerText;
         console.log(`Clicked emoji: ${clickedEmoji}, Message ID: ${idMessage}`);
@@ -385,7 +401,7 @@ const chat = (place) => {
         const {error} = await supabase
             .from('reaction')
             .insert([
-                {emojis_number: clickedEmoji, pseudo: pseudoCookies, message_id : idMessage},
+                {emojis: clickedEmoji, pseudo: pseudoCookies, message_id : idMessage},
             ])
             .select()
         if (error) {
