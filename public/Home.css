@@ -10,14 +10,14 @@ body {
     padding: 20px;
 }
 
-.divPixi {
+.divPrincipal {
     display: flex;
     background: black;
     justify-content: center;
-    padding-top: 15px;
+    padding-top: 1VH;
 }
 
-.ChargementText{
+.ChargementText {
     margin-bottom: 25px;
     text-align: center;
     color: white;
@@ -89,7 +89,7 @@ body {
     font-family: "Arial", ui-serif;
 }
 
-.pixiContainerTitle {
+.containerTitle {
     font-family: "Arial", ui-serif;
     display: flex;
     justify-content: center;
@@ -141,11 +141,13 @@ body {
 }
 
 .chatContainer3 {
-    position: absolute;
+    /*position: absolute;*/
     bottom: 0;
-    margin: 6px 6px 2VH;
+    margin: 0;
     display: flex;
+    flex-direction: row;
     align-items: center;
+    justify-content: center;
 }
 
 .chatContainer4 {
@@ -274,7 +276,7 @@ body {
     border-radius: 20px;
 }
 
-.modal-content2-bis{
+.modal-content2-bis {
     flex-direction: column;
     align-items: center;
     display: flex;
@@ -314,6 +316,6 @@ body {
     right: 15px;
 }
 
-.help:hover{
+.help:hover {
     scale: 1.1;
 }

@@ -5,7 +5,7 @@ import 'react-toastify/dist/ReactToastify.css';
 import Head from "next/head";
 import GameComponent from "../../src/scenes/SceneMain"
 import {useRouter} from "next/router";
-import Chat from "../chat/chat"
+import Chat from "../api/chat"
 import {InputFocusContext} from "../../src/InputFocusContext";
 
 const Home = () => {
@@ -168,8 +168,8 @@ const Home = () => {
                 </Head>
                 <InputFocusContext.Provider value={{isInputFocused, setInputFocused}}>
                     <div style={{background: "black", height: "100Vh"}}>
-                        <div className="divPixi">
-                            <div className="pixiContainerTitle">
+                        <div className="divPrincipal">
+                            <div className="containerTitle">
                                 <p className="titre">Sneakers World</p>
                                 <p id="PseudoName" className="pseudo"></p>
                             </div>

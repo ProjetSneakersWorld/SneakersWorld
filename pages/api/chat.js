@@ -191,18 +191,28 @@ const chat = (place) => {
                     newMessageDiv.style.borderRadius = Math.ceil(fontSize * 1.35) + "px " + Math.ceil(fontSize * 1.35) + "px " + Math.ceil(fontSize * 1.35) + "px 0px";
                 }
                 newParentDiv.appendChild(newAuthorDiv);
-                newParentDiv.appendChild(newMessageDiv);
+                //div avec le message et l'emojis
+                const divMessageContainer = document.createElement("div");
+                divMessageContainer.style.display = "flex";
+                divMessageContainer.style.flexDirection= "row-reverse";
+                divMessageContainer.style.gap= "5px";
+                divMessageContainer.appendChild(newMessageDiv);
 
-                const logEmojiAndMessageId = (event) => {
-                    const clickedEmoji = event.target.innerText;
-                    console.log(`Clicked emoji: ${clickedEmoji}, Message ID: ${idMessage}`);
-                };
+
+                //
+                const divEmojisChat = document.createElement("div");
+                const emojisChat = document.createElement("p");
+                emojisChat.innerText = "😂"
+                divEmojisChat.appendChild(emojisChat);
+                divMessageContainer.appendChild(divEmojisChat);
+
+                newParentDiv.appendChild(divMessageContainer);
 
                 // Liez un écouteur d'événement 'click' à chaque émoji
                 const bindEmojiClickListener = (emojiContainer) => {
                     const emojisSpans = emojiContainer.querySelectorAll(".emojisSpan");
                     emojisSpans.forEach((emojiSpan) => {
-                        emojiSpan.addEventListener("click", logEmojiAndMessageId);
+                        emojiSpan.addEventListener("click", (event) => logEmojiAndMessageId(event, idMessage));
                     });
                 };
 
@@ -243,19 +253,6 @@ const chat = (place) => {
         }
 
     }, []);
-
-    const createEmojiComponent = () => {
-        const emojiContainer = document.createElement("span");
-        emojiContainer.classList.add("emoji-container");
-        const emojis = ["😀", "😂", "😍", "😎", "😴"];
-        for (let i = 0; i < emojis.length; i++) {
-            const emojiSpan = document.createElement("span");
-            emojiSpan.className= "emojisSpan";
-            emojiSpan.textContent = emojis[i];
-            emojiContainer.append(emojiSpan);
-        }
-        return emojiContainer;
-    };
 
     useEffect(() => {
         // Récupérer l'id du pseudo
@@ -380,11 +377,39 @@ const chat = (place) => {
             }
         }
     }
+
+    const logEmojiAndMessageId = async (event, idMessage) => {
+        const clickedEmoji = event.target.innerText;
+        console.log(`Clicked emoji: ${clickedEmoji}, Message ID: ${idMessage}`);
+
+        const {error} = await supabase
+            .from('reaction')
+            .insert([
+                {emojis_number: clickedEmoji, pseudo: pseudoCookies, message_id : idMessage},
+            ])
+            .select()
+        if (error) {
+            console.error('Erreur database :', error);
+        }
+    };
+
+    const createEmojiComponent = () => {
+        const emojiContainer = document.createElement("span");
+        emojiContainer.classList.add("emoji-container");
+        const emojis = ["👍", "😂", "😍", "😎", "🥳"];
+        for (let i = 0; i < emojis.length; i++) {
+            const emojiSpan = document.createElement("span");
+            emojiSpan.className = "emojisSpan";
+            emojiSpan.textContent = emojis[i];
+            emojiContainer.append(emojiSpan);
+        }
+        return emojiContainer;
+    };
     const Rolling = (w, h) => (<svg
         xmlns="http://www.w3.org/2000/svg"
         xmlnsXlink="http://www.w3.org/1999/xlink"
         style={{
-            margin: "auto", display: "block", shapeRendering: "auto",
+            margin: "0", display: "block", shapeRendering: "auto",
         }}
         width={w}
         height={h}
@@ -413,75 +438,70 @@ const chat = (place) => {
         </style>
     </svg>);
 
-    return (
-        <div style={{display: "flex", alignItems: "stretch"}} id="chatContainer">
-            <div className="chatContainer" style={{border: isInputFocused ? "5px solid white" : ""}}>
-                <div style={{display: "flex", justifyContent: "center", flexDirection: "column"}}>
-                    <div style={{display: "flex", justifyContent: "center", fontFamily: "Arial"}}>
-                        <p style={{fontSize: "20px"}}>{place.nameChat}</p>
-                    </div>
-                    <div className="chatContainer2" style={{height: "73VH", paddingTop: "10px"}}>
-                        <div id="chatContainerMessage" style={{display: "contents"}}>
-                            <div className="messageAuthor">
-                                <p id="messageAuthor" style={{margin: 0}}></p>
-                            </div>
-                            <div id="messageContainer" className="containerChatMessage">
-
-                            </div>
+    return (<div style={{display: "flex", alignItems: "stretch"}} id="chatContainer">
+        <div className="chatContainer" style={{border: isInputFocused ? "5px solid white" : ""}}>
+            <div style={{display: "flex", justifyContent: "center", flexDirection: "column"}}>
+                <div style={{display: "flex", justifyContent: "center", fontFamily: "Arial"}}>
+                    <p style={{fontSize: "20px"}}>{place.nameChat}</p>
+                </div>
+                <div className="chatContainer2" style={{height: "73VH", paddingTop: "10px"}}>
+                    <div id="chatContainerMessage" style={{display: "contents"}}>
+                        <div className="messageAuthor">
+                            <p id="messageAuthor" style={{margin: 0}}></p>
+                        </div>
+                        <div id="messageContainer" className="containerChatMessage">
 
                         </div>
-                    </div>
-                    {isLoading ? (
-                        <div className="chatContainer3" style={{alignItems: "flex-start"}}>
-                            {Rolling(60, 60)}
-                            <p id="textMessage" style={{
-                                marginBottom: "0",
-                                display: "flex",
-                                justifyContent: "center",
-                                fontFamily: "Arial,ui-serif",
-                                fontSize: "18px"
-                            }}>{isSendMessage ? "Envoie ..." : "Chargement ..."}</p>
-                        </div>) : (
-                        <div className="chatContainer3">
-                            <form style={{display: "flex", alignItems: "center"}} onSubmit={(e) => {
-                                e.preventDefault(); // Empêche le rechargement de la page
-                                sendMessage();
-                            }}>
-                                <input
-                                    className="inputsChat"
-                                    maxLength="75"
-                                    id="inputMessage"
-                                    placeholder="envoyer un message"
-                                    required
-                                    onFocus={() => setInputFocused(true)}
-                                    onBlur={() => setInputFocused(false)}
-                                    onKeyDown={(event) => {
-                                        // Arrête la propagation de l'événement pour empêcher le jeu de le recevoir
-                                        event.stopPropagation();
-                                    }}
-                                />
 
-
-                                <button type="submit" style={{background: "none", border: "none"}}>
-                                    <img
-                                        width="35"
-                                        height="35"
-                                        style={{display: "flex", alignItems: "center", cursor: "pointer"}}
-                                        src={sendImage}
-                                        alt="external-send-user-interface-febrian-hidayat-gradient-febrian-hidayat"
-                                    />
-                                </button>
-                            </form>
-                        </div>)}
-                    <div className="chatContainer4">
-                        <p id="erreurSend"></p>
                     </div>
                 </div>
+                {isLoading ? (<div className="chatContainer3">
+                    {Rolling(40, 40)}
+                    <p id="textMessage" style={{
+                        marginBottom: "0",
+                        margin: 0,
+                        display: "flex",
+                        justifyContent: "center",
+                        fontFamily: "Arial,ui-serif",
+                        fontSize: "18px"
+                    }}>{isSendMessage ? "Envoie ..." : "Chargement ..."}</p>
+                </div>) : (<div className="chatContainer3">
+                    <form style={{display: "flex", alignItems: "center"}} onSubmit={(e) => {
+                        e.preventDefault(); // Empêche le rechargement de la page
+                        sendMessage();
+                    }}>
+                        <input
+                            className="inputsChat"
+                            maxLength="75"
+                            id="inputMessage"
+                            placeholder="envoyer un message"
+                            required
+                            onFocus={() => setInputFocused(true)}
+                            onBlur={() => setInputFocused(false)}
+                            onKeyDown={(event) => {
+                                // Arrête la propagation de l'événement pour empêcher le jeu de le recevoir
+                                event.stopPropagation();
+                            }}
+                        />
+
+
+                        <button type="submit" style={{background: "none", border: "none"}}>
+                            <img
+                                width="35"
+                                height="35"
+                                style={{display: "flex", alignItems: "center", cursor: "pointer"}}
+                                src={sendImage}
+                                alt="external-send-user-interface-febrian-hidayat-gradient-febrian-hidayat"
+                            />
+                        </button>
+                    </form>
+                </div>)}
             </div>
-            <div>
-                <ToastContainer/>
-            </div>
-        </div>);
+        </div>
+        <div>
+            <ToastContainer/>
+        </div>
+    </div>);
 };
 
 export default chat;

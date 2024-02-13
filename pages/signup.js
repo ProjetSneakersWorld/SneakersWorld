@@ -3,7 +3,7 @@ import React, {useRef, useState} from 'react';
 import "../public/style.css"
 import {router} from "next/router";
 import Head from "next/head";
-import * as emailjs from "emailjs-com";
+import * as emailjs from "@emailjs/browser";
 import {createClient} from "@supabase/supabase-js";
 import CryptoJS from "crypto-js";
 import {toast, ToastContainer} from "react-toastify";

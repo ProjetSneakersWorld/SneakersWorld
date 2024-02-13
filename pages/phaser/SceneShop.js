@@ -8,7 +8,7 @@ const supabase = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL, process.env.
 import 'react-toastify/dist/ReactToastify.css';
 import Head from "next/head";
 import GameComponent from "../../src/scenes/SceneShop"
-import Chat from "../chat/chat"
+import Chat from "../api/chat"
 import {useRouter} from "next/router";
 
 const Home = () => {
