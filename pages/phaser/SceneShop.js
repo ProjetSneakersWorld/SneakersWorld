@@ -3,7 +3,6 @@ import jwt from 'jsonwebtoken';
 import '/public/Home.css';
 import {createClient} from "@supabase/supabase-js";
 import Cookies from "js-cookie";
-import {toast, ToastContainer} from "react-toastify";
 const supabase = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY);
 import 'react-toastify/dist/ReactToastify.css';
 import Head from "next/head";
@@ -160,8 +159,8 @@ const Home = () => {
                     <meta name="viewport" content="initial-scale=1.0, width=device-width"/>
                 </Head>
                 <div style={{background: "black", height: "100Vh"}}>
-                    <div className="divPixi">
-                        <div className="pixiContainerTitle">
+                    <div className="divPrincipal">
+                        <div className="containerTitle">
                             <p className="titre">Shop</p>
                             <p id="PseudoName" className="pseudo"></p>
                         </div>

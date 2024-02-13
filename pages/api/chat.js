@@ -143,7 +143,6 @@ const chat = (place) => {
 
         // Fonction pour afficher un message
         const displayMessage = (idMessage, pseudo, dateMessage, message, emojis,firstMessage) => {
-            console.log(pseudo)
             if (pseudo !== pseudoCookies || firstMessage === true) {
                 // Créer une nouvelle div pour l'auteur du message
                 const newAuthorDiv = document.createElement("div");
@@ -198,7 +197,10 @@ const chat = (place) => {
                 //div avec le message et l'emojis
                 const divMessageContainer = document.createElement("div");
                 divMessageContainer.style.display = "flex";
-                divMessageContainer.style.flexDirection= "row-reverse";
+                divMessageContainer.style.flexDirection= "row";
+                if(pseudo === pseudoCookies){
+                    divMessageContainer.style.flexDirection = "row-reverse";
+                }
                 divMessageContainer.style.gap= "5px";
                 divMessageContainer.appendChild(newMessageDiv);
 
