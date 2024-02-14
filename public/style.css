@@ -19,13 +19,15 @@ body {
 .body {
     background: repeating-linear-gradient(85deg, #b75190, #2d3e8f) fixed;
     animation: 0.7s ease-out 0s 0.7 slideInFromRight;
-    height: 100Vh;
+    min-height: 100vh;
     display: flex;
-    justify-content: center;
+    justify-content: flex-start;
     flex-direction: column;
     align-items: center;
     text-align: center;
+
     font-family: arial, sans-serif;
+    overflow: auto;
 }
 
 .welcomDiv{

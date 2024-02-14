@@ -26,3 +26,18 @@
     font-size: 0.75rem;
     cursor: pointer;
 }
+
+.modalPage {
+    display: flex;
+    font-family: "Arial", ui-serif;
+    flex-direction: column;
+    align-items: center;
+    position: absolute;
+    inset: 50px;
+    border-radius: 15px;
+    border: 1px solid rgb(204, 204, 204);
+    background: rgb(255, 255, 255);
+    overflow: auto;
+    outline: none;
+    padding: 20px;
+}
