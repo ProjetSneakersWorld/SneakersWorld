@@ -114,7 +114,7 @@ const chat = (place) => {
                 const date = new Date();
                 if (payload.new.id_user !== id_USER) {
                     console.log("C'est toi qui a envoyé : " + payload.new.id_user);
-                    displayMessage(payload.new.id, pseudo, date.getHours() + "h" + date.getMinutes(), payload.new, false);
+                    displayMessage(payload.new.id, pseudo, date.getHours() + "h" + date.getMinutes(), payload.new.message, null);
                 }
                 setIsLoading(false);
             })
@@ -248,6 +248,8 @@ const chat = (place) => {
                     element.style.visibility = "hidden";
                 }
 
+
+                //Pas bon le faire une fois a la fin et il marche pas en plus !!
                 if (message.length !== 0) {
                     // Après avoir ajouté un nouveau message au conteneur
                     let chatContainer = document.querySelector('.chatContainer2');

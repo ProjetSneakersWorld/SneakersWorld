@@ -5,7 +5,7 @@ import 'react-toastify/dist/ReactToastify.css';
 import Head from "next/head";
 import GameComponent from "../../src/scenes/SceneMain"
 import {useRouter} from "next/router";
-import Chat from "../api/chat"
+import Chat from "../chat/chat"
 import {InputFocusContext} from "../../src/InputFocusContext";
 
 const Home = () => {
@@ -78,7 +78,7 @@ const Home = () => {
                     setAvatarSrc(img.src);
                     setIsLoadAvatar(false);
                 };
-                img.onerror = (error) => {
+                img.onerror = () => {
                     setAvatarSrc('/images/avatar.svg');
                     setIsLoadAvatar(false);
                 };
