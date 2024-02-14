@@ -21,7 +21,7 @@ body {
     animation: 0.7s ease-out 0s 0.7 slideInFromRight;
     min-height: 100vh;
     display: flex;
-    justify-content: flex-start;
+    justify-content: center;
     flex-direction: column;
     align-items: center;
     text-align: center;

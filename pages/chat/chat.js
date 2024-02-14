@@ -247,20 +247,16 @@ const chat = (place) => {
                 function hideEmoji(element) {
                     element.style.visibility = "hidden";
                 }
-
-
-                //Pas bon le faire une fois a la fin et il marche pas en plus !!
-                if (message.length !== 0) {
-                    // Après avoir ajouté un nouveau message au conteneur
-                    let chatContainer = document.querySelector('.chatContainer2');
-                    if (chatContainer) {
-                        chatContainer.scrollTop = chatContainer.scrollHeight;
-                    }
-                }
-
                 messageContainer.appendChild(newParentDiv);
             }
             setIsLoading(false);
+            if (message.length !== 0) {
+                // Après avoir ajouté un nouveau message au conteneur
+                let chatContainer = document.querySelector('.chatContainer2');
+                if (chatContainer) {
+                    chatContainer.scrollTop = chatContainer.scrollHeight;
+                }
+            }
             // emojisMessage();
         }
 
