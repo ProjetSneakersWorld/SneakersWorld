@@ -322,3 +322,34 @@ body {
 .help:hover {
     scale: 1.1;
 }
+
+
+.dropdownMenu {
+    font-family: "Arial", ui-serif;
+    display: block;
+    right: -2rem;
+    top: 5.5rem;
+    position: absolute;
+    background-color: #f9f9f9;
+    min-width: 150px;
+    box-shadow: 0 8px 16px 0 rgba(0,0,0,0.2);
+    border-radius: 15px;
+    z-index: 1;
+}
+
+.dropdownMenu a {
+    color: black;
+    padding: 12px 16px;
+    text-decoration: none;
+    display: block;
+}
+
+.item{
+    border-radius: 15px;
+    padding-top: 15px;
+    padding-bottom: 15px;
+}
+
+.item:hover{
+    background: #ccff90;
+}

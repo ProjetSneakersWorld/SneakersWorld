@@ -1,17 +1,24 @@
-import React, {useEffect, useState} from 'react';
+import React, {useContext, useEffect, useState} from 'react';
 import '/public/Home.css';
 import Cookies from "js-cookie";
 import 'react-toastify/dist/ReactToastify.css';
 import Head from "next/head";
-import GameComponent from "../../src/scenes/SceneMain"
+import GameComponent from "../../src/scenes/Scene"
 import {useRouter} from "next/router";
 import Chat from "../chat/chat"
 import {InputFocusContext} from "../../src/InputFocusContext";
+import {GameContext} from '../../src/GameContext';
 
 const Home = () => {
     const [isToken, setIsToken] = useState(false);
     const [isInputFocused, setInputFocused] = React.useState(false);
     const router = useRouter();
+    const {currentScene} = useContext(GameContext);
+
+    // console.log(currentScene);
+    // if (currentScene === "Scene") {
+    //     console.log("Scene")
+    // }
 
     useEffect(() => {
         isAuth().catch((error) => {
@@ -128,7 +135,8 @@ const Home = () => {
         </style>
     </svg>);
 
-
+    const [isOpenDropdown, setIsOpenDropdown] = useState(false);
+    const [isAdmin] = useState(true);
     if (isToken === false || isActive === "null") {
         return (
             <div>
@@ -170,7 +178,7 @@ const Home = () => {
                     <div style={{background: "black", height: "100Vh"}}>
                         <div className="divPrincipal">
                             <div className="containerTitle">
-                                <p className="titre">Sneakers World</p>
+                                <p className="titre">{currentScene === '' ? 'Sneakers World' : currentScene === 'SceneShop' ? 'Shop' : Rolling(50, 50, "#ffffff")}</p>
                                 <p id="PseudoName" className="pseudo"></p>
                             </div>
                             <div style={{display: "flex", alignItems: "center"}}>
@@ -181,20 +189,33 @@ const Home = () => {
                                     alignItems: "center"
                                 }}>
                                     <div style={{
-                                        marginLeft: "auto", paddingRight: "15px", display: "flex", alignItems: "center"
-                                    }}
-                                         onClick={() => router.push('/logout')}>
+                                        marginLeft: "auto",
+                                        paddingRight: "15px",
+                                        display: "flex",
+                                        alignItems: "center"
+                                    }} onClick={() => router.push('/logout')}>
                                         <button className="buttonLogout">Logout</button>
                                     </div>
-                                    <div className="buttonProfil">
+                                    <div className="buttonProfil" onMouseEnter={() => setIsOpenDropdown(true)}
+                                         onMouseLeave={() => setIsOpenDropdown(false)}>
                                         {isLoadAvatar ? Rolling(50, 50, "#000000") :
                                             <img src={avatarSrc} width="50" height="50" alt=""/>}
+                                        {isOpenDropdown && (
+                                            <div className="dropdownMenu">
+                                                <a className="item" href="#/action-1">Action 1</a>
+                                                {isAdmin ? (<a className="item" href="#/action-2">Manage Admin</a>) : (
+                                                    <a className="item" href="#/action-2">Manage</a>)}
+
+                                                <a className="item" href="/logout">Logout</a>
+                                            </div>
+                                        )}
                                     </div>
                                 </div>
                             </div>
                         </div>
                         <div className="ContainerPrincipale">
-                            <Chat place="home" nameChat="Chat Principal"/>
+                            {currentScene === '' ? <Chat place="home" nameChat="Chat Principal"/> : currentScene === 'SceneShop' ? <Chat place="shop" nameChat="Shop"/> : Rolling(50, 50, "#ffffff")}
+
                             <div style={{display: "flex", alignItems: "center"}} onClick={() => {
                                 if (document.getElementById("inputMessage")) {
                                     document.getElementById("inputMessage").blur()
