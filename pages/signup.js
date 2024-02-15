@@ -224,74 +224,75 @@ const Signup = () => {
     };
 
 
-    return (<div>
+    return (
+        <div>
         <Head>
             <title>Sneakers World</title>
             <meta name="viewport" content="initial-scale=1.0, width=device-width"/>
         </Head>
-        <div className="body">
-            <div className="box">
-                <p className="title">Signup</p>
-                <form action="/api/home" method="post" onSubmit={submitSignup}>
-                    <div className="avatarContainer" onClick={() => fileInput.current.click()}>
-                        <div style={{display: "flex", alignItems: "center", justifyContent: "center"}}>
-                        </div>
-                        <div style={{position: 'relative', width: '85px', height: '85px'}}>
-                            <img src={avatar} alt="" className="avatar"
-                                 style={{objectFit: selectedFile ? "scale-down" : "cover",}}/>
-                            <img src={edit} alt="" className="edit"
-                                 style={{visibility: selectedFile ? "hidden" : "visible"}}/>
-                        </div>
-                        <p style={{margin: 0, paddingTop: "2px"}}>Avatar</p>
-                        <input ref={fileInput} type="file" style={{display: 'none'}} accept=".png, .jpeg"
-                               onChange={loadAvatar}/>
-                    </div>
-                    <div className="form-group">
-                        <div className="formlabel">
-                            <label className="labelsSignup" form="name">Name</label>
-                            <label className="labelsSignup" form="lastName">LastName</label>
-                            <label className="labelsSignup" form="pseudo">Pseudo</label>
-                            <label style={{paddingTop: emailError ? "35px" : "0.8rem"}} className="labelsSignup"
-                                   form="email">Email</label>
-                            <label style={{paddingTop: pseudoError ? "35px" : "0.8rem"}} className="labelsSignup"
-                                   form="password">Password</label>
-                        </div>
-                        <div className="formlabel">
-                            <input className="inputsSignup" type='text' id="Name" maxLength="19" required/>
-                            <input className="inputsSignup" type='text' id="LastName" maxLength="19" required/>
-                            <input className="inputsSignup" type='text' id="Pseudo" maxLength="19" required
-                                   onChange={checkPseudo}/>
-                            <div>
-                                <p style={{color: "red", fontSize: "15px", margin: "0"}}>{pseudoError}</p>
+            <div className="body" style={{overflowY: "scroll"}}>
+                <div className="box">
+                    <p className="title">Signup</p>
+                    <form action="/api/home" method="post" onSubmit={submitSignup}>
+                        <div className="avatarContainer" onClick={() => fileInput.current.click()}>
+                            <div style={{display: "flex", alignItems: "center", justifyContent: "center"}}>
                             </div>
-                            <input className="inputsSignup" type='email' id="Email" maxLength="26" required
-                                   onChange={checkEmail}/>
-                            <div>
-                                <p style={{color: "red", fontSize: "15px", margin: "0"}}>{emailError}</p>
+                            <div style={{position: 'relative', width: '85px', height: '85px'}}>
+                                <img src={avatar} alt="" className="avatar"
+                                     style={{objectFit: selectedFile ? "scale-down" : "cover",}}/>
+                                <img src={edit} alt="" className="edit"
+                                     style={{visibility: selectedFile ? "hidden" : "visible"}}/>
                             </div>
-                            <input className="inputsSignup" type="password" id="NewPassword" maxLength="19" required
-                                   autoComplete="current-password"/>
+                            <p style={{margin: 0, paddingTop: "2px"}}>Avatar</p>
+                            <input ref={fileInput} type="file" style={{display: 'none'}} accept=".png, .jpeg"
+                                   onChange={loadAvatar}/>
                         </div>
-                    </div>
-                    <br/>
-                    <button className="button" id="validInscription" type='submit' disabled={isLoading}>
-                        {isLoading ? (
-                            <div>
-                                <Rolling/>
+                        <div className="form-group">
+                            <div className="formlabel">
+                                <label className="labelsSignup" form="name">Name</label>
+                                <label className="labelsSignup" form="lastName">LastName</label>
+                                <label className="labelsSignup" form="pseudo">Pseudo</label>
+                                <label style={{paddingTop: emailError ? "35px" : "0.8rem"}} className="labelsSignup"
+                                       form="email">Email</label>
+                                <label style={{paddingTop: pseudoError ? "35px" : "0.8rem"}} className="labelsSignup"
+                                       form="password">Password</label>
                             </div>
-                        ) : (<>Inscription</>)}
-                    </button>
-                    <p id="error" className="error"></p>
-                </form>
+                            <div className="formlabel">
+                                <input className="inputsSignup" type='text' id="Name" maxLength="19" required/>
+                                <input className="inputsSignup" type='text' id="LastName" maxLength="19" required/>
+                                <input className="inputsSignup" type='text' id="Pseudo" maxLength="19" required
+                                       onChange={checkPseudo}/>
+                                <div>
+                                    <p style={{color: "red", fontSize: "15px", margin: "0"}}>{pseudoError}</p>
+                                </div>
+                                <input className="inputsSignup" type='email' id="Email" maxLength="26" required
+                                       onChange={checkEmail}/>
+                                <div>
+                                    <p style={{color: "red", fontSize: "15px", margin: "0"}}>{emailError}</p>
+                                </div>
+                                <input className="inputsSignup" type="password" id="NewPassword" maxLength="19" required
+                                       autoComplete="current-password"/>
+                            </div>
+                        </div>
+                        <br/>
+                        <button className="button" id="validInscription" type='submit' disabled={isLoading}>
+                            {isLoading ? (
+                                <div>
+                                    <Rolling/>
+                                </div>
+                            ) : (<>Inscription</>)}
+                        </button>
+                        <p id="error" className="error"></p>
+                    </form>
+                </div>
+                <div style={{paddingTop: "15px"}}>
+                    <button className="button" onClick={() => handleClick('/')}>Retour</button>
+                </div>
+                <div>
+                    <ToastContainer/>
+                </div>
             </div>
-            <div style={{paddingTop: "15px"}}>
-                <button className="button" onClick={() => handleClick('/')}>Retour</button>
-            </div>
-            <div>
-                <ToastContainer/>
-            </div>
-        </div>
-    </div>);
+        </div>);
 };
 
 export default Signup;

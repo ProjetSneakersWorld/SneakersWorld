@@ -104,7 +104,7 @@ const Login = ({defaultIdf = '', defaultMdp = ''}) => {
                 <title>Sneakers World</title>
                 <meta name="viewport" content="initial-scale=1.0, width=device-width"/>
             </Head>
-            <div className="body" style={{paddingTop: "50px"}}>
+            <div className="body">
                 <div className="box">
                     <p className="title">Login</p>
                     <form action="/api/home" method="post" onSubmit={handleSubmit}>
