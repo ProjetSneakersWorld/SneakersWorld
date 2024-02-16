@@ -13,7 +13,7 @@ const Home = () => {
     const [isToken, setIsToken] = useState(false);
     const [isInputFocused, setInputFocused] = React.useState(false);
     const router = useRouter();
-    const {currentScene} = useContext(GameContext);
+    const {currentScene, setCurrentScene} = useContext(GameContext);
 
     // console.log(currentScene);
     // if (currentScene === "Scene") {
@@ -194,7 +194,7 @@ const Home = () => {
                                             <img src={avatarSrc} width="50" height="50" alt=""/>}
                                         {isOpenDropdown && (
                                             <div className="dropdownMenu">
-                                                <a className="item" href="#/action-1">Action 1</a>
+                                                <a className="item" onClick={()=>setCurrentScene('')}>Home</a>
                                                 {isAdmin ? (<a className="item" href="#/action-2">Manage Admin</a>) : (
                                                     <a className="item" href="#/action-2">Manage</a>)}
 

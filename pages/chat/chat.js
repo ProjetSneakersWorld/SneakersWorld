@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React, {useContext, useEffect, useState} from 'react';
 import '/public/Home.css';
 import {createClient} from "@supabase/supabase-js";
 import Cookies from "js-cookie";
@@ -6,6 +6,7 @@ import moment from 'moment-timezone';
 import {toast, ToastContainer} from "react-toastify";
 import 'react-toastify/dist/ReactToastify.css';
 import {InputFocusContext} from "../../src/InputFocusContext";
+import {GameContext} from "../../src/GameContext";
 
 const sendImage = "/images/send.png"
 
@@ -14,7 +15,8 @@ const supabase = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL, process.env.
 const chat = (place) => {
     const {isInputFocused, setInputFocused} = React.useContext(InputFocusContext);
     let lastAuthor = null;
-    let pseudoCookies = Cookies.get('Pseudo')
+    let pseudoCookies = Cookies.get('Pseudo');
+    const {currentScene} = useContext(GameContext);
     const notify = (text) => toast(text);
     const [id_USER, setId_USER] = useState('null');
     const [isActive, setIsActive] = useState('null');
@@ -23,6 +25,30 @@ const chat = (place) => {
 
     useEffect(() => {
         let messageContainer = document.getElementById('messageContainer');
+        if (!messageContainer) {
+            // Créer l'élément s'il n'existe pas
+            messageContainer = document.createElement('div');
+            messageContainer.id = 'messageContainer';
+
+            // Trouver l'élément parent
+            var chatContainerMessage = document.getElementById('chatContainerMessage');
+
+            // Si l'élément parent existe, ajouter l'élément créé en tant que son enfant
+            if (chatContainerMessage) {
+                chatContainerMessage.appendChild(messageContainer);
+            } else {
+                // Si l'élément parent n'existe pas, créer un div avec cet ID et l'ajouter au corps du document
+                chatContainerMessage = document.createElement('div');
+                chatContainerMessage.id = 'chatContainerMessage';
+                document.body.appendChild(chatContainerMessage);
+                chatContainerMessage.appendChild(messageContainer);
+            }
+        } else {
+            // S'il existe déjà, vider tous ses éléments enfants
+            while (messageContainer.firstChild) {
+                messageContainer.removeChild(messageContainer.firstChild);
+            }
+        }
 
         const fetchMessagesAndUsers = async () => {
             let currentDate = new Date();
@@ -260,7 +286,7 @@ const chat = (place) => {
             // emojisMessage();
         }
 
-    }, []);
+    }, [currentScene]);
 
     useEffect(() => {
         // Récupérer l'id du pseudo
