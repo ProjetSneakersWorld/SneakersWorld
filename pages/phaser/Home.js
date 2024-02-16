@@ -188,14 +188,6 @@ const Home = () => {
                                     display: "flex",
                                     alignItems: "center"
                                 }}>
-                                    <div style={{
-                                        marginLeft: "auto",
-                                        paddingRight: "15px",
-                                        display: "flex",
-                                        alignItems: "center"
-                                    }} onClick={() => router.push('/logout')}>
-                                        <button className="buttonLogout">Logout</button>
-                                    </div>
                                     <div className="buttonProfil" onMouseEnter={() => setIsOpenDropdown(true)}
                                          onMouseLeave={() => setIsOpenDropdown(false)}>
                                         {isLoadAvatar ? Rolling(50, 50, "#000000") :

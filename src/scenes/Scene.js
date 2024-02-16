@@ -27,7 +27,7 @@ function Scene() {
             }
 
             create() {
-                setCurrentScene('');
+                // setCurrentScene('');
                 const map = this.make.tilemap({key: "map", tileWidth: 16, tileHeight: 16});
                 const tileset = map.addTilesetImage("tiles1", "tiles");
                 const layer = map.createLayer("Calque de Tuiles 1", tileset, 0, 0);
@@ -117,46 +117,24 @@ function Scene() {
             }
 
             preload() {
-                this.load.image("tiles", "/assets/tileset.png");
-                this.load.tilemapTiledJSON('map', "/assets/othman_map.json");
-                this.load.spritesheet('character', '/assets/perso.png', {frameWidth: 32, frameHeight: 32});
+                this.load.image("tiles","/assets/store.png");
+                this.load.tilemapTiledJSON('map',"/assets/shopMapOthman.json");
+                this.load.spritesheet('perso', '/assets/perso.png', { frameWidth: 32, frameHeight: 32 });
             }
 
             create() {
-                const map = this.make.tilemap({key: "map", tileWidth: 16, tileHeight: 16});
-                const tileset = map.addTilesetImage("tiles1", "tiles");
-                const layer = map.createLayer("Calque de Tuiles 1", tileset, 0, 0);
-                const colision = map.createLayer("Collision", tileset, 0, 0)
-                this.player = this.physics.add.sprite(785, 655, "character").setFrame(5);
-                this.anims.create({
-                    key: 'up',
-                    frames: this.anims.generateFrameNumbers('character', {frames: [0, 2]}),
-                    frameRate: 10,
-                    repeat: -1,
-                });
-                this.anims.create({
-                    key: 'down',
-                    frames: this.anims.generateFrameNumbers('character', {frames: [5, 8]}),
-                    frameRate: 10,
-                    repeat: -1,
-                });
+                const map = this.make.tilemap({ key: "map", tileWidth: 32, tileHeight: 32});
 
-                this.anims.create({
-                    key: 'right',
-                    frames: this.anims.generateFrameNumbers('character', {frames: [1, 4]}),
-                    frameRate: 10,
-                    repeat: -1
-                });
-                this.anims.create({
-                    key: 'left',
-                    frames: this.anims.generateFrameNumbers('character', {frames: [3, 6]}),
-                    frameRate: 10,
-                    repeat: -1
-                });
+                const tileset = map.addTilesetImage("tiles","tiles");
+                const layer = map.createLayer("void", tileset, 0, 0);
+                const colision = map.createLayer("colision",tileset,0,0)
+                this.player = this.physics.add.sprite(437,844,"perso");
+
+
                 // colision.setCollisionByProperty({ collideBottom: true });
-                colision.addCollidesWith(this.player);
-                colision.setCollisionByExclusion([-1]);
-                this.physics.add.collider(this.player, colision, this.handleCollision, null, this);
+                // colision.addCollidesWith(this.player);
+                // colision.setCollisionByExclusion([-1]);
+                // this.physics.add.collider(this.player, colision, this.handleCollision, null, this);
                 // Align.scaleToGameW(this.player,0.15,this)
 
                 this.cameras.main.setBounds(0, 0, map.widthInPixels, map.heightInPixels);
@@ -191,6 +169,9 @@ function Scene() {
                     // If no cursor is down, stop the animation
                     this.player.anims.stop();
                 }
+            }
+            handleCollision(player, collisionLayer) {
+
             }
         }
 
