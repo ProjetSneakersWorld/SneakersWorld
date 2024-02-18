@@ -192,9 +192,10 @@ const chat = (place) => {
                 newMessageDiv.style.userSelect = "none";
                 newMessageDiv.style.color = "white";
                 newMessageDiv.className = "messageContainer";
+
                 // Créer un nouveau paragraphe pour le message
                 const newMessageP = document.createElement("p");
-                newMessageP.id = idMessage;
+                newMessageP.id = "message";
                 const newMessageContent = document.createTextNode(message);
                 newMessageP.appendChild(newMessageContent);
 
@@ -210,6 +211,7 @@ const chat = (place) => {
 
                 let fontSize = window.getComputedStyle(document.body).getPropertyValue('font-size');
                 fontSize = parseFloat(fontSize);
+
                 if (pseudo === pseudoCookies) {
                     newMessageDiv.style.background = "rgb(50, 121, 249)";
                     newParentDiv.style.alignItems = "flex-end";
@@ -217,8 +219,9 @@ const chat = (place) => {
                 } else {
                     newMessageDiv.style.borderRadius = Math.ceil(fontSize * 1.35) + "px " + Math.ceil(fontSize * 1.35) + "px " + Math.ceil(fontSize * 1.35) + "px 0px";
                 }
+                //ajouter l'auteur
                 newParentDiv.appendChild(newAuthorDiv);
-                //div avec le message et l'emojis
+                //div avec le message
                 const divMessageContainer = document.createElement("div");
                 divMessageContainer.style.display = "flex";
                 divMessageContainer.style.flexDirection = "row";
@@ -254,7 +257,7 @@ const chat = (place) => {
                 emojiComponent.className = "emojisContainer";
                 bindEmojiClickListener(emojiComponent); // Liaison de l'écouteur d'événement click
 
-                // Ajouter le composant emoji à newMessageDiv au lieu de newParentDiv
+                // Ajouter le composant emoji à newMessageDiv
                 newParentDiv.appendChild(emojiComponent);
 
                 // Ajouter des écouteurs d'événements 'mouseover' et 'mouseout' à newMessageDiv au lieu de newParentDiv
@@ -285,7 +288,7 @@ const chat = (place) => {
             // emojisMessage();
         }
 
-    }, [currentScene,isLoading]);
+    }, [currentScene]);
 
     useEffect(() => {
         // Récupérer l'id du pseudo
@@ -313,24 +316,61 @@ const chat = (place) => {
     }, []);
 
     const sendMessage = async () => {
-        let message = document.getElementById('inputMessage').value;
-        document.getElementById('inputMessage').innerText = "";
+        let msg = document.getElementById('inputMessage').value;
+        document.getElementById('messageContainer').className = "";
         if (document.getElementById('messageVideP')) {
             document.getElementById('messageVideP').remove();
         }
         if (id_USER === null || id_USER === undefined) {
             console.log("erreur lors de la recuperation de l'id du pseudo !!")
         } else {
-            if (message === "") {
+            if (msg === "") {
                 document.getElementById("erreurSend").innerText = "Message vide !";
             } else {
+                // Créer une nouvelle div pour le message
+                let messageContainer = document.getElementById('messageContainer');
+                messageContainer.style.width = "100%"
+                const newMessageDiv = document.createElement("div");
+                newMessageDiv.style.color = "white";
+
+                //le message vient de l'utilisateur actuel, changer la couleur de fond
+                newMessageDiv.style.background = "rgb(50, 121, 249)";
+                let fontSize = '16';
+                newMessageDiv.style.borderRadius = Math.ceil(fontSize * 1.35) + "px " + Math.ceil(fontSize * 1.35) + "px 0px " + Math.ceil(fontSize * 1.35) + "px";
+                newMessageDiv.style.userSelect = "none";
+                newMessageDiv.className = "messageContainer";
+
+                // Créer un nouveau paragraphe pour le message
+                const newMessageP = document.createElement("p");
+                newMessageP.id = "message";
+                const newMessageContent = document.createTextNode(msg);
+                newMessageP.appendChild(newMessageContent);
+
+                // Ajouter le paragraphe à la div du message
+                newMessageDiv.appendChild(newMessageP);
+
+                // Créer une nouvelle div pour contenir l'auteur et le message
+                const newParentDiv = document.createElement("div");
+                newParentDiv.className = "parentContainer";
+                newParentDiv.style.display = "flex";
+                newParentDiv.style.flexDirection = "column";
+                newParentDiv.style.alignItems = "flex-end";
+
+                // Ajouter l'auteur et le message à la div parente
+                newParentDiv.appendChild(newMessageDiv);
+
+                // Ajouter la nouvelle div à l'élément messageContainer
+                messageContainer.appendChild(newParentDiv);
+
+                document.querySelector('.chatContainer2').scrollTop = document.querySelector('.chatContainer2').scrollHeight;
+                setIsSendMessage(true);
                 setIsLoading(true);
                 try {
                     await supabase
                         .from('message')
                         .insert([{
                             id_user: id_USER,
-                            message: message,
+                            message: msg,
                             timestamp: moment().tz('Europe/Paris').format(),
                             place: place.place
                         },])
@@ -374,9 +414,15 @@ const chat = (place) => {
         }
     }
 
+    // const emojisMessage = async () => {
+    //     let { data: reaction, error } = await supabase
+    //         .from('reaction')
+    //         .select('emojis,message_id')
+    //
+    //     console.log(reaction);
+    // }
 
     const logEmojiAndMessageId = async (event, idMessage) => {
-        setIsLoading(true);
         const clickedEmoji = event.target.innerText;
         console.log(`Clicked emoji: ${clickedEmoji}, Message ID: ${idMessage}`);
 
