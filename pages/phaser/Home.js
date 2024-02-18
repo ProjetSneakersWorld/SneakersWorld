@@ -102,6 +102,11 @@ const Home = () => {
             document.getElementById("PseudoName").innerText = "Welcome, " + pseudoCookies;
         }
     }, [isActive]);
+
+    // setInterval(() => {
+    //     console.log('Bonjour');
+    // }, 5000);
+
     const Rolling = (w, h, color) => (<svg
         xmlns="http://www.w3.org/2000/svg"
         xmlnsXlink="http://www.w3.org/1999/xlink"
@@ -178,7 +183,7 @@ const Home = () => {
                     <div style={{background: "black", height: "100Vh"}}>
                         <div className="divPrincipal">
                             <div className="containerTitle">
-                                <p className="titre">{currentScene === '' ? 'Sneakers World' : currentScene === 'SceneShop' ? 'Shop' : Rolling(50, 50, "#ffffff")}</p>
+                                <p className="titre">{currentScene === 'home' ? 'Sneakers World' : currentScene === 'SceneShop' ? 'Shop' : Rolling(50, 50, "#ffffff")}</p>
                                 <p id="PseudoName" className="pseudo"></p>
                             </div>
                             <div style={{display: "flex", alignItems: "center"}}>
@@ -194,7 +199,7 @@ const Home = () => {
                                             <img src={avatarSrc} width="50" height="50" alt=""/>}
                                         {isOpenDropdown && (
                                             <div className="dropdownMenu">
-                                                <a className="item" onClick={()=>setCurrentScene('')}>Home</a>
+                                                <a className="item" onClick={()=>setCurrentScene('home')}>Home</a>
                                                 {isAdmin ? (<a className="item" href="#/action-2">Manage Admin</a>) : (
                                                     <a className="item" href="#/action-2">Manage</a>)}
 
@@ -206,7 +211,7 @@ const Home = () => {
                             </div>
                         </div>
                         <div className="ContainerPrincipale">
-                            {currentScene === '' ? <Chat place="home" nameChat="Chat Principal"/> : currentScene === 'SceneShop' ? <Chat place="shop" nameChat="Shop"/> : Rolling(50, 50, "#ffffff")}
+                            {currentScene === 'home' ? <Chat place="home" nameChat="Chat Principal"/> : currentScene === 'SceneShop' ? <Chat place="shop" nameChat="Shop"/> : Rolling(50, 50, "#ffffff")}
 
                             <div style={{display: "flex", alignItems: "center"}} onClick={() => {
                                 if (document.getElementById("inputMessage")) {
@@ -241,7 +246,6 @@ const Home = () => {
                                 X
                             </button>
                         </div>
-
                     </div>
                 </div>
             </div>);

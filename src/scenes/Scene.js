@@ -7,7 +7,7 @@ const speed = 250;
 
 function Scene() {
     const gameContainer = useRef(null);
-    const {currentScene,setCurrentScene} = useContext(GameContext);
+    const {currentScene, setCurrentScene} = useContext(GameContext);
     useEffect(() => {
         console.log(currentScene); // S'exécute chaque fois que currentScene change
     }, [currentScene]);
@@ -34,7 +34,6 @@ function Scene() {
             }
 
             create() {
-                // setCurrentScene('');
                 const map = this.make.tilemap({key: "map", tileWidth: 16, tileHeight: 16});
                 const tileset = map.addTilesetImage("tiles1", "tiles");
                 const layer = map.createLayer("Calque de Tuiles 1", tileset, 0, 0);
@@ -81,10 +80,10 @@ function Scene() {
             update = () => {
                 // console.log("X: "+this.player.x + " Y:"+ this.player.y)
                 // console.log(isInputFocused)
-                if(currentScene === ""){
+                if (currentScene === "home") {
                     this.game.canvas.style.border = "5px solid white";
                     this.game.canvas.style.borderRadius = "15px";
-                }else{
+                } else {
                     this.game.canvas.style.border = "5px solid green";
                     this.game.canvas.style.borderRadius = "15px";
                 }
@@ -110,7 +109,7 @@ function Scene() {
             }
 
             handleCollision(player, collisionLayer) {
-                if(currentScene===''){
+                if (currentScene === 'home') {
                     if (Math.abs(this.player.x >= 912) && Math.abs(this.player.x <= 974)
                         && Math.abs(this.player.y >= 1177) && Math.abs(this.player.y <= 1208)) {
                         // Charger la nouvelle carte
@@ -126,8 +125,8 @@ function Scene() {
         const config = {
             type: Phaser.AUTO,
             parent: gameContainer.current,
-            width: window.innerWidth-700,
-            height: window.innerHeight-180,
+            width: window.innerWidth - 700,
+            height: window.innerHeight - 180,
             scene: [SceneMain],
             audio: {
                 disableWebAudio: true,
@@ -139,7 +138,6 @@ function Scene() {
                 }
             },
         };
-
 
 
         const game = new Phaser.Game(config);

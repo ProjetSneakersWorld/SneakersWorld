@@ -77,7 +77,7 @@ const chat = (place) => {
             }
 
             results.sort((a, b) => new Date(a.timestamp) - new Date(b.timestamp));
-            console.log(results)
+            // console.log(results)
             for (let result of results) {
                 const pseudo = result.author_pseudo;
                 const date = new Date(result.message_timestamp);
@@ -85,11 +85,9 @@ const chat = (place) => {
 
                 // Récupérer les emojis associés au message
                 const emojis = result.emojis;
-
-                if (emojis) {
-                    console.log(`Message: ${result.message}, id : ${result.id}, Emojis: ${emojis}`);
-                }
-
+                // if (emojis) {
+                //     console.log(`Message: ${result.message}, id : ${result.id}, Emojis: ${emojis}`);
+                // }
 
                 displayMessage(result.id, pseudo, formattedTime, result.message, emojis, true);
 
@@ -115,20 +113,6 @@ const chat = (place) => {
         }
 
         fetchPseudoAndDateOnline();
-        //
-        // const fetchAllReactions = async () => {
-        //     let {data: reactions, error} = await supabase
-        //         .rpc('fetch_all_reactions');
-        //
-        //     if (error) {
-        //         console.error('Erreur lors de la récupération des réactions:', error);
-        //         return;
-        //     }
-        //
-        //     console.log(reactions);
-        // };
-        //
-        // fetchAllReactions();
 
 
         // Créer un canal pour écouter les changements
@@ -143,6 +127,15 @@ const chat = (place) => {
                 }
                 setIsLoading(false);
             })
+            // A chaque mise à jour dans la table emojis
+            .on('postgres_changes', {event: 'INSERT', schema: 'public', table: 'reaction'}, async (payload) => {
+                if (payload.new.place === place.place) {
+                    console.log("Emojis adding");
+                    setIsActive(false);
+                    setIsActive(true);
+
+                }
+            })
             // A chaque mise à jour dans la table connexion
             .on('postgres_changes', {event: 'UPDATE', schema: 'public', table: 'connexion'}, async (payload) => {
                 // Récupère l'ancienne dateOnline pour le pseudo qui a été modifié
@@ -155,12 +148,6 @@ const chat = (place) => {
                         // Met à jour la dateOnline dans l'objet dateOnlineByPseudo
                         dateOnlineByPseudo[payload.new.pseudo] = payload.new.dateOnline;
                     }
-                }
-            })
-            // A chaque mise à jour dans la table connexion
-            .on('postgres_changes', {event: 'UPDATE', schema: 'public', table: 'connexion'}, async (payload) => {
-                if (payload.new.isActive === true) {
-                    setIsActive(true);
                 }
             })
             .subscribe();
@@ -285,7 +272,7 @@ const chat = (place) => {
             // emojisMessage();
         }
 
-    }, [currentScene,isLoading]);
+    }, [currentScene, isLoading]);
 
     useEffect(() => {
         // Récupérer l'id du pseudo
@@ -324,6 +311,7 @@ const chat = (place) => {
             if (message === "") {
                 document.getElementById("erreurSend").innerText = "Message vide !";
             } else {
+                setIsSendMessage(true);
                 setIsLoading(true);
                 try {
                     await supabase
@@ -368,7 +356,6 @@ const chat = (place) => {
 
             // console.log(user)
             if (user[0] !== undefined) {
-
                 return user[0].pseudo
             }
         }
@@ -378,12 +365,12 @@ const chat = (place) => {
     const logEmojiAndMessageId = async (event, idMessage) => {
         setIsLoading(true);
         const clickedEmoji = event.target.innerText;
-        console.log(`Clicked emoji: ${clickedEmoji}, Message ID: ${idMessage}`);
+        // console.log(`Clicked emoji: ${clickedEmoji}, Message ID: ${idMessage}`);
 
         const {error} = await supabase
             .from('reaction')
             .insert([
-                {emojis: clickedEmoji, pseudo: pseudoCookies, message_id: idMessage},
+                {emojis: clickedEmoji, pseudo: pseudoCookies, message_id: idMessage, place: place.place},
             ])
             .select()
         if (error) {
