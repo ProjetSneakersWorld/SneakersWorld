@@ -129,11 +129,13 @@ const chat = (place) => {
             })
             // A chaque mise à jour dans la table emojis
             .on('postgres_changes', {event: 'INSERT', schema: 'public', table: 'reaction'}, async (payload) => {
-                if (payload.new.place === place.place) {
-                    console.log("Emojis adding");
-                    setIsActive(false);
-                    setIsActive(true);
-
+                if (payload.new.place === place.place && payload.new.pseudo !== pseudoCookies) {
+                    // console.log("Emojis adding");
+                    let messageContainer = document.getElementById('messageContainer');
+                    while (messageContainer.firstChild) {
+                        messageContainer.removeChild(messageContainer.firstChild);
+                    }
+                    await fetchMessagesAndUsers();
                 }
             })
             // A chaque mise à jour dans la table connexion
@@ -429,7 +431,7 @@ const chat = (place) => {
                 <div style={{display: "flex", justifyContent: "center", fontFamily: "Arial"}}>
                     <p style={{fontSize: "20px"}}>{place.nameChat}</p>
                 </div>
-                <div className="chatContainer2" style={{height: "73VH", paddingTop: "10px"}}>
+                <div className="chatContainer2" id="chatContainer2" style={{height: "73VH", paddingTop: "10px"}}>
                     <div id="chatContainerMessage" style={{display: "contents"}}>
                         <div className="messageAuthor">
                             <p id="messageAuthor" style={{margin: 0}}></p>

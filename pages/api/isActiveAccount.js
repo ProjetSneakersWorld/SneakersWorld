@@ -5,7 +5,7 @@ export default async function handler(req, res) {
     if (req.method === "POST") {
         try {
             const pseudoCookies = req.body.pseudoCookies
-            console.log(pseudoCookies)
+            // console.log(pseudoCookies)
             let {data: id, error} = await supabase
                 .from('connexion')
                 .select('id, isActive') // Ajoutez isActive ici
