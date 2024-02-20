@@ -156,13 +156,24 @@ const chat = (place) => {
             })
             // A chaque mise à jour dans la table reaction
             .on('postgres_changes', {event: 'INSERT', schema: 'public', table: 'reaction'}, async (payload) => {
-                if (payload.new.place === place.place && payload.new.pseudo !== pseudoCookies) {
-                    // console.log("Emojis adding");
-                    let messageContainer = document.getElementById('messageContainer');
-                    while (messageContainer.firstChild) {
-                        messageContainer.removeChild(messageContainer.firstChild);
+                if (payload.new.place === place.place) {
+                    // Récupérer l'ID du message auquel la réaction a été ajoutée
+                    const messageId = payload.new.message_id;
+
+                    // Récupérer les emojis existants pour ce message
+                    const reactions = await fetchReactionsByMessageId(messageId);
+
+                    // Mettre à jour les emojis pour le message spécifique
+                    const existingEmojisChat = document.getElementById("emojis-" + messageId);
+                    if (existingEmojisChat) {
+                        const emojisChatP = existingEmojisChat.querySelector("p");
+                        if (emojisChatP) {
+                            emojisChatP.innerText = reactions; // Mettre à jour le texte des emojis
+                        }
                     }
-                    await fetchMessagesAndUsers();
+
+                    // Trigger a UI update for the updated reactions
+                    setIsLoading(false);
                 }
             })
             // A chaque mise à jour dans la table connexion
@@ -181,6 +192,20 @@ const chat = (place) => {
             })
             .subscribe();
     }, [currentScene, isLoading]);
+
+    const fetchReactionsByMessageId = async (messageId) => {
+        try {
+            let { data: reactions, error } = await supabase
+                .from("reaction")
+                .select("emojis")
+                .eq("message_id", messageId);
+            if (error) throw error;
+            let allEmojis = reactions.map((reaction) => reaction.emojis);
+            return allEmojis.join(' ');
+        } catch (error) {
+            console.error("Erreur lors de la récupération des réactions :", error);
+        }
+    };
 
     // Fonction pour afficher un message
     const displayMessage = (idMessage, pseudo, dateMessage, message, emojis, firstMessage) => {
