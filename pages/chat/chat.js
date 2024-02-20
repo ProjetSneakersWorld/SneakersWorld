@@ -48,6 +48,16 @@ const chat = (place) => {
         fetchId_Pseudo();
     }, []);
 
+    //supprimer tout les message a chaque changement de scene
+    useEffect(() => {
+        let messageContainer = document.getElementById('messageContainer');
+        if (messageContainer) {
+            while (messageContainer.firstChild) {
+                messageContainer.removeChild(messageContainer.firstChild);
+            }
+        }
+    }, [currentScene]);
+
     useEffect(() => {
         let messageContainer = document.getElementById('messageContainer');
         if (!messageContainer) {
@@ -195,7 +205,7 @@ const chat = (place) => {
 
     const fetchReactionsByMessageId = async (messageId) => {
         try {
-            let { data: reactions, error } = await supabase
+            let {data: reactions, error} = await supabase
                 .from("reaction")
                 .select("emojis")
                 .eq("message_id", messageId);
@@ -327,7 +337,8 @@ const chat = (place) => {
                 function hideEmoji(element) {
                     element.style.visibility = "hidden";
                 }
-                document.getElementById('messageContainer').width="100%";
+
+                document.getElementById('messageContainer').width = "100%";
                 document.getElementById('messageContainer').appendChild(newParentDiv);
             }
 
@@ -345,15 +356,15 @@ const chat = (place) => {
     const sendMessage = async () => {
         let message = document.getElementById('inputMessage').value;
         document.getElementById('inputMessage').innerText = "";
-        if (document.getElementById('messageVideP')) {
-            document.getElementById('messageVideP').remove();
-        }
         if (id_USER === null || id_USER === undefined) {
             console.log("erreur lors de la recuperation de l'id du pseudo !!")
         } else {
             if (message === "") {
                 document.getElementById("erreurSend").innerText = "Message vide !";
             } else {
+                if (document.getElementById('messageVideP')) {
+                    document.getElementById('messageVideP').remove();
+                }
                 setIsSendMessage(true);
                 setIsLoading(true);
                 try {

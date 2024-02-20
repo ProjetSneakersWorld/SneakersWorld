@@ -21,12 +21,11 @@ function Scene() {
             }
 
             preload() {
-                if(currentScene === ""){
+                if (currentScene === "") {
                     this.load.image("tiles", "/assets/tileset.png");
                     this.load.tilemapTiledJSON('map', "/assets/othman_map.json");
                     this.load.spritesheet('character', '/assets/perso.png', {frameWidth: 32, frameHeight: 32});
-                }
-                else{
+                } else {
                     this.load.image("tiles", "/assets/tileset.png");
                     this.load.tilemapTiledJSON('map', "/assets/othman_map.json");
                     this.load.spritesheet('character', '/assets/perso.png', {frameWidth: 32, frameHeight: 32});
