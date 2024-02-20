@@ -230,7 +230,7 @@ const Signup = () => {
             <title>Sneakers World</title>
             <meta name="viewport" content="initial-scale=1.0, width=device-width"/>
         </Head>
-            <div className="body" style={{overflowY: "scroll"}}>
+            <div className="body" style={{height: "calc(100vh - 150px)", padding: "100px 50px"}}>
                 <div className="box">
                     <p className="title">Signup</p>
                     <form action="/api/home" method="post" onSubmit={submitSignup}>

@@ -24,6 +24,31 @@ const chat = (place) => {
     const [isSendMessage, setIsSendMessage] = useState(false);
 
     useEffect(() => {
+        // Récupérer l'id du pseudo
+        const fetchId_Pseudo = async () => {
+            // console.log(pseudoCookies)
+            try {
+                let {data: id, error} = await supabase
+                    .from('connexion')
+                    .select('id, isActive') // Ajoutez isActive ici
+                    .eq('pseudo', pseudoCookies);
+
+                if (error) throw error; // Si une erreur est renvoyée par supabase, la propager
+
+                setId_USER(id[0].id);
+                setIsActive(id[0].isActive);
+                if (isActive) {
+                }
+            } catch (error) {
+                console.error('Une erreur est survenue lors de la récupération de l\'ID :', error);
+                // Gérer l'erreur comme vous le souhaitez
+            }
+        }
+
+        fetchId_Pseudo();
+    }, []);
+
+    useEffect(() => {
         let messageContainer = document.getElementById('messageContainer');
         if (!messageContainer) {
             // Créer l'élément s'il n'existe pas
@@ -95,6 +120,8 @@ const chat = (place) => {
         };
 
         fetchMessagesAndUsers();
+
+        //TODO A QUOI SA SERT (PEUT PEUT ETRE ETRE SUPPRIME !!)
         let dateOnlineByPseudo = "";
         const fetchPseudoAndDateOnline = async () => {
             // Récupère la date actuelle de dateOnline pour tous les utilisateurs
@@ -153,153 +180,126 @@ const chat = (place) => {
                 }
             })
             .subscribe();
-
-
-        // Fonction pour afficher un message
-        const displayMessage = (idMessage, pseudo, dateMessage, message, emojis, firstMessage) => {
-            if (pseudo !== pseudoCookies || firstMessage === true) {
-                // Créer une nouvelle div pour l'auteur du message
-                const newAuthorDiv = document.createElement("div");
-                newAuthorDiv.className = "messageAuthor";
-
-                // Créer un nouveau paragraphe pour l'auteur du message
-                const newAuthorP = document.createElement("p");
-                newAuthorP.style.color = "white";
-                newAuthorP.id = "messageAuthor";
-                const newAuthorContent = document.createTextNode(pseudo + " " + dateMessage);
-                newAuthorP.appendChild(newAuthorContent);
-
-                // Ajouter le paragraphe à la div de l'auteur du message
-                newAuthorDiv.appendChild(newAuthorP);
-
-                // Mettre à jour l'auteur du dernier message
-                lastAuthor = pseudo;
-
-                // Créer une nouvelle div pour le message
-                const newMessageDiv = document.createElement("div");
-                newMessageDiv.style.background = "rgb(103, 194, 98)";
-                newMessageDiv.style.userSelect = "none";
-                newMessageDiv.style.color = "white";
-                newMessageDiv.className = "messageContainer";
-                // Créer un nouveau paragraphe pour le message
-                const newMessageP = document.createElement("p");
-                newMessageP.id = idMessage;
-                const newMessageContent = document.createTextNode(message);
-                newMessageP.appendChild(newMessageContent);
-
-                // Ajouter le paragraphe à la div du message
-                newMessageDiv.appendChild(newMessageP);
-
-                // Créer une nouvelle div pour contenir l'auteur et le message
-                const newParentDiv = document.createElement("div");
-                newParentDiv.className = "parentContainer";
-                newParentDiv.style.display = "flex";
-                newParentDiv.style.flexDirection = "column";
-                newParentDiv.style.alignItems = "flex-start";
-
-                let fontSize = window.getComputedStyle(document.body).getPropertyValue('font-size');
-                fontSize = parseFloat(fontSize);
-                if (pseudo === pseudoCookies) {
-                    newMessageDiv.style.background = "rgb(50, 121, 249)";
-                    newParentDiv.style.alignItems = "flex-end";
-                    newMessageDiv.style.borderRadius = Math.ceil(fontSize * 1.35) + "px " + Math.ceil(fontSize * 1.35) + "px 0px " + Math.ceil(fontSize * 1.35) + "px";
-                } else {
-                    newMessageDiv.style.borderRadius = Math.ceil(fontSize * 1.35) + "px " + Math.ceil(fontSize * 1.35) + "px " + Math.ceil(fontSize * 1.35) + "px 0px";
-                }
-                newParentDiv.appendChild(newAuthorDiv);
-                //div avec le message et l'emojis
-                const divMessageContainer = document.createElement("div");
-                divMessageContainer.style.display = "flex";
-                divMessageContainer.style.flexDirection = "row";
-                if (pseudo === pseudoCookies) {
-                    divMessageContainer.style.flexDirection = "row-reverse";
-                }
-                divMessageContainer.style.gap = "5px";
-                divMessageContainer.appendChild(newMessageDiv);
-
-
-                //
-                const divEmojisChat = document.createElement("div");
-                divEmojisChat.id = idMessage;
-                divEmojisChat.style.display = "flex";
-                divEmojisChat.style.alignItems = "center";
-                const emojisChat = document.createElement("p");
-                emojisChat.innerText = emojis;
-                divEmojisChat.appendChild(emojisChat);
-                divMessageContainer.appendChild(divEmojisChat);
-
-                newParentDiv.appendChild(divMessageContainer);
-
-                // Liez un écouteur d'événement 'click' à chaque émoji
-                const bindEmojiClickListener = (emojiContainer) => {
-                    const emojisSpans = emojiContainer.querySelectorAll(".emojisSpan");
-                    emojisSpans.forEach((emojiSpan) => {
-                        emojiSpan.addEventListener("click", (event) => logEmojiAndMessageId(event, idMessage));
-                    });
-                };
-
-                // Créer un nouveau composant avec des emojis
-                const emojiComponent = createEmojiComponent();
-                emojiComponent.className = "emojisContainer";
-                bindEmojiClickListener(emojiComponent); // Liaison de l'écouteur d'événement click
-
-                // Ajouter le composant emoji à newMessageDiv au lieu de newParentDiv
-                newParentDiv.appendChild(emojiComponent);
-
-                // Ajouter des écouteurs d'événements 'mouseover' et 'mouseout' à newMessageDiv au lieu de newParentDiv
-                newMessageDiv.addEventListener("mouseover", () => showEmoji(emojiComponent));
-                newMessageDiv.addEventListener("mouseout", () => hideEmoji(emojiComponent));
-                // Ajouter des écouteurs d'événements 'mouseover' et 'mouseout' à emojiComponent
-                emojiComponent.addEventListener("mouseover", () => showEmoji(emojiComponent));
-                emojiComponent.addEventListener("mouseout", () => hideEmoji(emojiComponent));
-
-                function showEmoji(element) {
-                    element.style.visibility = "visible";
-                }
-
-                function hideEmoji(element) {
-                    element.style.visibility = "hidden";
-                }
-
-                messageContainer.appendChild(newParentDiv);
-            }
-            setIsLoading(false);
-            if (message.length !== 0) {
-                // Après avoir ajouté un nouveau message au conteneur
-                let chatContainer = document.querySelector('.chatContainer2');
-                if (chatContainer) {
-                    chatContainer.scrollTop = chatContainer.scrollHeight;
-                }
-            }
-            // emojisMessage();
-        }
-
     }, [currentScene, isLoading]);
 
-    useEffect(() => {
-        // Récupérer l'id du pseudo
-        const fetchId_Pseudo = async () => {
-            // console.log(pseudoCookies)
-            try {
-                let {data: id, error} = await supabase
-                    .from('connexion')
-                    .select('id, isActive') // Ajoutez isActive ici
-                    .eq('pseudo', pseudoCookies);
+    // Fonction pour afficher un message
+    const displayMessage = (idMessage, pseudo, dateMessage, message, emojis, firstMessage) => {
+        if (pseudo !== pseudoCookies || firstMessage === true) {
+            // Créer une nouvelle div pour l'auteur du message
+            const newAuthorDiv = document.createElement("div");
+            newAuthorDiv.className = "messageAuthor";
 
-                if (error) throw error; // Si une erreur est renvoyée par supabase, la propager
+            // Créer un nouveau paragraphe pour l'auteur du message
+            const newAuthorP = document.createElement("p");
+            newAuthorP.style.color = "white";
+            newAuthorP.id = "messageAuthor";
+            const newAuthorContent = document.createTextNode(pseudo + " " + dateMessage);
+            newAuthorP.appendChild(newAuthorContent);
 
-                setId_USER(id[0].id);
-                setIsActive(id[0].isActive);
-                if (isActive) {
-                }
-            } catch (error) {
-                console.error('Une erreur est survenue lors de la récupération de l\'ID :', error);
-                // Gérer l'erreur comme vous le souhaitez
+            // Ajouter le paragraphe à la div de l'auteur du message
+            newAuthorDiv.appendChild(newAuthorP);
+
+            // Mettre à jour l'auteur du dernier message
+            lastAuthor = pseudo;
+
+            // Créer une nouvelle div pour le message
+            const newMessageDiv = document.createElement("div");
+            newMessageDiv.style.background = "rgb(103, 194, 98)";
+            newMessageDiv.style.userSelect = "none";
+            newMessageDiv.style.color = "white";
+            newMessageDiv.className = "messageContainer";
+            // Créer un nouveau paragraphe pour le message
+            const newMessageP = document.createElement("p");
+            newMessageP.id = idMessage;
+            const newMessageContent = document.createTextNode(message);
+            newMessageP.appendChild(newMessageContent);
+
+            // Ajouter le paragraphe à la div du message
+            newMessageDiv.appendChild(newMessageP);
+
+            // Créer une nouvelle div pour contenir l'auteur et le message
+            const newParentDiv = document.createElement("div");
+            newParentDiv.className = "parentContainer";
+            newParentDiv.style.display = "flex";
+            newParentDiv.style.flexDirection = "column";
+            newParentDiv.style.alignItems = "flex-start";
+
+            let fontSize = window.getComputedStyle(document.body).getPropertyValue('font-size');
+            fontSize = parseFloat(fontSize);
+            if (pseudo === pseudoCookies) {
+                newMessageDiv.style.background = "rgb(50, 121, 249)";
+                newParentDiv.style.alignItems = "flex-end";
+                newMessageDiv.style.borderRadius = Math.ceil(fontSize * 1.35) + "px " + Math.ceil(fontSize * 1.35) + "px 0px " + Math.ceil(fontSize * 1.35) + "px";
+            } else {
+                newMessageDiv.style.borderRadius = Math.ceil(fontSize * 1.35) + "px " + Math.ceil(fontSize * 1.35) + "px " + Math.ceil(fontSize * 1.35) + "px 0px";
+            }
+            newParentDiv.appendChild(newAuthorDiv);
+            //div avec le message et l'emojis
+            const divMessageContainer = document.createElement("div");
+            divMessageContainer.style.display = "flex";
+            divMessageContainer.style.flexDirection = "row";
+            if (pseudo === pseudoCookies) {
+                divMessageContainer.style.flexDirection = "row-reverse";
+            }
+            divMessageContainer.style.gap = "5px";
+            divMessageContainer.appendChild(newMessageDiv);
+
+
+            //
+            const divEmojisChat = document.createElement("div");
+            divEmojisChat.id = idMessage;
+            divEmojisChat.style.display = "flex";
+            divEmojisChat.style.alignItems = "center";
+            const emojisChat = document.createElement("p");
+            emojisChat.innerText = emojis;
+            divEmojisChat.appendChild(emojisChat);
+            divMessageContainer.appendChild(divEmojisChat);
+
+            newParentDiv.appendChild(divMessageContainer);
+
+            // Liez un écouteur d'événement 'click' à chaque émoji
+            const bindEmojiClickListener = (emojiContainer) => {
+                const emojisSpans = emojiContainer.querySelectorAll(".emojisSpan");
+                emojisSpans.forEach((emojiSpan) => {
+                    emojiSpan.addEventListener("click", (event) => logEmojiAndMessageId(event, idMessage));
+                });
+            };
+
+            // Créer un nouveau composant avec des emojis
+            const emojiComponent = createEmojiComponent();
+            emojiComponent.className = "emojisContainer";
+            bindEmojiClickListener(emojiComponent); // Liaison de l'écouteur d'événement click
+
+            // Ajouter le composant emoji à newMessageDiv au lieu de newParentDiv
+            newParentDiv.appendChild(emojiComponent);
+
+            // Ajouter des écouteurs d'événements 'mouseover' et 'mouseout' à newMessageDiv au lieu de newParentDiv
+            newMessageDiv.addEventListener("mouseover", () => showEmoji(emojiComponent));
+            newMessageDiv.addEventListener("mouseout", () => hideEmoji(emojiComponent));
+            // Ajouter des écouteurs d'événements 'mouseover' et 'mouseout' à emojiComponent
+            emojiComponent.addEventListener("mouseover", () => showEmoji(emojiComponent));
+            emojiComponent.addEventListener("mouseout", () => hideEmoji(emojiComponent));
+
+            function showEmoji(element) {
+                element.style.visibility = "visible";
+            }
+
+            function hideEmoji(element) {
+                element.style.visibility = "hidden";
+            }
+
+            messageContainer.appendChild(newParentDiv);
+        }
+        setIsLoading(false);
+        if (message.length !== 0) {
+            // Après avoir ajouté un nouveau message au conteneur
+            let chatContainer = document.querySelector('.chatContainer2');
+            if (chatContainer) {
+                chatContainer.scrollTop = chatContainer.scrollHeight;
             }
         }
-
-        fetchId_Pseudo();
-    }, []);
+        // emojisMessage();
+    }
 
     const sendMessage = async () => {
         let message = document.getElementById('inputMessage').value;
@@ -362,7 +362,6 @@ const chat = (place) => {
             }
         }
     }
-
 
     const logEmojiAndMessageId = async (event, idMessage) => {
         setIsLoading(true);
@@ -442,47 +441,52 @@ const chat = (place) => {
 
                     </div>
                 </div>
-                {isLoading ? (<div className="chatContainer3">
-                    {Rolling(40, 40)}
-                    <p id="textMessage" style={{
-                        marginBottom: "0",
-                        margin: 0,
-                        display: "flex",
-                        justifyContent: "center",
-                        fontFamily: "Arial,ui-serif",
-                        fontSize: "18px"
-                    }}>{isSendMessage ? "Envoie ..." : "Chargement ..."}</p>
-                </div>) : (<div className="chatContainer3">
-                    <form style={{display: "flex", alignItems: "center"}} onSubmit={(e) => {
-                        e.preventDefault(); // Empêche le rechargement de la page
-                        sendMessage();
-                    }}>
-                        <input
-                            className="inputsChat"
-                            maxLength="75"
-                            id="inputMessage"
-                            placeholder="envoyer un message"
-                            required
-                            onFocus={() => setInputFocused(true)}
-                            onBlur={() => setInputFocused(false)}
-                            onKeyDown={(event) => {
-                                // Arrête la propagation de l'événement pour empêcher le jeu de le recevoir
-                                event.stopPropagation();
-                            }}
-                        />
+                <div className="chatContainer3">
+                    {isLoading ? (<div>
+                            {Rolling(40, 40)}
+                            <p id="textMessage" style={{
+                                marginBottom: "0",
+                                margin: 0,
+                                display: "flex",
+                                justifyContent: "center",
+                                fontFamily: "Arial,ui-serif",
+                                fontSize: "18px"
+                            }}>{isSendMessage ? "Envoie ..." : "Chargement ..."}</p>
+                        </div>)
+                        :
+                        (<div>
+                                <form style={{display: "flex", alignItems: "center"}} onSubmit={(e) => {
+                                    e.preventDefault(); // Empêche le rechargement de la page
+                                    sendMessage();
+                                }}>
+                                    <input
+                                        className="inputsChat"
+                                        maxLength="75"
+                                        id="inputMessage"
+                                        placeholder="envoyer un message"
+                                        required
+                                        onFocus={() => setInputFocused(true)}
+                                        onBlur={() => setInputFocused(false)}
+                                        onKeyDown={(event) => {
+                                            // Arrête la propagation de l'événement pour empêcher le jeu de le recevoir
+                                            event.stopPropagation();
+                                        }}
+                                    />
 
 
-                        <button type="submit" style={{background: "none", border: "none"}}>
-                            <img
-                                width="35"
-                                height="35"
-                                style={{display: "flex", alignItems: "center", cursor: "pointer"}}
-                                src={sendImage}
-                                alt="external-send-user-interface-febrian-hidayat-gradient-febrian-hidayat"
-                            />
-                        </button>
-                    </form>
-                </div>)}
+                                    <button type="submit" style={{background: "none", border: "none"}}>
+                                        <img
+                                            width="35"
+                                            height="35"
+                                            style={{display: "flex", alignItems: "center", cursor: "pointer"}}
+                                            src={sendImage}
+                                            alt="external-send-user-interface-febrian-hidayat-gradient-febrian-hidayat"
+                                        />
+                                    </button>
+                                </form>
+                            </div>
+                        )}
+                </div>
             </div>
         </div>
         <div>

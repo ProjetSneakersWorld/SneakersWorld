@@ -28,8 +28,6 @@ body {
     text-align: center;
     font-family: arial, sans-serif;
     overflow: auto;
-    height: calc(100vh - 50px); /* Soustraire 50px pour le padding en haut et en bas */
-    padding: 25px 0; /* 25px de padding en haut et en bas, 0 sur les côtés */
 }
 
 

@@ -8,6 +8,7 @@ import {useRouter} from "next/router";
 import Chat from "../chat/chat"
 import {InputFocusContext} from "../../src/InputFocusContext";
 import {GameContext} from '../../src/GameContext';
+import ManageAdmin from "../manageAdmin";
 
 const Home = () => {
     const [isToken, setIsToken] = useState(false);
@@ -142,6 +143,16 @@ const Home = () => {
 
     const [isOpenDropdown, setIsOpenDropdown] = useState(false);
     const [isAdmin] = useState(true);
+    const [isManageAdminOpen, setIsManageAdminOpen] = useState(false);
+
+    const handleManageAdminOpen = () => {
+        setIsManageAdminOpen(true);
+    };
+
+    const handleManageAdminClose = () => {
+        setIsManageAdminOpen(false);
+    };
+
     if (isToken === false || isActive === "null") {
         return (
             <div>
@@ -199,19 +210,24 @@ const Home = () => {
                                             <img src={avatarSrc} width="50" height="50" alt=""/>}
                                         {isOpenDropdown && (
                                             <div className="dropdownMenu">
-                                                <a className="item" onClick={()=>setCurrentScene('home')}>Home</a>
-                                                {isAdmin ? (<a className="item" href="#/action-2">Manage Admin</a>) : (
-                                                    <a className="item" href="#/action-2">Manage</a>)}
-
+                                                <a className="item" onClick={() => setCurrentScene('home')}>Home</a>
+                                                {isAdmin ? (
+                                                    <a className="item" href="#" onClick={handleManageAdminOpen}>Manage
+                                                        Admin</a>
+                                                ) : (
+                                                    <a className="item" href="/manageAccount">Manage</a>)}
                                                 <a className="item" href="/logout">Logout</a>
                                             </div>
                                         )}
                                     </div>
                                 </div>
                             </div>
+                            {isManageAdminOpen && <ManageAdmin onClose={handleManageAdminClose}/>}
                         </div>
                         <div className="ContainerPrincipale">
-                            {currentScene === 'home' ? <Chat place="home" nameChat="Chat Principal"/> : currentScene === 'SceneShop' ? <Chat place="shop" nameChat="Shop"/> : Rolling(50, 50, "#ffffff")}
+                            {currentScene === 'home' ?
+                                <Chat place="home" nameChat="Chat Principal"/> : currentScene === 'SceneShop' ?
+                                    <Chat place="shop" nameChat="Shop"/> : Rolling(50, 50, "#ffffff")}
 
                             <div style={{display: "flex", alignItems: "center"}} onClick={() => {
                                 if (document.getElementById("inputMessage")) {
