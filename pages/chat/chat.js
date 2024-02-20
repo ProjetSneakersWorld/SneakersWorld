@@ -327,8 +327,8 @@ const chat = (place) => {
                 function hideEmoji(element) {
                     element.style.visibility = "hidden";
                 }
-
-                messageContainer.appendChild(newParentDiv);
+                document.getElementById('messageContainer').width="100%";
+                document.getElementById('messageContainer').appendChild(newParentDiv);
             }
 
             setIsLoading(false);
@@ -340,7 +340,6 @@ const chat = (place) => {
                 }
             }
         }
-        // emojisMessage();
     }
 
     const sendMessage = async () => {
