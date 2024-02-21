@@ -61,7 +61,7 @@ const Logout = () => {
                 <meta name="viewport" content="initial-scale=1.0, width=device-width"/>
             </Head>
             <div>
-                <p className="ChargementText">Déconnexion ...</p>
+                <p className="ChargementText">Disconnect ...</p>
                 {Rolling(80, 80, "#ffffff")}
             </div>
         </div>

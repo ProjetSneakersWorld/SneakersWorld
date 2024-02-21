@@ -141,7 +141,7 @@ const Login = ({defaultIdf = '', defaultMdp = ''}) => {
                     </form>
                 </div>
                 <div style={{paddingTop: "15px"}}>
-                    <button className="button" onClick={() => handleClick('/')}>Retour</button>
+                    <button className="button" onClick={() => handleClick('/')}>Back</button>
                 </div>
             </div>
         </div>);

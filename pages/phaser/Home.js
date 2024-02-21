@@ -6,9 +6,9 @@ import Head from "next/head";
 import GameComponent from "../../src/scenes/Scene"
 import {useRouter} from "next/router";
 import Chat from "../chat/chat"
-import {InputFocusContext} from "../../src/InputFocusContext";
 import {GameContext} from '../../src/GameContext';
 import ManageAdmin from "../manageAdmin";
+import ManageAccount from "../manageAccount";
 
 const Home = () => {
     const [isToken, setIsToken] = useState(false);
@@ -142,8 +142,8 @@ const Home = () => {
     </svg>);
 
     const [isOpenDropdown, setIsOpenDropdown] = useState(false);
-    const [isAdmin] = useState(true);
     const [isManageAdminOpen, setIsManageAdminOpen] = useState(false);
+    const [isManageAccountOpen, setIsManageAccountOpen] = useState(false);
 
     const handleManageAdminOpen = () => {
         setIsManageAdminOpen(true);
@@ -153,10 +153,18 @@ const Home = () => {
         setIsManageAdminOpen(false);
     };
 
+    const handleManageAccountOpen = () => {
+        setIsManageAccountOpen(true);
+    };
+
+    const handleManageAccountClose = () => {
+        setIsManageAccountOpen(false);
+    };
+
     if (isToken === false || isActive === "null") {
         return (
             <div>
-                <p className="ChargementText">Chargement ...</p>
+                <p className="ChargementText">Loading ...</p>
                 {Rolling(80, 80, "#ffffff")}
             </div>);
     } else if (isActive === false) {
@@ -190,59 +198,58 @@ const Home = () => {
                     <title>Map principal</title>
                     <meta name="viewport" content="initial-scale=1.0, width=device-width"/>
                 </Head>
-                <InputFocusContext.Provider value={{isInputFocused, setInputFocused}}>
-                    <div style={{background: "black", height: "100Vh"}}>
-                        <div className="divPrincipal">
-                            <div className="containerTitle">
-                                <p className="titre">{currentScene === 'home' ? 'Sneakers World' : currentScene === 'SceneShop' ? 'Shop' : Rolling(50, 50, "#ffffff")}</p>
-                                <p id="PseudoName" className="pseudo"></p>
-                            </div>
-                            <div style={{display: "flex", alignItems: "center"}}>
-                                <div style={{
-                                    marginLeft: "auto",
-                                    paddingRight: "15px",
-                                    display: "flex",
-                                    alignItems: "center"
-                                }}>
-                                    <div className="buttonProfil" onMouseEnter={() => setIsOpenDropdown(true)}
-                                         onMouseLeave={() => setIsOpenDropdown(false)}>
-                                        {isLoadAvatar ? Rolling(50, 50, "#000000") :
-                                            <img src={avatarSrc} width="50" height="50" alt=""/>}
-                                        {isOpenDropdown && (
-                                            <div className="dropdownMenu">
-                                                <a className="item" onClick={() => setCurrentScene('home')}>Home</a>
-                                                {isAdmin ? (
-                                                    <a className="item" href="#" onClick={handleManageAdminOpen}>Manage
-                                                        Admin</a>
-                                                ) : (
-                                                    <a className="item" href="/manageAccount">Manage</a>)}
-                                                <a className="item" href="/logout">Logout</a>
-                                            </div>
-                                        )}
-                                    </div>
+                <div style={{background: "black", height: "100Vh"}}>
+                    <div className="divPrincipal">
+                        <div className="containerTitle">
+                            <p className="titre">{currentScene === 'home' ? 'Sneakers World' : currentScene === 'SceneShop' ? 'Shop' : Rolling(50, 50, "#ffffff")}</p>
+                            <p id="PseudoName" className="pseudo"></p>
+                        </div>
+                        <div style={{display: "flex", alignItems: "center"}}>
+                            <div style={{
+                                marginLeft: "auto",
+                                paddingRight: "15px",
+                                display: "flex",
+                                alignItems: "center"
+                            }}>
+                                <div className="buttonProfil" onMouseEnter={() => setIsOpenDropdown(true)}
+                                     onMouseLeave={() => setIsOpenDropdown(false)}>
+                                    {isLoadAvatar ? Rolling(50, 50, "#000000") :
+                                        <img src={avatarSrc} width="50" height="50" alt=""/>}
+                                    {isOpenDropdown && (
+                                        <div className="dropdownMenu">
+                                            <a className="item" onClick={() => setCurrentScene('home')}>Home</a>
+                                            {pseudoCookies === "admin" ? (
+                                                <a className="item" onClick={handleManageAdminOpen}>Manage Admin</a>
+                                            ) : (
+                                                <a className="item" onClick={handleManageAccountOpen}>Manage Account</a>
+                                            )}
+                                            <a className="item" href="/logout">Logout</a>
+                                        </div>
+                                    )}
                                 </div>
                             </div>
-                            {isManageAdminOpen && <ManageAdmin onClose={handleManageAdminClose}/>}
                         </div>
-                        <div className="ContainerPrincipale">
-                            {currentScene === 'home' ?
-                                <Chat place="home" nameChat="Chat Principal"/> : currentScene === 'SceneShop' ?
-                                    <Chat place="shop" nameChat="Shop"/> : Rolling(50, 50, "#ffffff")}
+                        {isManageAdminOpen && <ManageAdmin onClose={handleManageAdminClose}/>}
+                        {isManageAccountOpen && <ManageAccount onClose={handleManageAccountClose}/>}
+                    </div>
+                    <div className="ContainerPrincipale" id="ContainerPrincipale">
+                        {currentScene === 'home' ?
+                            <Chat place="home" nameChat="Chat Principal"/> : currentScene === 'SceneShop' ?
+                                <Chat place="shop" nameChat="Shop"/> : Rolling(50, 50, "#ffffff")}
 
-                            <div style={{display: "flex", alignItems: "center"}} onClick={() => {
-                                if (document.getElementById("inputMessage")) {
-                                    document.getElementById("inputMessage").blur()
-                                }
-                            }}>
-                                <GameComponent/>
-                            </div>
-                        </div>
-                        <div className="help"
-                             onClick={() => document.getElementById('modalHelp').style.display = "block"}>
-                            <img src="/images/aide.png" width="75" height="75" alt=""/>
+                        <div style={{display: "flex", alignItems: "center"}} onClick={() => {
+                            if (document.getElementById("inputMessage")) {
+                                document.getElementById("inputMessage").blur()
+                            }
+                        }}>
+                            <GameComponent/>
                         </div>
                     </div>
-                </InputFocusContext.Provider>
+                    <div className="help"
+                         onClick={() => document.getElementById('modalHelp').style.display = "block"}>
+                        <img src="/images/aide.png" width="75" height="75" alt=""/>
+                    </div>
+                </div>
                 )
                 <div className="modal" id="modalHelp" style={{display: "none"}}>
                     <div className="modal-content2">

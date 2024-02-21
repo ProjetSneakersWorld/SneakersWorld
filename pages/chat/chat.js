@@ -5,7 +5,6 @@ import Cookies from "js-cookie";
 import moment from 'moment-timezone';
 import {toast, ToastContainer} from "react-toastify";
 import 'react-toastify/dist/ReactToastify.css';
-import {InputFocusContext} from "../../src/InputFocusContext";
 import {GameContext} from "../../src/GameContext";
 
 const sendImage = "/images/send.png"
@@ -13,7 +12,6 @@ const sendImage = "/images/send.png"
 const supabase = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY);
 
 const chat = (place) => {
-    const {isInputFocused, setInputFocused} = React.useContext(InputFocusContext);
     let lastAuthor = null;
     let pseudoCookies = Cookies.get('Pseudo');
     const {currentScene} = useContext(GameContext);
@@ -99,16 +97,18 @@ const chat = (place) => {
                 return;
             }
 
-            if (results.length === 0) {
-                messageContainer.className = "messageVide";
-                const messageVideP = document.createElement("p");
-                messageVideP.id = "messageVideP";
-                messageVideP.style.textAlign = "center";
-                messageVideP.style.userSelect = "none";
-                messageVideP.innerText = "Aucun message disponible";
-                messageContainer.appendChild(messageVideP);
-                setIsLoading(false);
-                return;
+            if(!document.getElementById("messageVideP")){
+                if (results.length === 0) {
+                    messageContainer.className = "messageVide";
+                    const messageVideP = document.createElement("p");
+                    messageVideP.id = "messageVideP";
+                    messageVideP.style.textAlign = "center";
+                    messageVideP.style.userSelect = "none";
+                    messageVideP.innerText = "Aucun message disponible";
+                    messageContainer.appendChild(messageVideP);
+                    setIsLoading(false);
+                    return;
+                }
             }
 
             results.sort((a, b) => new Date(a.timestamp) - new Date(b.timestamp));
@@ -131,7 +131,6 @@ const chat = (place) => {
 
         fetchMessagesAndUsers();
 
-        //TODO A QUOI SA SERT (PEUT PEUT ETRE ETRE SUPPRIME !!)
         let dateOnlineByPseudo = "";
         const fetchPseudoAndDateOnline = async () => {
             // Récupère la date actuelle de dateOnline pour tous les utilisateurs
@@ -477,7 +476,7 @@ const chat = (place) => {
     </svg>);
 
     return (<div style={{display: "flex", alignItems: "stretch"}} id="chatContainer">
-        <div className="chatContainer" style={{border: isInputFocused ? "5px solid white" : ""}}>
+        <div className="chatContainer" style={{border: "5px solid white"}}>
             <div style={{display: "flex", justifyContent: "center", flexDirection: "column", width: "100%"}}>
                 <div style={{display: "flex", justifyContent: "center", fontFamily: "Arial"}}>
                     <p style={{fontSize: "20px"}}>{place.nameChat}</p>
@@ -502,7 +501,7 @@ const chat = (place) => {
                         justifyContent: "center",
                         fontFamily: "Arial,ui-serif",
                         fontSize: "18px"
-                    }}>{isSendMessage ? "Envoie ..." : "Chargement ..."}</p>
+                    }}>{isSendMessage ? "Sending ..." : "Loading ..."}</p>
                 </div>) : (<div className="chatContainer3">
                         <form style={{display: "flex", alignItems: "center"}} onSubmit={(e) => {
                             e.preventDefault(); // Empêche le rechargement de la page
@@ -514,8 +513,6 @@ const chat = (place) => {
                                 id="inputMessage"
                                 placeholder="envoyer un message"
                                 required
-                                onFocus={() => setInputFocused(true)}
-                                onBlur={() => setInputFocused(false)}
                                 onKeyDown={(event) => {
                                     // Arrête la propagation de l'événement pour empêcher le jeu de le recevoir
                                     event.stopPropagation();

@@ -1,6 +1,5 @@
 import React, {useEffect, useRef, useContext} from "react";
 import {router} from "next/router";
-import {InputFocusContext} from "../InputFocusContext";
 import {GameContext} from '../GameContext';
 
 const speed = 250;
@@ -88,7 +87,6 @@ function Scene() {
                 }
 
                 this.player.setVelocity(0);
-
                 if (this.cursors.up.isDown) {
                     this.player.setVelocityY(-speed);
                     this.player.anims.play('up', true);

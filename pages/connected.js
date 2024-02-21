@@ -1,6 +1,6 @@
 // connected.js
-import React, { useEffect, useState } from 'react';
-import { useRouter } from 'next/router';
+import React, {useEffect, useState} from 'react';
+import {useRouter} from 'next/router';
 import Cookies from 'js-cookie';
 import Head from "next/head";
 
@@ -17,7 +17,7 @@ function ConnectedPage() {
                     body: JSON.stringify({token: Cookies.get('TOKEN')}),
                 });
 
-                const { valid } = await response.json();
+                const {valid} = await response.json();
 
                 if (valid) {
                     // Token valide, rediriger vers la page phaser Home
@@ -37,26 +37,28 @@ function ConnectedPage() {
         verifyToken();
     }, [router]);
 
-    if (!loading) {
+
         // Vous pouvez afficher un indicateur de chargement ici si nécessaire
         return (
-            <div style={{height: "100VH",overflow: "hidden", background: "black"}}>
+            <div style={{height: "100Vh", background: "black"}}>
                 <Head>
                     <title>Loading ...</title>
                     <meta name="viewport" content="initial-scale=1.0, width=device-width"/>
                 </Head>
                 <div><p style={{
+                    padding: "0",
+                    margin: "0",
                     textAlign: "center",
                     color: "white",
                     background: "black",
-                    paddingTop: "25px",
+                    paddingTop: "60px",
                     fontSize: "35px",
-                    fontFamily: "Calibri"
-                }}>Chargement ...</p>
+                    fontFamily: "Arial, ui-serif"
+                }}>Loading ...</p>
                 </div>
             </div>
         );
-    }
+
 }
 
 export default ConnectedPage;

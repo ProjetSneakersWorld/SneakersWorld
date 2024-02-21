@@ -23,7 +23,8 @@ function Index() {
         setModalIsOpen(false);
     };
 
-    return (<div>
+    return (
+        <div>
         <Head>
             <title>Sneakers World</title>
             <meta name="viewport" content="initial-scale=1.0, width=device-width"/>
@@ -38,7 +39,7 @@ function Index() {
         <div className="copyrightContainer">
             <p>© Projet SAE 2024</p>
             <div>
-                <p onClick={openModal}> Politique de confidentialité</p>
+                <p onClick={openModal} style={{cursor: "pointer"}}> Politique de confidentialité</p>
             </div>
         </div>
         <Modal
