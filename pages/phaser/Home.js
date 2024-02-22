@@ -5,10 +5,15 @@ import 'react-toastify/dist/ReactToastify.css';
 import Head from "next/head";
 import GameComponent from "../../src/scenes/Scene"
 import {useRouter} from "next/router";
-import Chat from "../chat/chat"
+import Chat from "../componentHome/chat"
 import {GameContext} from '../../src/GameContext';
 import ManageAdmin from "../manageAdmin";
 import ManageAccount from "../manageAccount";
+import Online from "../componentHome/online";
+import moment from "moment-timezone";
+import {createClient} from "@supabase/supabase-js";
+
+const supabase = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY);
 
 const Home = () => {
     const [isToken, setIsToken] = useState(false);
@@ -161,6 +166,27 @@ const Home = () => {
         setIsManageAccountOpen(false);
     };
 
+    const updateDateOnline = async () => {
+        try {
+            const { error } = await supabase
+                .from("connexion")
+                .update({
+                    isOnline: moment().tz("Europe/Paris").format(),
+                })
+                .eq("pseudo", pseudoCookies);
+
+            if (error) {
+                console.error("Une erreur s'est produite : ", error);
+            } else {
+                // console.log("Mise à jour réussie de la dateOnline");
+            }
+        } catch (error) {
+            console.error("Une erreur s'est produite : ", error);
+        }
+    };
+    //Appelle la fonction de mise à jour toutes les 5 secondes
+    setInterval(updateDateOnline, 5000);
+
     if (isToken === false || isActive === "null") {
         return (
             <div>
@@ -244,6 +270,8 @@ const Home = () => {
                         }}>
                             <GameComponent/>
                         </div>
+
+                        <Online/>
                     </div>
                     <div className="help"
                          onClick={() => document.getElementById('modalHelp').style.display = "block"}>

@@ -85,9 +85,6 @@ const chat = (place) => {
         }
 
         const fetchMessagesAndUsers = async () => {
-            let currentDate = new Date();
-            let pastDate = new Date();
-            pastDate.setHours(currentDate.getHours() - 24);
 
             // Appeler la fonction fetch_messages_users_reactions
             let {data: results, error} = await supabase
@@ -364,11 +361,11 @@ const chat = (place) => {
             if (message === "") {
                 document.getElementById("erreurSend").innerText = "Message vide !";
             } else {
+                setIsSendMessage(true);
+                setIsLoading(true);
                 if (document.getElementById('messageVideP')) {
                     document.getElementById('messageVideP').remove();
                 }
-                setIsSendMessage(true);
-                setIsLoading(true);
                 try {
                     await supabase
                         .from('message')
