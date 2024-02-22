@@ -1,6 +1,8 @@
-import React, {useEffect, useState} from 'react';
+import React, {useContext, useState} from 'react';
 import {createClient} from '@supabase/supabase-js';
 import '/public/manage.css';
+import {GameContext} from "../src/GameContext";
+import Swal from 'sweetalert2';
 
 const supabase = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY);
 
@@ -9,147 +11,202 @@ const ManageAdmin = ({onClose}) => {
     const [data, setData] = useState([]);
     const [loading, setLoading] = useState(false);
     const [editingCell, setEditingCell] = useState(null);
+    const [selectAll, setSelectAll] = useState(false);
+    const [confirmDelete, setConfirmDelete] = useState(false);
 
-    useEffect(() => {
-        // document.getElementById("ContainerPrincipale").remove();
-    }, [])
     // Define a table component for each table type
     const ConnexionTable = ({data}) => (
-        <table>
-            <thead>
-            <tr>
-                <th>Pseudo</th>
-                <th>Name</th>
-                <th>LastName</th>
-                <th>Email</th>
-                <th>Active Account</th>
-                <th>date Online</th>
-                <th>Action</th>
-            </tr>
-            </thead>
-            <tbody>
-            {data.map((connexion, index) => (
-                <tr key={connexion.id}>
-                    <EditableCell
-                        value={connexion.pseudo}
-                        rowId={connexion.id}
-                        field="pseudo"
-                        isEditing={editingCell === `${connexion.id}-pseudo`}
-                        setEditingCell={setEditingCell}
-                        updateData={updateData}
-                    />
-                    <EditableCell
-                        value={connexion.name}
-                        rowId={connexion.id}
-                        field="name"
-                        isEditing={editingCell === `${connexion.id}-name`}
-                        setEditingCell={setEditingCell}
-                        updateData={updateData}
-                    />
-                    <EditableCell
-                        value={connexion.lastName}
-                        rowId={connexion.id}
-                        field="lastName"
-                        isEditing={editingCell === `${connexion.id}-lastName`}
-                        setEditingCell={setEditingCell}
-                        updateData={updateData}
-                    />
-                    <EditableCell
-                        value={connexion.email}
-                        rowId={connexion.id}
-                        field="email"
-                        isEditing={editingCell === `${connexion.id}-email`}
-                        setEditingCell={setEditingCell}
-                        updateData={updateData}
-                    />
-                    <td>{connexion.isActive ? "Actif" : "Inactif"}</td>
-                    <td>{connexion.dateOnline ? connexion.dateOnline : "null"}</td>
-                    <td>
-                        <button className="buttonManage"
-                                onClick={() => handleDelete(connexion.id, "connexion", "ce compte")}>
-                            Supprimer
-                        </button>
-                    </td>
+        <div>
+            <button className="buttonManage" onClick={() => handleDeleteAll(currentView)}>
+                Supprimer tout
+            </button>
+            <table>
+                <thead>
+                <tr>
+                    <th>Pseudo</th>
+                    <th>Name</th>
+                    <th>LastName</th>
+                    <th>Email</th>
+                    <th>Active Account</th>
+                    <th>date Online</th>
+                    <th>Action</th>
                 </tr>
-            ))}
-            </tbody>
-        </table>
+                </thead>
+                <tbody>
+                {data.map((connexion, index) => (
+                    <tr key={connexion.id}>
+                        <EditableCell
+                            value={connexion.pseudo}
+                            rowId={connexion.id}
+                            field="pseudo"
+                            isEditing={editingCell === `${connexion.id}-pseudo`}
+                            setEditingCell={setEditingCell}
+                            updateData={updateData}
+                        />
+                        <EditableCell
+                            value={connexion.name}
+                            rowId={connexion.id}
+                            field="name"
+                            isEditing={editingCell === `${connexion.id}-name`}
+                            setEditingCell={setEditingCell}
+                            updateData={updateData}
+                        />
+                        <EditableCell
+                            value={connexion.lastName}
+                            rowId={connexion.id}
+                            field="lastName"
+                            isEditing={editingCell === `${connexion.id}-lastName`}
+                            setEditingCell={setEditingCell}
+                            updateData={updateData}
+                        />
+                        <EditableCell
+                            value={connexion.email}
+                            rowId={connexion.id}
+                            field="email"
+                            isEditing={editingCell === `${connexion.id}-email`}
+                            setEditingCell={setEditingCell}
+                            updateData={updateData}
+                        />
+                        <td>{connexion.isActive ? "Actif" : "Inactif"}</td>
+                        <td>{connexion.dateOnline ? connexion.dateOnline : "null"}</td>
+                        <td>
+                            <button className="buttonManage"
+                                    onClick={() => handleDelete(connexion.id, "connexion", "ce compte")}>
+                                Supprimer
+                            </button>
+                        </td>
+                    </tr>
+                ))}
+                </tbody>
+            </table>
+        </div>
     );
 
     const ReactionTable = ({data}) => (
-        <table>
-            <thead>
-            <tr>
-                <th>Pseudo</th>
-                <th>Emojis</th>
-                <th>Place</th>
-                <th>Action</th>
-            </tr>
-            </thead>
-            <tbody>
-            {data.map(Reaction => (
-                <tr key={Reaction.id}>
-                    <EditableCell
-                        value={Reaction.pseudo}
+        <div>
+            <button className="buttonManage" onClick={() => handleDeleteAll(currentView)}>
+                Supprimer tout
+            </button>
+            {selectAll && (
+                <button
+                    className="buttonManage"
+                    style={{color: 'red'}}
+                    onClick={() => handleDeleteAll("reaction", true)}
+                >
+                    Delete All {currentView}
+                </button>
+            )}
+            <table>
+                <thead>
+                <tr>
+                    <th>Pseudo</th>
+                    <th>Emojis</th>
+                    <th>Place</th>
+                    <th>Action</th>
+                </tr>
+                </thead>
+                <tbody>
+                {data.map(Reaction => (
+                    <tr key={Reaction.id}>
+                        <EditableCell
+                            value={Reaction.pseudo}
+                            rowId={Reaction.id}
+                            field="pseudo"
+                            isEditing={editingCell === `${Reaction.id}-pseudo`}
+                            setEditingCell={setEditingCell}
+                            updateData={updateData}
+                        />
+                        <EditableCell
+                            value={Reaction.emojis}
+                            rowId={Reaction.id}
+                            field="emojis"
+                            isEditing={editingCell === `${Reaction.id}-emojis`}
+                            setEditingCell={setEditingCell}
+                            updateData={updateData}
+                        /><EditableCell
+                        value={Reaction.place}
                         rowId={Reaction.id}
-                        field="pseudo"
-                        isEditing={editingCell === `${Reaction.id}-pseudo`}
+                        field="place"
+                        isEditing={editingCell === `${Reaction.id}-place`}
                         setEditingCell={setEditingCell}
                         updateData={updateData}
                     />
-                    <EditableCell
-                        value={Reaction.emojis}
-                        rowId={Reaction.id}
-                        field="emojis"
-                        isEditing={editingCell === `${Reaction.id}-emojis`}
-                        setEditingCell={setEditingCell}
-                        updateData={updateData}
-                    /><EditableCell
-                    value={Reaction.place}
-                    rowId={Reaction.id}
-                    field="place"
-                    isEditing={editingCell === `${Reaction.id}-place`}
-                    setEditingCell={setEditingCell}
-                    updateData={updateData}
-                />
-                    <td>
-                        <button className="buttonManage"
-                                onClick={() => handleDelete(Reaction.id, "reaction", "cette reaction")}>
-                            Supprimer
-                        </button>
-                    </td>
-                </tr>
-            ))}
-            </tbody>
-        </table>
+                        <td>
+                            <button className="buttonManage"
+                                    onClick={() => handleDelete(Reaction.id, "reaction", "cette reaction")}>
+                                Supprimer
+                            </button>
+                        </td>
+                    </tr>
+                ))}
+                </tbody>
+            </table>
+        </div>
     );
 
     const MessageTable = ({data}) => (
-        <table>
-            <thead>
-            <tr>
-                <th>Message</th>
-                <th>Timestamp</th>
-                <th>Place</th>
-                <th>Action</th>
-            </tr>
-            </thead>
-            <tbody>
-            {data.map(Message => (
-                <tr key={Message.id}>
-                    <td>{Message.message}</td>
-                    <td>{Message.timestamp}</td>
-                    <td>{Message.place}</td>
-                    <td>
-                        <button className="buttonManage"
-                                onClick={() => handleDelete(Message.id, "message", "ce message")}>
-                            Supprimer
-                        </button>
-                    </td>
-                </tr>
-            ))}
-            </tbody>
-        </table>
+        <div>
+            <button className="buttonManage" onClick={() => handleDeleteAll(currentView)}>
+                Supprimer tout
+            </button>
+            {selectAll && (
+                <button
+                    className="buttonManage"
+                    style={{color: 'red'}}
+                    onClick={() => handleDeleteAll("message", true)}
+                >
+                    Delete All {currentView}
+                </button>
+            )}
+            <div>
+                <table>
+                    <thead>
+                    <tr>
+                        <th>Message</th>
+                        <th>Timestamp</th>
+                        <th>Place</th>
+                        <th>Action</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {data.map(Message => (
+                        <tr key={Message.id}>
+                            <EditableCell
+                                value={Message.message}
+                                rowId={Message.id}
+                                field="message"
+                                isEditing={editingCell === `${Message.id}-message`}
+                                setEditingCell={setEditingCell}
+                                updateData={updateData}
+                            />
+                            <EditableCell
+                                value={Message.timestamp}
+                                rowId={Message.id}
+                                field="timestamp"
+                                isEditing={editingCell === `${Message.id}-timestamp`}
+                                setEditingCell={setEditingCell}
+                                updateData={updateData}
+                            />
+                            <EditableCell
+                                value={Message.place}
+                                rowId={Message.id}
+                                field="place"
+                                isEditing={editingCell === `${Message.id}-place`}
+                                setEditingCell={setEditingCell}
+                                updateData={updateData}
+                            />
+                            <td>
+                                <button className="buttonManage"
+                                        onClick={() => handleDelete(Message.id, "message", "ce message")}>
+                                    Supprimer
+                                </button>
+                            </td>
+                        </tr>
+                    ))}
+                    </tbody>
+                </table>
+            </div>
+        </div>
     );
 
     const handleDelete = async (id, table, itemType) => {
@@ -167,6 +224,54 @@ const ManageAdmin = ({onClose}) => {
         }
     };
 
+    const handleDeleteAll = async (tableName) => {
+        const confirmed = window.confirm(
+            `Êtes-vous sûr de vouloir supprimer tous les éléments de la table ${tableName} ?`
+        );
+        if (confirmed) {
+            try {
+                // Affichez une alerte non fermable pendant la suppression
+                const deletingSwal = Swal.fire({
+                    title: `Suppression des éléments de la table ${tableName}`,
+                    text: 'Veuillez patienter...',
+                    allowOutsideClick: false,
+                    didOpen: () => {
+                        Swal.showLoading();
+                    },
+                    customClass: {
+                        popup: 'my-swal-style', // Appliquez la classe CSS personnalisée
+                    },
+                });
+
+                const {data, error} = await supabase.from('message').select();
+
+                if (error) {
+                    console.error('Erreur lors de la récupération des données :', error);
+                } else {
+                    for (const row of data) {
+                        await supabase.from('message').delete().eq('id', row.id);
+                    }
+                }
+
+                if (error) {
+                    throw error;
+                }
+                setData([]);
+
+                // Fermez l'alerte de suppression et affichez une alerte de succès
+                deletingSwal.close();
+                await Swal.fire({
+                    text: `Tous les éléments de la table ${tableName} ont été supprimés avec succès.`,
+                    customClass: {
+                        popup: 'my-swal-style', // Appliquez la classe CSS personnalisée
+                    },
+                });
+            } catch (err) {
+                console.error("Error deleting all items:", err);
+                alert("Une erreur s'est produite lors de la suppression des éléments.");
+            }
+        }
+    };
 
     const fetchData = async (tableName) => {
         setLoading(true);
@@ -276,40 +381,49 @@ const ManageAdmin = ({onClose}) => {
                   `}
         </style>
     </svg>);
+    const {setUpdateChat} = useContext(GameContext);
+    const reloadChat = () => {
+        setUpdateChat(prev => !prev);
+    }
     return (
         <div className="modal" id="modalAdmin">
             <div className="modal-content-manage">
-                {loading ? (
-                    <div style={{
-                        textAlign: "center",
-                        display: "flex",
-                        flexDirection: "column",
-                        alignItems: "center",
-                        padding: "200px",
-                        fontSize: "25px"
-                    }}>
-                        <p>Loading ...</p>
-                        <Rolling/>
-                    </div>
-                ) : currentView === 'menu' ? (
-                    <div style={{display: "flex", flexDirection: "column", padding: "50px 150px", gap: "19px"}}>
-                        <h1>Table</h1>
-                        <button className="buttonManage" onClick={() => fetchData('connexion')}>Connexion</button>
-                        <button className="buttonManage" onClick={() => fetchData('reaction')}>Réaction</button>
-                        <button className="buttonManage" onClick={() => fetchData('message')}>Message</button>
-                    </div>
-                ) : (
-                    <div>
-                        <button className="buttonManage" style={{background: "green"}}
-                                onClick={() => setCurrentView('menu')}>Back
+                <div>
+                    {loading ? (
+                        <div style={{
+                            textAlign: "center",
+                            display: "flex",
+                            flexDirection: "column",
+                            alignItems: "center",
+                            padding: "200px",
+                            fontSize: "25px"
+                        }}>
+                            <p>Loading ...</p>
+                            <Rolling/>
+                        </div>
+                    ) : currentView === 'menu' ? (
+                        <div style={{display: "flex", flexDirection: "column", padding: "50px 150px", gap: "19px"}}>
+                            <h1>Table</h1>
+                            <button className="buttonManage" onClick={() => fetchData('connexion')}>Connexion</button>
+                            <button className="buttonManage" onClick={() => fetchData('reaction')}>Réaction</button>
+                            <button className="buttonManage" onClick={() => fetchData('message')}>Message</button>
+                        </div>
+                    ) : (
+                        <div>
+                            <button className="buttonManage" style={{background: "green"}}
+                                    onClick={() => setCurrentView('menu')}>Back
+                            </button>
+                            {renderTable()}
+                        </div>
+                    )}
+                    <div className="modal-content-close">
+                        <button className="buttonManageClose" onClick={() => {
+                            onClose();
+                            reloadChat();
+                        }} aria-label="Close">
+                            X
                         </button>
-                        {renderTable()}
                     </div>
-                )}
-                <div className="modal-content-close">
-                    <button className="buttonManageClose" onClick={onClose} aria-label="Close">
-                        X
-                    </button>
                 </div>
             </div>
         </div>

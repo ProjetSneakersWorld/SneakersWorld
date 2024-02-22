@@ -7,12 +7,12 @@
 }
 
 .modal-content-manage {
+    max-height: 70%;
     overflow: auto;
     display: flex;
     padding: 50px;
     background: #fff;
-    /*padding: 10px;*/
-    border-radius: 15px;
+    border-radius: 30px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     position: relative;
     flex-direction: column;
@@ -87,4 +87,13 @@ tr:hover {
 .buttonChat {
     background-color: #3498db;
     color: #fff;
+}
+
+.buttonManage.delete-confirm {
+    color: red;
+}
+
+.my-swal-style {
+    font-family: Arial, sans-serif;
+    border-radius: 30px;
 }

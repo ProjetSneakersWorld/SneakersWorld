@@ -6,10 +6,8 @@ const speed = 250;
 
 function Scene() {
     const gameContainer = useRef(null);
-    const {currentScene, setCurrentScene} = useContext(GameContext);
-    useEffect(() => {
-        console.log(currentScene); // S'exécute chaque fois que currentScene change
-    }, [currentScene]);
+    const { currentScene, setCurrentScene} = useContext(GameContext);
+
     useEffect(() => {
         // console.log(currentScene);
         const Phaser = require('phaser');
@@ -76,8 +74,6 @@ function Scene() {
             }
 
             update = () => {
-                // console.log("X: "+this.player.x + " Y:"+ this.player.y)
-                // console.log(isInputFocused)
                 if (currentScene === "home") {
                     this.game.canvas.style.border = "5px solid white";
                     this.game.canvas.style.borderRadius = "15px";

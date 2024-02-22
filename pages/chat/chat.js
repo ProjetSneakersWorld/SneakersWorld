@@ -15,6 +15,7 @@ const chat = (place) => {
     let lastAuthor = null;
     let pseudoCookies = Cookies.get('Pseudo');
     const {currentScene} = useContext(GameContext);
+    const {updateChat} = useContext(GameContext);
     const notify = (text) => toast(text);
     const [id_USER, setId_USER] = useState('null');
     const [isActive, setIsActive] = useState('null');
@@ -54,7 +55,7 @@ const chat = (place) => {
                 messageContainer.removeChild(messageContainer.firstChild);
             }
         }
-    }, [currentScene]);
+    }, [currentScene, updateChat]);
 
     useEffect(() => {
         let messageContainer = document.getElementById('messageContainer');
@@ -103,8 +104,10 @@ const chat = (place) => {
                     const messageVideP = document.createElement("p");
                     messageVideP.id = "messageVideP";
                     messageVideP.style.textAlign = "center";
+                    messageVideP.style.margin = "15px";
+                    messageVideP.style.lineHeight = "25px";
                     messageVideP.style.userSelect = "none";
-                    messageVideP.innerText = "Aucun message disponible";
+                    messageVideP.innerText = "No new messages received in the past 24 hours.";
                     messageContainer.appendChild(messageVideP);
                     setIsLoading(false);
                     return;
@@ -200,7 +203,7 @@ const chat = (place) => {
                 }
             })
             .subscribe();
-    }, [currentScene, isLoading]);
+    }, [currentScene, isLoading, updateChat]);
 
     const fetchReactionsByMessageId = async (messageId) => {
         try {

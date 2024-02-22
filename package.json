@@ -32,7 +32,8 @@
     "react-modal": "^3.16.1",
     "react-toastify": "^10.0.4",
     "request": "^2.88.2",
-    "serve-favicon": "^2.5.0"
+    "serve-favicon": "^2.5.0",
+    "sweetalert2": "^11.10.5"
   },
   "devDependencies": {
     "@types/node": "^20",
