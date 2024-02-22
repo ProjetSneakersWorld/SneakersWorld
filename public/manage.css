@@ -39,6 +39,10 @@
     font-size: 16px; /* Ajuster la taille de la police si nécessaire */
 }
 
+.buttonManageClose:hover {
+    background-color: #ff0000;
+}
+
 table {
     width: 100%;
     border-collapse: collapse;
@@ -64,6 +68,8 @@ tr:hover {
 }
 
 .buttonManage {
+    font-family: "Arial", ui-serif;
+    margin-top: 9px;
     background-color: #ff4d4f;
     color: #fff;
     border: none;
@@ -75,7 +81,7 @@ tr:hover {
 }
 
 .buttonManage:hover {
-    background-color: #ff7875;
+    background-color: rgba(255, 120, 117, 0.8);
 }
 
 .modal-content-close {
@@ -84,13 +90,19 @@ tr:hover {
     right: 20px;
 }
 
-.buttonChat {
-    background-color: #3498db;
-    color: #fff;
-}
 
 .buttonManage.delete-confirm {
     color: red;
+}
+
+.inputsManage {
+    width: fit-content;
+    height: fit-content;
+    background: rgba(0, 0, 0, .2);
+    border: 2px solid #f1eff1;
+    outline: none;
+    padding: 5px 5px;
+    border-radius: 10px;
 }
 
 .my-swal-style {

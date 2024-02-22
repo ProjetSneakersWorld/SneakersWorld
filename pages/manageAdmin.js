@@ -12,13 +12,13 @@ const ManageAdmin = ({onClose}) => {
     const [loading, setLoading] = useState(false);
     const [editingCell, setEditingCell] = useState(null);
     const [selectAll, setSelectAll] = useState(false);
-    const [confirmDelete, setConfirmDelete] = useState(false);
+    const {setUpdateChat} = useContext(GameContext);
 
     // Define a table component for each table type
     const ConnexionTable = ({data}) => (
         <div>
             <button className="buttonManage" onClick={() => handleDeleteAll(currentView)}>
-                Supprimer tout
+                Delete all
             </button>
             <table>
                 <thead>
@@ -72,7 +72,7 @@ const ManageAdmin = ({onClose}) => {
                         <td>
                             <button className="buttonManage"
                                     onClick={() => handleDelete(connexion.id, "connexion", "ce compte")}>
-                                Supprimer
+                                Delete
                             </button>
                         </td>
                     </tr>
@@ -85,7 +85,7 @@ const ManageAdmin = ({onClose}) => {
     const ReactionTable = ({data}) => (
         <div>
             <button className="buttonManage" onClick={() => handleDeleteAll(currentView)}>
-                Supprimer tout
+                Delete all
             </button>
             {selectAll && (
                 <button
@@ -106,6 +106,9 @@ const ManageAdmin = ({onClose}) => {
                 </tr>
                 </thead>
                 <tbody>
+                {data.length === 0 && (
+                    <p>Aucune Données</p>
+                )}
                 {data.map(Reaction => (
                     <tr key={Reaction.id}>
                         <EditableCell
@@ -123,18 +126,19 @@ const ManageAdmin = ({onClose}) => {
                             isEditing={editingCell === `${Reaction.id}-emojis`}
                             setEditingCell={setEditingCell}
                             updateData={updateData}
-                        /><EditableCell
-                        value={Reaction.place}
-                        rowId={Reaction.id}
-                        field="place"
-                        isEditing={editingCell === `${Reaction.id}-place`}
-                        setEditingCell={setEditingCell}
-                        updateData={updateData}
-                    />
+                        />
+                        <EditableCell
+                            value={Reaction.place}
+                            rowId={Reaction.id}
+                            field="place"
+                            isEditing={editingCell === `${Reaction.id}-place`}
+                            setEditingCell={setEditingCell}
+                            updateData={updateData}
+                        />
                         <td>
                             <button className="buttonManage"
                                     onClick={() => handleDelete(Reaction.id, "reaction", "cette reaction")}>
-                                Supprimer
+                                Delete
                             </button>
                         </td>
                     </tr>
@@ -147,7 +151,7 @@ const ManageAdmin = ({onClose}) => {
     const MessageTable = ({data}) => (
         <div>
             <button className="buttonManage" onClick={() => handleDeleteAll(currentView)}>
-                Supprimer tout
+                Delete all
             </button>
             {selectAll && (
                 <button
@@ -169,7 +173,12 @@ const ManageAdmin = ({onClose}) => {
                     </tr>
                     </thead>
                     <tbody>
-                    {data.map(Message => (
+                    {data.length === 0 && (
+                        <div style={{}}>
+                            <p>Aucune Données</p>
+                        </div>
+                    )}
+                    {data.map((Message) => (
                         <tr key={Message.id}>
                             <EditableCell
                                 value={Message.message}
@@ -196,9 +205,11 @@ const ManageAdmin = ({onClose}) => {
                                 updateData={updateData}
                             />
                             <td>
-                                <button className="buttonManage"
-                                        onClick={() => handleDelete(Message.id, "message", "ce message")}>
-                                    Supprimer
+                                <button
+                                    className="buttonManage"
+                                    onClick={() => handleDelete(Message.id, "message", "ce message")}
+                                >
+                                    Delete
                                 </button>
                             </td>
                         </tr>
@@ -210,7 +221,7 @@ const ManageAdmin = ({onClose}) => {
     );
 
     const handleDelete = async (id, table, itemType) => {
-        if (window.confirm(`Êtes-vous sûr de vouloir supprimer ${itemType} ?`)) {
+        if (window.confirm(`Êtes-vous sûr de vouloir Delete ${itemType} ?`)) {
             setLoading(true);
             const {error} = await supabase.from(table).delete().eq('id', id);
             setLoading(false);
@@ -226,7 +237,7 @@ const ManageAdmin = ({onClose}) => {
 
     const handleDeleteAll = async (tableName) => {
         const confirmed = window.confirm(
-            `Êtes-vous sûr de vouloir supprimer tous les éléments de la table ${tableName} ?`
+            `Êtes-vous sûr de vouloir Delete tous les éléments de la table ${tableName} ?`
         );
         if (confirmed) {
             try {
@@ -321,6 +332,7 @@ const ManageAdmin = ({onClose}) => {
                     value={inputValue}
                     onChange={(e) => setInputValue(e.target.value)}
                     onBlur={handleBlur}
+                    className="inputsManage"
                     autoFocus
                     onKeyDown={(event) => {
                         event.stopPropagation();
@@ -355,8 +367,8 @@ const ManageAdmin = ({onClose}) => {
         style={{
             margin: "0", display: "block", shapeRendering: "auto",
         }}
-        width="50"
-        height="50"
+        width="60"
+        height="60"
         viewBox="0 0 100 100"
         preserveAspectRatio="xMidYMid"
     >
@@ -381,10 +393,7 @@ const ManageAdmin = ({onClose}) => {
                   `}
         </style>
     </svg>);
-    const {setUpdateChat} = useContext(GameContext);
-    const reloadChat = () => {
-        setUpdateChat(prev => !prev);
-    }
+
     return (
         <div className="modal" id="modalAdmin">
             <div className="modal-content-manage">
@@ -395,7 +404,7 @@ const ManageAdmin = ({onClose}) => {
                             display: "flex",
                             flexDirection: "column",
                             alignItems: "center",
-                            padding: "200px",
+                            padding: "140px",
                             fontSize: "25px"
                         }}>
                             <p>Loading ...</p>
@@ -403,13 +412,14 @@ const ManageAdmin = ({onClose}) => {
                         </div>
                     ) : currentView === 'menu' ? (
                         <div style={{display: "flex", flexDirection: "column", padding: "50px 150px", gap: "19px"}}>
-                            <h1>Table</h1>
-                            <button className="buttonManage" onClick={() => fetchData('connexion')}>Connexion</button>
-                            <button className="buttonManage" onClick={() => fetchData('reaction')}>Réaction</button>
-                            <button className="buttonManage" onClick={() => fetchData('message')}>Message</button>
+                            <h1 style={{textAlign: "center"}}>Table</h1>
+                            <button className="buttonManage" style={{height: "3.5rem", padding: "12px 36px"}} onClick={() => fetchData('connexion')}>Connexion</button>
+                            <button className="buttonManage" style={{height: "3.5rem", padding: "12px 36px"}} onClick={() => fetchData('message')}>Message</button>
+                            <button className="buttonManage" style={{height: "3.5rem", padding: "12px 36px"}} onClick={() => fetchData('reaction')}>Réaction</button>
                         </div>
                     ) : (
                         <div>
+                            <h1 style={{textAlign: "center"}}>{currentView}</h1>
                             <button className="buttonManage" style={{background: "green"}}
                                     onClick={() => setCurrentView('menu')}>Back
                             </button>
@@ -419,7 +429,7 @@ const ManageAdmin = ({onClose}) => {
                     <div className="modal-content-close">
                         <button className="buttonManageClose" onClick={() => {
                             onClose();
-                            reloadChat();
+                            setUpdateChat(prev => !prev);
                         }} aria-label="Close">
                             X
                         </button>
