@@ -2,10 +2,10 @@
 import jwt from 'jsonwebtoken';
 import {serialize} from 'cookie';
 import bcrypt from "bcrypt";
-import {createClient} from '@supabase/supabase-js';
 import moment from "moment-timezone";
+import { supabase } from './supabaseClient'
 
-const supabase = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY);
+
 
 export default async function handler(req, res) {
     if (req.method === 'POST') {

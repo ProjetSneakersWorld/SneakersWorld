@@ -1,15 +1,15 @@
 import React, {useContext, useEffect, useState} from 'react';
 import '/public/Home.css';
-import {createClient} from "@supabase/supabase-js";
+
 import Cookies from "js-cookie";
 import moment from 'moment-timezone';
 import {toast, ToastContainer} from "react-toastify";
 import 'react-toastify/dist/ReactToastify.css';
 import {GameContext} from "../../src/GameContext";
+import {supabase} from "../api/supabaseClient";
 
 const sendImage = "/images/send.png"
 
-const supabase = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY);
 
 const chat = (place) => {
     let lastAuthor = null;
@@ -36,8 +36,6 @@ const chat = (place) => {
 
                 setId_USER(id[0].id);
                 setIsActive(id[0].isActive);
-                if (isActive) {
-                }
             } catch (error) {
                 console.error('Une erreur est survenue lors de la récupération de l\'ID :', error);
                 // Gérer l'erreur comme vous le souhaitez

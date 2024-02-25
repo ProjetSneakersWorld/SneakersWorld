@@ -3,8 +3,7 @@ import {createClient} from '@supabase/supabase-js';
 import '/public/manage.css';
 import {GameContext} from "../src/GameContext";
 import Swal from 'sweetalert2';
-
-const supabase = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY);
+import { supabase } from './api/supabaseClient'
 
 const ManageAdmin = ({onClose}) => {
     const [currentView, setCurrentView] = useState('menu');

@@ -11,13 +11,10 @@ import ManageAdmin from "../manageAdmin";
 import ManageAccount from "../manageAccount";
 import Online from "../componentHome/online";
 import moment from "moment-timezone";
-import {createClient} from "@supabase/supabase-js";
-
-const supabase = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY);
+import { supabase } from '../api/supabaseClient'
 
 const Home = () => {
     const [isToken, setIsToken] = useState(false);
-    const [isInputFocused, setInputFocused] = React.useState(false);
     const router = useRouter();
     const {currentScene, setCurrentScene} = useContext(GameContext);
 
