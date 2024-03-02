@@ -473,7 +473,7 @@ const chat = (place) => {
         </style>
     </svg>);
 
-    return (<div style={{display: "flex", alignItems: "stretch"}} id="chatContainer">
+    return (<div style={{display: "flex", alignItems: "stretch", height: "-webkit-fill-available"}} id="chatContainer">
         <div className="chatContainer" style={{border: "5px solid white"}}>
             <div style={{display: "flex", justifyContent: "center", flexDirection: "column", width: "100%"}}>
                 <div style={{display: "flex", justifyContent: "center", fontFamily: "Arial"}}>
