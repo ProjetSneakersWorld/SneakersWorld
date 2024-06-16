@@ -264,7 +264,7 @@ const Signup = () => {
                                 <div>
                                     <p style={{color: "red", fontSize: "15px", margin: "0"}}>{pseudoError}</p>
                                 </div>
-                                <input className="inputsSignup" type='email' id="Email" maxLength="26" required
+                                <input className="inputsSignup" type='email' id="Email" maxLength="40" required
                                        onChange={checkEmail}/>
                                 <div>
                                     <p style={{color: "red", fontSize: "15px", margin: "0"}}>{emailError}</p>

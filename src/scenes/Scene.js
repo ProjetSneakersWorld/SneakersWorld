@@ -1,15 +1,13 @@
 import React, {useEffect, useRef, useContext} from "react";
-import {router} from "next/router";
 import {GameContext} from '../GameContext';
 
 const speed = 250;
 
 function Scene() {
     const gameContainer = useRef(null);
-    const { currentScene, setCurrentScene} = useContext(GameContext);
+    const {currentScene, setCurrentScene} = useContext(GameContext);
 
     useEffect(() => {
-        // console.log(currentScene);
         const Phaser = require('phaser');
 
         class SceneMain extends Phaser.Scene {
@@ -18,71 +16,102 @@ function Scene() {
             }
 
             preload() {
-                if (currentScene === "") {
-                    this.load.image("tiles", "/assets/tileset.png");
-                    this.load.tilemapTiledJSON('map', "/assets/othman_map.json");
-                    this.load.spritesheet('character', '/assets/perso.png', {frameWidth: 32, frameHeight: 32});
-                } else {
-                    this.load.image("tiles", "/assets/tileset.png");
-                    this.load.tilemapTiledJSON('map', "/assets/othman_map.json");
-                    this.load.spritesheet('character', '/assets/perso.png', {frameWidth: 32, frameHeight: 32});
-                }
+                this.load.image("tiles", "/assets/tileset.png");
+                this.load.tilemapTiledJSON('map', "/assets/othman_map.json");
+                this.load.spritesheet('character', '/assets/perso.png', {frameWidth: 32, frameHeight: 32});
             }
 
             create() {
-                const map = this.make.tilemap({key: "map", tileWidth: 16, tileHeight: 16});
+                const map = this.make.tilemap({ key: "map", tileWidth: 16, tileHeight: 16 });
                 const tileset = map.addTilesetImage("tiles1", "tiles");
                 const layer = map.createLayer("Calque de Tuiles 1", tileset, 0, 0);
-                const colision = map.createLayer("Collision", tileset, 0, 0)
+                const collisionLayer = map.createLayer("Collision", tileset, 0, 0);
+
+                // Ajouter le joueur et définir les animations
                 this.player = this.physics.add.sprite(785, 655, "character").setFrame(5);
                 this.anims.create({
                     key: 'up',
-                    frames: this.anims.generateFrameNumbers('character', {frames: [0, 2]}),
+                    frames: this.anims.generateFrameNumbers('character', { frames: [0, 2] }),
                     frameRate: 10,
                     repeat: -1,
                 });
                 this.anims.create({
                     key: 'down',
-                    frames: this.anims.generateFrameNumbers('character', {frames: [5, 8]}),
+                    frames: this.anims.generateFrameNumbers('character', { frames: [5, 8] }),
+                    frameRate: 10,
+                    repeat: -1,
+                });
+                this.anims.create({
+                    key: 'right',
+                    frames: this.anims.generateFrameNumbers('character', { frames: [1, 4] }),
+                    frameRate: 10,
+                    repeat: -1,
+                });
+                this.anims.create({
+                    key: 'left',
+                    frames: this.anims.generateFrameNumbers('character', { frames: [3, 6] }),
                     frameRate: 10,
                     repeat: -1,
                 });
 
-                this.anims.create({
-                    key: 'right',
-                    frames: this.anims.generateFrameNumbers('character', {frames: [1, 4]}),
-                    frameRate: 10,
-                    repeat: -1
-                });
-                this.anims.create({
-                    key: 'left',
-                    frames: this.anims.generateFrameNumbers('character', {frames: [3, 6]}),
-                    frameRate: 10,
-                    repeat: -1
-                });
-                // colision.setCollisionByProperty({ collideBottom: true });
-                colision.addCollidesWith(this.player);
-                colision.setCollisionByExclusion([-1]);
-                this.physics.add.collider(this.player, colision, this.handleCollision, null, this);
+                // Gérer les collisions avec la couche de collision
+                collisionLayer.setCollisionByExclusion([-1]);
+                this.physics.add.collider(this.player, collisionLayer);
 
+                // Configurer la caméra pour suivre le joueur
                 this.cameras.main.setBounds(0, 0, map.widthInPixels, map.heightInPixels);
                 this.cameras.main.startFollow(this.player);
-                this.physics.add.collider(this.player, colision);
                 this.cameras.main.setFollowOffset(-100, -100);
                 this.player.setScale(1.5);
                 this.cursors = this.input.keyboard.createCursorKeys();
+
+                // Créer la zone de transition en fonction de la scène actuelle
+                if (currentScene === 'home') {
+                    this.createTransitionZone(943, 1190, 0xf06543, 'Shop'); // Zone pour aller vers "Shop"
+                } else {
+                    this.createTransitionZone(320, 480, 0x3f98b9, 'Home'); // Zone pour retourner à "Home"
+                }
             }
 
-            update = () => {
-                if (currentScene === "home") {
-                    this.game.canvas.style.border = "5px solid white";
-                    this.game.canvas.style.borderRadius = "15px";
-                } else {
-                    this.game.canvas.style.border = "5px solid green";
-                    this.game.canvas.style.borderRadius = "15px";
-                }
+            createTransitionZone(x, y, fillColor, buttonText) {
+                // Créer la zone de transition
+                this.doorZone = this.add.zone(x, y, 64, 32);
+                const doorGraphics = this.add.graphics();
+                doorGraphics.fillStyle(fillColor, 1);
+                doorGraphics.fillRoundedRect(this.doorZone.x - this.doorZone.width / 2, this.doorZone.y - this.doorZone.height / 2, this.doorZone.width, this.doorZone.height, 8);
+                doorGraphics.lineStyle(2, 0xffffff, 1);
+                doorGraphics.strokeRoundedRect(this.doorZone.x - this.doorZone.width / 2, this.doorZone.y - this.doorZone.height / 2, this.doorZone.width, this.doorZone.height, 8);
 
+                // Ajouter le texte à l'intérieur de la zone de transition
+                const doorText = this.add.text(this.doorZone.x, this.doorZone.y, buttonText, {
+                    fontSize: '20px',
+                    fontFamily: 'Arial',
+                    fontStyle: 'bold',
+                    fill: '#ffffff',
+                });
+                doorText.setOrigin(0.5, 0.5);
+
+                // Activer la physique pour la zone de transition
+                this.physics.world.enable(this.doorZone);
+                this.doorZone.body.setAllowGravity(false);
+                this.doorZone.body.moves = false;
+
+                // Détecter la collision entre le joueur et la zone de transition
+                this.physics.add.overlap(this.player, this.doorZone, () => {
+                    // Gérer le changement de scène en fonction du texte de la zone
+                    if (buttonText === 'Shop') {
+                        setCurrentScene('SceneShop');
+                    } else if (buttonText === 'Home') {
+                        setCurrentScene('home')
+                    }
+                }, null, this);
+            }
+
+
+
+            update() {
                 this.player.setVelocity(0);
+
                 if (this.cursors.up.isDown) {
                     this.player.setVelocityY(-speed);
                     this.player.anims.play('up', true);
@@ -96,23 +125,10 @@ function Scene() {
                     this.player.setVelocityY(speed);
                     this.player.anims.play('down', true);
                 } else {
-                    // If no cursor is down, stop the animation
                     this.player.anims.stop();
+                    this.player.setTexture('character', 5); // Réinitialise la texture du joueur à une position neutre
                 }
             }
-
-            handleCollision(player, collisionLayer) {
-                if (currentScene === 'home') {
-                    if (Math.abs(this.player.x >= 912) && Math.abs(this.player.x <= 974)
-                        && Math.abs(this.player.y >= 1177) && Math.abs(this.player.y <= 1208)) {
-                        // Charger la nouvelle carte
-                        console.log("ENTRER dans SceneShop");
-                        this.scene.start('SceneShop'); // Changez à la scène 'SceneShop'
-                        setCurrentScene('SceneShop');
-                    }
-                }
-            }
-
         }
 
         const config = {
@@ -128,24 +144,19 @@ function Scene() {
                 default: 'arcade',
                 arcade: {
                     fps: 120,
+                    debug: false,
                 }
             },
         };
 
-
         const game = new Phaser.Game(config);
 
         return () => {
-            // Destroy the game instance when the component is unmounted
             game.destroy(true);
         };
     }, [currentScene]);
 
-    return (
-
-        <div ref={gameContainer}/>
-    );
+    return <div ref={gameContainer}/>;
 }
 
 export default Scene;
-

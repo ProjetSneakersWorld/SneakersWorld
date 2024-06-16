@@ -14,11 +14,10 @@ const Online = () => {
                 { event: 'UPDATE', schema: 'public', table: 'connexion' },
                 (payload) => {
                     const newUser = payload.new;
-                    const now = moment().tz("Europe/London").unix(); // Utilisez unix() pour obtenir le timestamp en secondes
-                    if (newUser.isOnline) {
-                        setOnlineUsers(prevUsers => {
-                            // Ajouter ou mettre à jour l'utilisateur
-                            const userIndex = prevUsers.findIndex(user => user.id === newUser.id);
+                    const now = moment().tz("Europe/Paris").unix(); // Utilisez unix() pour obtenir le timestamp en secondes
+                    setOnlineUsers(prevUsers => {
+                        const userIndex = prevUsers.findIndex(user => user.id === newUser.id);
+                        if (newUser.isOnline) {
                             if (userIndex > -1) {
                                 // Mise à jour de l'utilisateur existant
                                 const updatedUsers = [...prevUsers];
@@ -28,29 +27,27 @@ const Online = () => {
                                 // Ajouter un nouvel utilisateur
                                 return [...prevUsers, { ...newUser, dateOnline: now }];
                             }
-                        });
-                    } else {
-                        // Retirer l'utilisateur qui est hors ligne
-                        setOnlineUsers(prevUsers => prevUsers.filter(user => user.id !== newUser.id));
-                    }
+                        } else {
+                            // Retirer l'utilisateur qui est hors ligne
+                            return prevUsers.filter(user => user.id !== newUser.id);
+                        }
+                    });
                 }
             )
             .subscribe();
 
-        // Vérifiez périodiquement le statut en ligne des utilisateurs
         const intervalId = setInterval(() => {
             const currentTimestamp = moment().tz("Europe/Paris").unix();
             setOnlineUsers(prevUsers =>
                 prevUsers.filter(user => currentTimestamp - user.dateOnline <= 15)
             );
-        }, 5000); // Mettre à jour toutes les 5 secondes
+        }, 5000);
 
-        // Nettoyage en cas de démontage du composant
         return () => {
-            supabase.removeChannel(channel); // Assurez-vous de bien nettoyer le canal
-            clearInterval(intervalId);
+            supabase.removeChannel(channel); // Nettoyage du canal
+            clearInterval(intervalId); // Nettoyage de l'intervalle
         };
-    }, []); // Suppression de l'écoute sur les changements de onlineUsers
+    }, []);
 
     return (
         <div style={{ position: "relative", left: "2rem" }}>
