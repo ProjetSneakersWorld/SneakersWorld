@@ -1,11 +1,12 @@
-import React, {useEffect, useRef, useContext} from "react";
-import {GameContext} from '../GameContext';
+import React, { useEffect, useRef, useContext } from "react";
+import { GameContext } from '../GameContext';
 
 const speed = 250;
+let isMouseDown = false;
 
 function Scene() {
-    const gameContainer = useRef(null);
-    const {currentScene, setCurrentScene} = useContext(GameContext);
+    const gameContainerRef = useRef(null);
+    const { currentScene, setCurrentScene } = useContext(GameContext);
 
     useEffect(() => {
         const Phaser = require('phaser');
@@ -18,7 +19,7 @@ function Scene() {
             preload() {
                 this.load.image("tiles", "/assets/tileset.png");
                 this.load.tilemapTiledJSON('map', "/assets/othman_map.json");
-                this.load.spritesheet('character', '/assets/perso.png', {frameWidth: 32, frameHeight: 32});
+                this.load.spritesheet('character', '/assets/perso.png', { frameWidth: 32, frameHeight: 32 });
             }
 
             create() {
@@ -26,6 +27,34 @@ function Scene() {
                 const tileset = map.addTilesetImage("tiles1", "tiles");
                 const layer = map.createLayer("Calque de Tuiles 1", tileset, 0, 0);
                 const collisionLayer = map.createLayer("Collision", tileset, 0, 0);
+
+                // const mapWidth = map.widthInPixels -700 ;
+                // const mapHeight = map.heightInPixels -180;
+                //
+                // this.physics.world.setBounds(0, 0, mapWidth, mapHeight);
+                // this.cameras.main.setBounds(0, 0, mapWidth, mapHeight);
+                // this.scale.setGameSize(mapWidth, mapHeight);
+
+                this.isCameraFollowing = true;
+
+                this.input.on('pointerdown', () => {
+                    isMouseDown = true;
+                    this.isCameraFollowing = false;
+                    this.cameras.main.stopFollow();
+                });
+
+                this.input.on('pointerup', () => {
+                    isMouseDown = false;
+                    // this.isCameraFollowing = true;
+                    // this.cameras.main.startFollow(this.player);
+                });
+
+                this.input.on('pointermove', (pointer) => {
+                    if (isMouseDown) {
+                        this.cameras.main.scrollX -= (pointer.x - pointer.prevPosition.x) / this.cameras.main.zoom;
+                        this.cameras.main.scrollY -= (pointer.y - pointer.prevPosition.y) / this.cameras.main.zoom;
+                    }
+                });
 
                 // Ajouter le joueur et définir les animations
                 this.player = this.physics.add.sprite(785, 655, "character").setFrame(5);
@@ -61,13 +90,21 @@ function Scene() {
                 // Configurer la caméra pour suivre le joueur
                 this.cameras.main.setBounds(0, 0, map.widthInPixels, map.heightInPixels);
                 this.cameras.main.startFollow(this.player);
+                this.input.on('wheel', (pointer, gameObjects, deltaX, deltaY, deltaZ) => {
+                    const zoomAmount = deltaY < 0 ? 1.09 : 0.95;
+                    const newZoom = this.cameras.main.zoom * zoomAmount;
+
+                    if (newZoom >= 0.5 && newZoom <= 1.5) {
+                        this.cameras.main.zoom = newZoom;
+                    }
+                });
                 this.cameras.main.setFollowOffset(-100, -100);
                 this.player.setScale(1.5);
                 this.cursors = this.input.keyboard.createCursorKeys();
 
                 // Créer la zone de transition en fonction de la scène actuelle
                 if (currentScene === 'home') {
-                    this.createTransitionZone(943, 1190, 0xf06543, 'Shop'); // Zone pour aller vers "Shop"
+                    this.createTransitionZone(943, 1178, 0xf06543, 'Shop'); // Zone pour aller vers "Shop"
                 } else {
                     this.createTransitionZone(320, 480, 0x3f98b9, 'Home'); // Zone pour retourner à "Home"
                 }
@@ -107,10 +144,15 @@ function Scene() {
                 }, null, this);
             }
 
-
-
             update() {
                 this.player.setVelocity(0);
+
+                if (this.cursors.up.isDown || this.cursors.down.isDown || this.cursors.left.isDown || this.cursors.right.isDown) {
+                    if (!this.isCameraFollowing) {
+                        this.isCameraFollowing = true;
+                        this.cameras.main.startFollow(this.player);
+                    }
+                }
 
                 if (this.cursors.up.isDown) {
                     this.player.setVelocityY(-speed);
@@ -133,7 +175,7 @@ function Scene() {
 
         const config = {
             type: Phaser.AUTO,
-            parent: gameContainer.current,
+            parent: gameContainerRef.current,
             width: window.innerWidth - 700,
             height: window.innerHeight - 180,
             scene: [SceneMain],
@@ -151,12 +193,15 @@ function Scene() {
 
         const game = new Phaser.Game(config);
 
+        const gameContainer = gameContainerRef.current;
+        gameContainer.style.cursor = 'pointer';
+
         return () => {
             game.destroy(true);
         };
     }, [currentScene]);
 
-    return <div ref={gameContainer}/>;
+    return <div ref={gameContainerRef} />;
 }
 
 export default Scene;
