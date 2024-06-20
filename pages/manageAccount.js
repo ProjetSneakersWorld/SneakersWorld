@@ -36,8 +36,7 @@ const ManageAccount = ({ onClose }) => {
                 if (error) {
                     throw error;
                 }
-
-                Swal.fire({
+                await Swal.fire({
                     title: 'Succès',
                     text: 'Votre email a été mis à jour.',
                     icon: 'success',
@@ -48,7 +47,7 @@ const ManageAccount = ({ onClose }) => {
                 setEmail(newEmail);  // Met à jour l'état avec le nouvel email
             } catch (error) {
                 console.error('Erreur lors de la mise à jour de l\'email :', error);
-                Swal.fire({
+                await Swal.fire({
                     title: 'Erreur',
                     text: 'Une erreur est survenue lors de la mise à jour de votre email.',
                     icon: 'error',

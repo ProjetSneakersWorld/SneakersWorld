@@ -1,12 +1,17 @@
-import React, { useEffect, useRef, useContext } from "react";
-import { GameContext } from '../GameContext';
+import React, {useEffect, useRef, useContext, useState} from "react";
+import {GameContext} from '../GameContext';
+import {supabase} from "../../pages/api/supabaseClient";
+import '/public/personalisation.css';
+import Cookies from "js-cookie";
 
 const speed = 250;
+const POSITION_UPDATE_INTERVAL = 200; // Mise à jour toutes les 200ms
 let isMouseDown = false;
 
 function Scene() {
     const gameContainerRef = useRef(null);
-    const { currentScene, setCurrentScene } = useContext(GameContext);
+    const {currentScene, setCurrentScene} = useContext(GameContext);
+    const [showPersonalizationModal, setShowPersonalizationModal] = useState(false);
 
     useEffect(() => {
         const Phaser = require('phaser');
@@ -14,27 +19,21 @@ function Scene() {
         class SceneMain extends Phaser.Scene {
             constructor() {
                 super("Scene");
+                this.otherPlayers = {};
             }
 
             preload() {
                 this.load.image("tiles", "/assets/tileset.png");
                 this.load.tilemapTiledJSON('map', "/assets/othman_map.json");
-                this.load.spritesheet('character', '/assets/perso.png', { frameWidth: 32, frameHeight: 32 });
+                this.load.spritesheet('character', '/assets/Perso/perso1.png', {frameWidth: 64, frameHeight: 64});
             }
 
             create() {
-                const map = this.make.tilemap({ key: "map", tileWidth: 16, tileHeight: 16 });
+                const map = this.make.tilemap({key: "map", tileWidth: 16, tileHeight: 16});
                 const tileset = map.addTilesetImage("tiles1", "tiles");
                 const layer = map.createLayer("Calque de Tuiles 1", tileset, 0, 0);
                 const collisionLayer = map.createLayer("Collision", tileset, 0, 0);
-
-                // const mapWidth = map.widthInPixels -700 ;
-                // const mapHeight = map.heightInPixels -180;
-                //
-                // this.physics.world.setBounds(0, 0, mapWidth, mapHeight);
-                // this.cameras.main.setBounds(0, 0, mapWidth, mapHeight);
-                // this.scale.setGameSize(mapWidth, mapHeight);
-
+                this.otherPlayers = {};
                 this.isCameraFollowing = true;
 
                 this.input.on('pointerdown', () => {
@@ -45,8 +44,6 @@ function Scene() {
 
                 this.input.on('pointerup', () => {
                     isMouseDown = false;
-                    // this.isCameraFollowing = true;
-                    // this.cameras.main.startFollow(this.player);
                 });
 
                 this.input.on('pointermove', (pointer) => {
@@ -58,27 +55,29 @@ function Scene() {
 
                 // Ajouter le joueur et définir les animations
                 this.player = this.physics.add.sprite(785, 655, "character").setFrame(5);
+                this.player.setScale(0.85);
+                this.player.setCrop(0, 1, 64, 63); // setCrop(x, y, width, height)
                 this.anims.create({
                     key: 'up',
-                    frames: this.anims.generateFrameNumbers('character', { frames: [0, 2] }),
+                    frames: this.anims.generateFrameNumbers('character', {frames: [16, 15, 14]}),
                     frameRate: 10,
                     repeat: -1,
                 });
                 this.anims.create({
                     key: 'down',
-                    frames: this.anims.generateFrameNumbers('character', { frames: [5, 8] }),
+                    frames: this.anims.generateFrameNumbers('character', {frames: [1, 2, 3]}),
                     frameRate: 10,
                     repeat: -1,
                 });
                 this.anims.create({
                     key: 'right',
-                    frames: this.anims.generateFrameNumbers('character', { frames: [1, 4] }),
+                    frames: this.anims.generateFrameNumbers('character', {frames: [9, 10, 11]}),
                     frameRate: 10,
                     repeat: -1,
                 });
                 this.anims.create({
                     key: 'left',
-                    frames: this.anims.generateFrameNumbers('character', { frames: [3, 6] }),
+                    frames: this.anims.generateFrameNumbers('character', {frames: [5, 6, 7]}),
                     frameRate: 10,
                     repeat: -1,
                 });
@@ -99,7 +98,6 @@ function Scene() {
                     }
                 });
                 this.cameras.main.setFollowOffset(-100, -100);
-                this.player.setScale(1.5);
                 this.cursors = this.input.keyboard.createCursorKeys();
 
                 // Créer la zone de transition en fonction de la scène actuelle
@@ -108,6 +106,12 @@ function Scene() {
                 } else {
                     this.createTransitionZone(320, 480, 0x3f98b9, 'Home'); // Zone pour retourner à "Home"
                 }
+
+                // Initialiser la mise à jour de la position
+                this.updatePlayerPosition();
+
+                // Écouter les mises à jour de position des autres joueurs
+                this.subscribeToPlayerUpdates();
             }
 
             createTransitionZone(x, y, fillColor, buttonText) {
@@ -121,7 +125,7 @@ function Scene() {
 
                 // Ajouter le texte à l'intérieur de la zone de transition
                 const doorText = this.add.text(this.doorZone.x, this.doorZone.y, buttonText, {
-                    fontSize: '20px',
+                    fontSize: '22px',
                     fontFamily: 'Arial',
                     fontStyle: 'bold',
                     fill: '#ffffff',
@@ -146,7 +150,6 @@ function Scene() {
 
             update() {
                 this.player.setVelocity(0);
-
                 if (this.cursors.up.isDown || this.cursors.down.isDown || this.cursors.left.isDown || this.cursors.right.isDown) {
                     if (!this.isCameraFollowing) {
                         this.isCameraFollowing = true;
@@ -170,6 +173,133 @@ function Scene() {
                     this.player.anims.stop();
                     this.player.setTexture('character', 5); // Réinitialise la texture du joueur à une position neutre
                 }
+
+                // Interpoler les positions des autres joueurs
+                this.interpolateOtherPlayers();
+            }
+
+            getDirection() {
+                if (this.cursors.up.isDown) return 'up';
+                if (this.cursors.down.isDown) return 'down';
+                if (this.cursors.left.isDown) return 'left';
+                if (this.cursors.right.isDown) return 'right';
+                return 'idle';
+            }
+
+            updatePlayerPosition() {
+                setInterval(() => {
+                    const pseudo = Cookies.get('Pseudo');
+                    if (!pseudo) {
+                        console.error('Pseudo non trouvé dans les cookies');
+                        return;
+                    }
+                    const direction = this.getDirection(); // Obtenez la direction actuelle du joueur
+                    supabase
+                        .from('player_positions')
+                        .upsert({
+                            pseudo: pseudo,
+                            place: currentScene,
+                            x: this.player.x,
+                            y: this.player.y,
+                            direction: direction, // Ajoutez la direction
+                            last_updated: new Date().toISOString()
+                        }, {onConflict: 'pseudo'})
+                        .then(({data, error}) => {
+                            if (error) {
+                                console.error('Erreur lors de la mise à jour de la position:', error);
+                            } else {
+                                console.log('Position mise à jour avec succès');
+                            }
+                        });
+                }, POSITION_UPDATE_INTERVAL);
+            }
+
+
+            subscribeToPlayerUpdates() {
+                const channel = supabase
+                    .channel('player_positions')
+                    .on(
+                        'postgres_changes',
+                        {
+                            event: '*',
+                            schema: 'public',
+                            table: 'player_positions'
+                        },
+                        (payload) => {
+                            if ((payload.eventType === 'INSERT' || payload.eventType === 'UPDATE') && payload.new.place === currentScene) { // Vérifiez si la scène est la même
+                                this.updateOtherPlayer(payload.new);
+                            }
+                        }
+                    )
+                    .subscribe();
+
+                // Stockez la référence du canal pour pouvoir le fermer plus tard si nécessaire
+                this.playerPositionsChannel = channel;
+            }
+
+
+            updateOtherPlayer(playerData) {
+                if (playerData.pseudo === Cookies.get('Pseudo') || playerData.place !== currentScene) return; // Ignorer le joueur actuel ou si la scène est différente
+
+                if (!this.otherPlayers[playerData.pseudo]) {
+                    // Créer un nouveau sprite pour le joueur
+                    const playerSprite = this.add.sprite(playerData.x, playerData.y, 'character');
+
+                    // Ajouter le texte du pseudo au-dessus du sprite
+                    const playerText = this.add.text(playerData.x, playerData.y - 20, playerData.pseudo, {
+                        font: '18px Arial',
+                        fill: '#1d2e52',
+                        align: 'center'
+                    });
+                    playerText.setOrigin(0.5, 0.5); // Centrer le texte
+
+                    // Stocker à la fois le sprite et le texte
+                    this.otherPlayers[playerData.pseudo] = {
+                        sprite: playerSprite,
+                        text: playerText,
+                        targetX: playerData.x,
+                        targetY: playerData.y
+                    };
+                } else {
+                    // Mettre à jour la position cible du joueur existant et de son texte
+                    this.otherPlayers[playerData.pseudo].targetX = playerData.x;
+                    this.otherPlayers[playerData.pseudo].targetY = playerData.y;
+                }
+
+                // Mettre à jour l'animation en fonction de la direction
+                const player = this.otherPlayers[playerData.pseudo].sprite;
+                if (player && player.anims) {
+                    switch (playerData.direction) {
+                        case 'up':
+                            player.anims.play('up', true);
+                            break;
+                        case 'down':
+                            player.anims.play('down', true);
+                            break;
+                        case 'left':
+                            player.anims.play('left', true);
+                            break;
+                        case 'right':
+                            player.anims.play('right', true);
+                            break;
+                        default:
+                            player.anims.stop();
+                            player.setTexture('character', 5); // Réinitialise la texture du joueur à une position neutre
+                            break;
+                    }
+                }
+            }
+
+
+            interpolateOtherPlayers() {
+                const interpolationFactor = 0.1; // Ajustez cette valeur pour un lissage plus ou moins rapide
+                Object.values(this.otherPlayers).forEach(player => {
+                    const {sprite, text, targetX, targetY} = player;
+                    sprite.x += (targetX - sprite.x) * interpolationFactor;
+                    sprite.y += (targetY - sprite.y) * interpolationFactor;
+                    text.x = sprite.x;
+                    text.y = sprite.y - 20;
+                });
             }
         }
 
@@ -201,7 +331,48 @@ function Scene() {
         };
     }, [currentScene]);
 
-    return <div ref={gameContainerRef} />;
+    const handleCharacterChange = (frame) => {
+        // this.player.setTexture('character', frame);
+        setShowPersonalizationModal(false); // Fermer la modal après avoir choisi un personnage
+    };
+
+    const characterImages = [];
+    for (let i = 1; i <= 10; i++) {
+        characterImages.push(`/assets/Perso/perso${i}.png`);
+    }
+
+    return (
+        <div>
+            <div ref={gameContainerRef} />
+            {showPersonalizationModal && (
+                <div className="modal-personalization">
+                    <div className="modal-content-personalization">
+                        <span className="close-personalization" onClick={() => setShowPersonalizationModal(false)}>&times;</span>
+                        <h2>Choisir un style de personnage :</h2>
+                        <div className="character-options">
+                            {characterImages.map((img, index) => (
+                                <img
+                                    key={index}
+                                    style={{
+                                        width: '64px',
+                                        height: '64px',
+                                        background: `url(${img}) -${0}px -${0}px`,
+                                        backgroundSize: 'auto',
+                                        cursor: 'pointer',
+                                    }}
+                                    onClick={() => handleCharacterChange(index + 1)}
+                                />
+                            ))}
+                        </div>
+                    </div>
+                </div>
+            )}
+            <div style={{ display: "flex", justifyContent: "center", marginTop: "20px" }}>
+                <button className="buttonChange" onClick={() => setShowPersonalizationModal(true)}>Style personnage</button>
+            </div>
+        </div>
+    );
+
 }
 
 export default Scene;

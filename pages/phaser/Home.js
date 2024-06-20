@@ -277,7 +277,7 @@ const Home = () => {
                 </div>
                 )
                 <div className="modal" id="modalHelp" style={{display: "none"}}>
-                    <div className="modal-content2">
+                <div className="modal-content2">
                         <div className="modal-content2-bis">
                             <p>Aide</p>
                             <p>blablabla</p>
