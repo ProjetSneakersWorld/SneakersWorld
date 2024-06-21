@@ -265,10 +265,11 @@ const Home = () => {
                                 document.getElementById("inputMessage").blur()
                             }
                         }}>
-                            <GameComponent/>
+                            <div style={{display: "flex"}}>
+                                <GameComponent/>
+                            </div>
                         </div>
-
-                        <Online/>
+                        {/*<Online/>*/}
                     </div>
                     <div className="help"
                          onClick={() => document.getElementById('modalHelp').style.display = "block"}>
