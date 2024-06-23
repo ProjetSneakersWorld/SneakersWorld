@@ -1,98 +1,90 @@
-/* ManageAdmin.module.css */
-.modal {
+.modal-manage-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
     display: flex;
     align-items: center;
     justify-content: center;
-    /*position: relative; !* Ajouté pour la position relative *!*/
+    background-color: rgba(0, 0, 0, 0.7);
+    z-index: 50;
+    backdrop-filter: blur(8px);
 }
 
-.modal-content-manage {
-    max-height: 70%;
-    overflow: auto;
+.modal-manage-content {
+    background-color: #ffffff;
+    padding: 3rem;
+    border-radius: 2rem;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25), 0 4px 6px -2px rgba(0, 0, 0, 0.05), 0 0 0 2px rgba(255, 255, 255, 0.5) inset;
+    width: 80%;
+    max-width: 600px;
+    animation: fadeInScale 0.4s ease-in-out;
     display: flex;
-    padding: 50px;
-    background: #fff;
-    border-radius: 30px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    position: relative;
+    flex-direction: column;
+}
+
+.modal-manage-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid #e2e8f0;
+}
+
+.modal-manage-title {
+    font-size: 2rem;
+    font-weight: 700;
+    color: #1a202c;
+    font-family: 'Poppins', sans-serif;
+}
+
+.modal-manage-body {
+    flex-grow: 1;
+    display: flex;
     flex-direction: column;
     align-items: center;
-}
-
-.modal-content-close {
-    position: absolute;
-    top: -10px;
-    right: -10px;
-    z-index: 10;
-}
-
-.buttonManageClose {
-    background-color: #3498db;
-    color: #fff;
-    border: none;
-    width: 46px;
-    height: 45px;
-    padding: 8px 16px;
-    border-radius: 50%; /* Optionnel : pour rendre le bouton rond */
-    cursor: pointer;
-    line-height: 1; /* Ajuster la hauteur de ligne si nécessaire */
-    font-size: 16px; /* Ajuster la taille de la police si nécessaire */
-}
-
-.buttonManageClose:hover {
-    background-color: #ff0000;
-}
-
-table {
-    width: 100%;
-    border-collapse: collapse;
-    margin-top: 2px;
-}
-
-thead {
-    background-color: #f4f4f4;
-}
-
-th, td {
-    text-align: left;
-    padding: 12px;
-    border-bottom: 1px solid #ddd;
-}
-
-th {
-    color: #333;
-}
-
-tr:hover {
-    background-color: #f5f5f5;
+    justify-content: center;
+    gap: 2rem;
 }
 
 .buttonManage {
-    font-family: "Arial", ui-serif;
-    margin-top: 9px;
-    background-color: #ff4d4f;
-    color: #fff;
+    padding: 1rem 2rem;
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: #ffffff;
+    background-color: #6c63ff;
     border: none;
-    height: 2.5rem;
-    padding: 8px 16px;
-    border-radius: 15px;
+    border-radius: 0.5rem;
     cursor: pointer;
     transition: background-color 0.3s ease;
 }
 
 .buttonManage:hover {
-    background-color: rgba(255, 120, 117, 0.8);
+    background-color: #5a50e6;
 }
 
-.modal-content-close {
-    position: absolute;
-    top: 20px;
-    right: 20px;
+.delete-button {
+    background-color: #ff6b6b;
 }
 
+.delete-button:hover {
+    background-color: #ff4f4f;
+}
 
-.buttonManage.delete-confirm {
-    color: red;
+.close-manage-button {
+    color: #718096;
+    transition: color 0.3s ease, transform 0.3s ease;
+    background-color: transparent;
+    border: none;
+    font-size: 2rem;
+    cursor: pointer;
+}
+
+.close-manage-button:hover {
+    color: #e53e3e;
+    transform: rotate(180deg);
 }
 
 .inputsManage {

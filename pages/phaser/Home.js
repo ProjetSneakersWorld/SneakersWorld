@@ -271,7 +271,7 @@ const Home = () => {
                         {/*<Online/>*/}
                     </div>
                     <div className="help" onClick={() => setIsOpen(true)}>
-                        <img src="/images/aide.png" width="75" height="75" alt=""/>
+                        <img src="/images/aide.png" width="75" height="75" style={{scale: "1.1"}} alt=""/>
                     </div>
                     {isOpen && (
                         <div className="modal-help-overlay">

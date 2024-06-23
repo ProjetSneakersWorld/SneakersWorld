@@ -322,8 +322,8 @@ body {
     cursor: pointer;
     display: block;
     position: absolute;
-    bottom: 15px;
-    right: 15px;
+    bottom: 18px;
+    right: 20px;
 }
 
 .help:hover {

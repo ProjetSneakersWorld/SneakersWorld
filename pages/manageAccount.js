@@ -136,17 +136,17 @@ const ManageAccount = ({ onClose }) => {
     };
 
     return (
-        <div className="modal" id="modalAdmin">
-            <div className="modal-content-manage" style={{padding: "85px", display: "flex"}}>
-                <div>
-                    <button className="buttonManage" onClick={changeEmail}>Change email</button>
-                    <div></div>
-                    <button className="buttonManage" onClick={deleteAccount}>Supprimer mon compte</button>
-                </div>
-                <div className="modal-content-close">
-                    <button className="buttonChat" onClick={onClose}>
-                        X
+        <div className="modal-manage-overlay">
+            <div className="modal-manage-content">
+                <div className="modal-manage-header">
+                    <h2 className="modal-manage-title">Manage Account</h2>
+                    <button className="close-manage-button" onClick={onClose}>
+                        <span>&times;</span>
                     </button>
+                </div>
+                <div className="modal-manage-body">
+                    <button className="buttonManage" onClick={changeEmail}>Changer d'email</button>
+                    <button className="buttonManage delete-button" onClick={deleteAccount}>Supprimer mon compte</button>
                 </div>
             </div>
         </div>

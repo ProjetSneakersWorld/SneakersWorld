@@ -7,6 +7,7 @@ import Cookies from "js-cookie";
 const speed = 250;
 let currentSkin = 1;
 const POSITION_UPDATE_INTERVAL = 200; // Mise à jour toutes les 200ms
+const nbSkin = 12;
 let isMouseDown = false;
 
 function Scene() {
@@ -29,7 +30,7 @@ function Scene() {
             preload() {
                 this.load.image("tiles", "/assets/tileset.png");
                 this.load.tilemapTiledJSON('map', "/assets/othman_map.json");
-                for (let i = 1; i <= 10; i++) {
+                for (let i = 1; i <= nbSkin; i++) {
                     this.load.spritesheet(`character${i}`, `/assets/Perso/perso${i}.png`, { frameWidth: 64, frameHeight: 64 });
                 }
             }
@@ -48,7 +49,7 @@ function Scene() {
                 this.player.setCrop(0, 1, 64, 64); // setCrop(x, y, width, height)
 
                 // Créer les animations pour chaque personnage
-                for (let i = 1; i <= 10; i++) {
+                for (let i = 1; i <= nbSkin; i++) {
                     this.anims.create({
                         key: `down${i}`,
                         frames: this.anims.generateFrameNumbers(`character${i}`, { frames: [0, 1, 2, 3]}),
@@ -397,7 +398,7 @@ function Scene() {
     }, [currentScene]);
 
     const characterImages = [];
-    for (let i = 1; i <= 10; i++) {
+    for (let i = 1; i <= nbSkin; i++) {
         characterImages.push(`/assets/Perso/perso${i}.png`);
     }
 
@@ -413,25 +414,39 @@ function Scene() {
         <div>
             <div id="gameContainer" ref={gameContainerRef}/>
             {showPersonalizationModal && (
-                <div className="modal-personalization">
-                    <div className="modal-content-personalization">
-                        <span className="close-personalization" onClick={() => setShowPersonalizationModal(false)}>&times;</span>
-                        <h2 style={{fontFamily: "arial", paddingBottom: "25px"}}>Choisir un style de personnage</h2>
-                        <div className="character-options" style={{paddingBottom: "5px"}}>
-                            {characterImages.map((img, index) => (
-                                <img
-                                    key={index}
-                                    style={{
-                                        width: '64px',
-                                        height: '64px',
-                                        background: `url(${img}) -${0}px -${0}px`,
-                                        backgroundSize: 'auto',
-                                        cursor: 'pointer',
-                                    }}
-                                    onClick={() => handleCharacterChange(index + 1)}
-                                    alt=""
-                                />
-                            ))}
+                <div className="modal-personalization-overlay">
+                    <div className="modal-personalization-content">
+                        <div className="modal-personalization-header">
+                            <h2 className="modal-personalization-title">Choisir un style de personnage</h2>
+                            <button className="close-personalization-button" onClick={() => setShowPersonalizationModal(false)}>
+                                <span>&times;</span>
+                            </button>
+                        </div>
+                        <div className="modal-personalization-body">
+                            <div className="character-options">
+                                {characterImages.map((img, index) => (
+                                    <div
+                                        key={index}
+                                        className="character-option"
+                                        onClick={() => handleCharacterChange(index + 1)}
+                                    >
+                                        <div
+                                            className="character-image"
+                                            style={{
+                                                width: '64px',
+                                                height: '64px',
+                                                background: `url(${img}) -${0}px -${0}px`,
+                                                backgroundSize: 'auto',
+                                                cursor: 'pointer',
+                                                display: "flex",
+                                                alignItems: "center",
+                                                justifyContent: "center",
+
+                                            }}
+                                        ></div>
+                                    </div>
+                                ))}
+                            </div>
                         </div>
                     </div>
                 </div>
