@@ -17,6 +17,9 @@ const ManageAccount = ({ onClose }) => {
             inputLabel: 'Entrez votre nouvelle adresse email',
             inputPlaceholder: 'Nouvelle adresse email',
             showCancelButton: true,
+            customClass: {
+                popup: 'my-swal-style',
+            },
             inputValidator: (value) => {
                 if (!value) {
                     return 'Vous devez écrire quelque chose !';
