@@ -9,15 +9,14 @@ import Chat from "../componentHome/chat"
 import {GameContext} from '../../src/GameContext';
 import ManageAdmin from "../manageAdmin";
 import ManageAccount from "../manageAccount";
-import Online from "../componentHome/online";
 import moment from "moment-timezone";
-import { supabase } from '../api/supabaseClient'
+import {supabase} from '../api/supabaseClient'
 
 const Home = () => {
     const [isToken, setIsToken] = useState(false);
     const router = useRouter();
     const {currentScene, setCurrentScene} = useContext(GameContext);
-
+    const [isOpen, setIsOpen] = useState(false);
     // console.log(currentScene);
     // if (currentScene === "Scene") {
     //     console.log("Scene")
@@ -165,7 +164,7 @@ const Home = () => {
 
     const updateDateOnline = async () => {
         try {
-            const { error } = await supabase
+            const {error} = await supabase
                 .from("connexion")
                 .update({
                     isOnline: moment().tz("Europe/Paris").format(),
@@ -271,14 +270,50 @@ const Home = () => {
                         </div>
                         {/*<Online/>*/}
                     </div>
-                    <div className="help"
-                         onClick={() => document.getElementById('modalHelp').style.display = "block"}>
+                    <div className="help" onClick={() => setIsOpen(true)}>
                         <img src="/images/aide.png" width="75" height="75" alt=""/>
                     </div>
+                    {isOpen && (
+                        <div className="modal-help-overlay">
+                            <div className="modal-help-content"> {/* Changement ici */}
+                                <div className="modal-help-header">
+                                    <h2 className="modal-help-title">Bienvenue sur Sneakers World</h2>
+                                    <button className="close-help-button" onClick={() => setIsOpen(false)}>
+                                        <span>&times;</span>
+                                    </button>
+                                </div>
+                                <div className="modal-help-body">
+                                    <p>
+                                        Sneakers World est un espace dédié aux passionnés de sneakers. Rejoignez notre
+                                        communauté pour partager votre
+                                        passion dans un environnement convivial.
+                                    </p>
+                                    <Section title="Navigation et Interaction">
+                                        <li>Utilisez les touches fléchées de votre clavier (haut, bas, droite, gauche) pour vous déplacer.</li>
+                                        <li>Réduisez la map avec la souris. Cliquez et faites glisser pour la déplacer.</li>
+                                        <li>Changez de pièce en entrant dans une maison indiquant une pièce spécifique.</li>
+                                    </Section>
+                                    <Section title="Fonctionnalités de Chat">
+                                        <li>Discutez en temps réel avec les utilisateurs connectés.</li>
+                                        <li>Ajoutez des réactions aux messages parmi celles disponibles.</li>
+                                        <li>Recevez une notification lors de la connexion d'un nouveau joueur.</li>
+                                        <li>Visualisez les joueurs présents dans la même pièce sur la map.</li>
+                                    </Section>
+                                    <Section title="Personnalisation et Gestion de Compte">
+                                        <li>Personnalisez l'apparence de votre personnage avec le bouton en bas de la map.</li>
+                                        <li>Depuis votre avatar, changez votre email ou supprimez votre compte.</li>
+                                    </Section>
+                                    <p className="modal-footer-text">
+                                        Explorez, discutez et partagez votre passion pour les sneakers dans cet espace unique !
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    )}
                 </div>
                 )
                 <div className="modal" id="modalHelp" style={{display: "none"}}>
-                <div className="modal-content2">
+                    <div className="modal-content2">
                         <div className="modal-content2-bis">
                             <p>Aide</p>
                             <p>blablabla</p>
@@ -300,6 +335,13 @@ const Home = () => {
             </div>);
     }
 };
+
+const Section = ({ title, children }) => (
+    <div className="section-help">
+        <h3 className="section-help-title">{title}</h3>
+        <ul className="section-help-list">{children}</ul>
+    </div>
+);
 
 export default Home;
 

@@ -366,8 +366,8 @@ function Scene() {
         const config = {
             type: Phaser.AUTO,
             parent: gameContainerRef.current,
-            width: window.innerWidth - 700,
-            height: window.innerHeight - 260,
+            width: window.innerWidth - 500,
+            height: window.innerHeight - 240,
             scene: [SceneMain],
             audio: {
                 disableWebAudio: true,
@@ -411,7 +411,7 @@ function Scene() {
 
     return (
         <div>
-            <div ref={gameContainerRef} />
+            <div id="gameContainer" ref={gameContainerRef}/>
             {showPersonalizationModal && (
                 <div className="modal-personalization">
                     <div className="modal-content-personalization">
@@ -436,7 +436,7 @@ function Scene() {
                     </div>
                 </div>
             )}
-            <div style={{ display: "flex", justifyContent: "center", marginTop: "20px" }}>
+            <div style={{ display: "flex", justifyContent: "center", marginTop: "10px" }}>
                 <button className="buttonChange" onClick={() => setShowPersonalizationModal(true)}>Style personnage</button>
             </div>
         </div>
