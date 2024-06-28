@@ -93,7 +93,7 @@ const chat = (place) => {
                 return;
             }
 
-            if(!document.getElementById("messageVideP")){
+            if (!document.getElementById("messageVideP")) {
                 if (results.length === 0) {
                     messageContainer.className = "messageVide";
                     const messageVideP = document.createElement("p");
@@ -361,9 +361,6 @@ const chat = (place) => {
             } else {
                 setIsSendMessage(true);
                 setIsLoading(true);
-                if (document.getElementById('messageVideP')) {
-                    document.getElementById('messageVideP').remove();
-                }
                 try {
                     await supabase
                         .from('message')
@@ -374,6 +371,9 @@ const chat = (place) => {
                             place: place.place
                         },])
                         .select()
+                    if (document.getElementById('messageVideP')) {
+                        document.getElementById('messageVideP').remove();
+                    }
                 } catch (error) {
                     console.error("Une erreur s'est produite lors de la récupération des données :", error);
                 }

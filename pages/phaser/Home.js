@@ -236,7 +236,7 @@ const Home = () => {
                                 <div className="buttonProfil" onMouseEnter={() => setIsOpenDropdown(true)}
                                      onMouseLeave={() => setIsOpenDropdown(false)}>
                                     {isLoadAvatar ? Rolling(50, 50, "#000000") :
-                                        <img src={avatarSrc} width="50" height="50" alt=""/>}
+                                        <img src={avatarSrc} width="50" height="50" alt="Avatar"/>}
                                     {isOpenDropdown && (
                                         <div className="dropdownMenu">
                                             <a className="item" onClick={() => setCurrentScene('home')}>Home</a>
@@ -277,8 +277,8 @@ const Home = () => {
                         <div className="modal-help-overlay">
                             <div className="modal-help-content"> {/* Changement ici */}
                                 <div className="modal-help-header">
-                                    <h2 className="modal-help-title">Bienvenue sur Sneakers World</h2>
-                                    <button className="close-help-button" onClick={() => setIsOpen(false)}>
+                                    <h2 className="modal-help-title">Bienvenue dans Sneakers World</h2>
+                                    <button className="close-manage-button" onClick={() => setIsOpen(false)}>
                                         <span>&times;</span>
                                     </button>
                                 </div>
@@ -312,26 +312,6 @@ const Home = () => {
                     )}
                 </div>
                 )
-                <div className="modal" id="modalHelp" style={{display: "none"}}>
-                    <div className="modal-content2">
-                        <div className="modal-content2-bis">
-                            <p>Aide</p>
-                            <p>blablabla</p>
-                            <div style={{display: "flex"}}>
-                                <img src="/images/up.png" width="75" height="75" alt=""/>
-                                <img src="/images/up.png" width="75" height="75" alt="" style={{rotate: '180deg'}}/>
-                                <img src="/images/up.png" width="75" height="75" alt="" style={{rotate: '90deg'}}/>
-                                <img src="/images/up.png" width="75" height="75" alt="" style={{rotate: '270deg'}}/>
-                            </div>
-                        </div>
-                        <div className="modal-content-close">
-                            <button className="buttonChat"
-                                    onClick={() => document.getElementById('modalHelp').style.display = "none"}>
-                                X
-                            </button>
-                        </div>
-                    </div>
-                </div>
             </div>);
     }
 };

@@ -51,23 +51,9 @@
     font-family: 'Poppins', sans-serif;
 }
 
-.close-personalization-button {
-    color: #718096;
-    transition: color 0.3s ease, transform 0.3s ease;
-    background-color: transparent;
-    border: none;
-    font-size: 2rem;
-    cursor: pointer;
-}
-
-.close-personalization-button:hover {
-    color: #e53e3e;
-    transform: rotate(180deg);
-}
-
 .modal-personalization-body {
     overflow-y: auto;
-    padding-right: 1.5rem;
+    padding: 2rem 1.5rem 2rem 2rem;
 }
 
 .character-options {

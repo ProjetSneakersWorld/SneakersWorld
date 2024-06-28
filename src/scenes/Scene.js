@@ -418,7 +418,7 @@ function Scene() {
                     <div className="modal-personalization-content">
                         <div className="modal-personalization-header">
                             <h2 className="modal-personalization-title">Choisir un style de personnage</h2>
-                            <button className="close-personalization-button" onClick={() => setShowPersonalizationModal(false)}>
+                            <button className="close-manage-button" onClick={() => setShowPersonalizationModal(false)}>
                                 <span>&times;</span>
                             </button>
                         </div>

@@ -18,7 +18,11 @@ const ManageAccount = ({ onClose }) => {
             inputPlaceholder: 'Nouvelle adresse email',
             showCancelButton: true,
             customClass: {
-                popup: 'my-swal-style',
+                popup: 'my-swal-style arial-text-modal',
+                title: 'arial-text-modal',
+                content: 'arial-text-modal',
+                confirmButton: 'arial-text-modal',
+                cancelButton: 'arial-text-modal'
             },
             inputValidator: (value) => {
                 if (!value) {
